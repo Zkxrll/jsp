@@ -34,10 +34,6 @@ export default function HomePage() {
           <GetKeyButton />
         </div>
 
-        <div className="animate-rise" style={{ animationDelay: "220ms" }}>
-          <TimelineStrip />
-        </div>
-
         <dl
           className="animate-rise grid grid-cols-1 gap-x-10 gap-y-4 text-sm text-ink-muted sm:grid-cols-3"
           style={{ animationDelay: "320ms" }}
