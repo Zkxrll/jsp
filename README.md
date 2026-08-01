@@ -1,7 +1,7 @@
-# rFrame Animator — landing page
+Zkx Hub — landing page
 
 A key-gateway landing page: visitors land here, see the product, click
-**Get Key**, and get redirected to wherever your key/license system
+**Get Key**, and get redirected to wherever your key system
 lives. Built to be edited by one person in one file for the common
 changes (branding, redirect URL, links) and to grow into more pages
 without a rewrite.
