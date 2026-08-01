@@ -16,17 +16,17 @@ function readStatus(value: string | undefined): ServiceStatus {
 
 export const siteConfig = {
   /** Shown in the header, hero, footer, and <title>. */
-  name: "rFrame Animator",
+  name: "Zkx Hub",
 
   /** One line. Used in the hero subheading and as a metadata fallback. */
-  tagline: "The animation editor Roblox Studio should have shipped with.",
+  tagline: "The one Rivals script every exploiters need.",
 
   /** Longer form — used for the SEO meta description and OpenGraph. */
   description:
-    "rFrame Animator brings a curve-based keyframe editor and bone-accurate IK to Roblox Studio. Install free from the Creator Store, then grab a key to unlock the full toolset.",
+    "Zkx Hub gives you access to one of the most advanced free Rivals script.",
 
   /** Canonical production URL. Update once a custom domain is attached. */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://rframe-animator.vercel.app",
+  url: process.env.zkxhub.vercel.app ?? "https://rframe-animator.vercel.app",
 
   /**
    * Destination for the "Get Key" button. Required in production — the
@@ -35,12 +35,11 @@ export const siteConfig = {
    * in Vercel's environment variables) any time; no other file needs
    * to change.
    */
-  keySystemUrl: process.env.NEXT_PUBLIC_KEY_SYSTEM_URL ?? "",
+  keySystemUrl: process.env.jnkie.com/get-key/zkxhub ?? "",
 
   /** Optional support / community links. Empty string hides the link. */
   links: {
-    discord: process.env.NEXT_PUBLIC_DISCORD_URL ?? "",
-    docs: process.env.NEXT_PUBLIC_DOCS_URL ?? "",
+    discord: process.env.discord.com/invite/bxu2WMjNjN ?? "",
   },
 
   /** Drives the header status pill and the /status page. */
