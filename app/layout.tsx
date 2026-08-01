@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { siteConfig } from "@/lib/config";
+import Script from "next/script";
 import "./globals.css";
+
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -64,7 +66,16 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="min-h-dvh antialiased">
+  {children}
+
+  <Script
+    src="https://quge5.com/88/tag.min.js"
+    data-zone="266006"
+    strategy="afterInteractive"
+    data-cfasync="false"
+  />
+</body>
     </html>
   );
 }
