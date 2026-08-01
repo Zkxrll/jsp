@@ -1,8 +1,8 @@
 {
-  "name": "rframe-animator-landing",
+  "name": "Zkx-Hub-landing",
   "version": "1.0.0",
   "private": true,
-  "description": "Landing page and key-system gateway for rFrame Animator",
+  "description": "Landing page and key-system gateway for Zkx Hub",
   "engines": {
     "node": ">=20.9.0"
   },
