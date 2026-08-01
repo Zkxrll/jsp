@@ -31,6 +31,7 @@ export const metadata: Metadata = {
 
   other: {
     "admaven-placement": "BqHw6rdCE",
+    "monetag": "56c5ac3660d10332ebc79bc7b9892566",
   },
   openGraph: {
     title: siteConfig.name,
