@@ -28,6 +28,10 @@ export const metadata: Metadata = {
     template: `%s — ${siteConfig.name}`,
   },
   description: siteConfig.description,
+
+  other: {
+    "admaven-placement": "BqHw6rdCE",
+  },
   openGraph: {
     title: siteConfig.name,
     description: siteConfig.description,
