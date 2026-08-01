@@ -23,6 +23,10 @@ export const siteConfig = {
     discord:
       process.env.NEXT_PUBLIC_DISCORD_URL ??
       "https://discord.com/invite/bxu2WMjNjN",
+
+  docs:
+    process.env.NEXT_PUBLIC_DOCS_URL ??
+    "",
   },
 
   status: readStatus(process.env.NEXT_PUBLIC_SERVICE_STATUS),
