@@ -1,7 +1,6 @@
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { GetKeyButton } from "@/components/get-key-button";
-import { TimelineStrip } from "@/components/timeline-strip";
 import { siteConfig } from "@/lib/config";
 
 const FEATURES = [
