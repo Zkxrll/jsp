@@ -5,9 +5,9 @@ import { TimelineStrip } from "@/components/timeline-strip";
 import { siteConfig } from "@/lib/config";
 
 const FEATURES = [
-  { label: "Editor", value: "Curve-based keyframing" },
-  { label: "Rigging", value: "Bone-accurate IK" },
-  { label: "Install", value: "Free on the Creator Store" },
+  { label: "Aimbot", value: "Highly configurable aiming system with smooth target tracking, intelligent prioritization, and extensive customization options." },
+  { label: "ESP", value: "Clean and optimized visuals with support for customizable indicators, colors, and display settings. Built to stay simple while giving you full control over what is shown." },
+  { label: "[Partial] UnlockALL", value: "Get access to every cosmetics available in the game, even admin reserved ones." },
 ] as const;
 
 export default function HomePage() {
