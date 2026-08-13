@@ -1,78 +1,204 @@
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { GetKeyButton } from "@/components/get-key-button";
 import { siteConfig } from "@/lib/config";
 
 const FEATURES = [
-  { label: "Aimbot", value: "Highly configurable aiming system with smooth target tracking, intelligent prioritization, and extensive customization options." },
-  { label: "ESP", value: "Clean and optimized visuals with support for customizable indicators, colors, and display settings. Built to stay simple while giving you full control over what is shown." },
-  { label: "[Partial] UnlockALL", value: "Get access to every cosmetics available in the game, even admin reserved ones." },
+  {
+    label: "Aimbot",
+    title: "Precision targeting",
+    description:
+      "Smooth target tracking with configurable prioritization and responsive aiming controls.",
+    icon: "⌁",
+  },
+  {
+    label: "ESP",
+    title: "See everything",
+    description:
+      "Clean visual indicators with customizable information so you always know what is around you.",
+    icon: "◈",
+  },
+  {
+    label: "UnlockALL",
+    title: "Full access",
+    description:
+      "Access available cosmetics, including content normally reserved for administrators.",
+    icon: "✦",
+  },
 ] as const;
 
 export default function HomePage() {
   return (
-    <div className="relative flex min-h-dvh flex-col overflow-hidden">
-      <div
-        className="decorative-grid animate-drift pointer-events-none absolute inset-0 opacity-40"
-        aria-hidden="true"
-      />
-      <div className="decorative-glow pointer-events-none absolute inset-0" aria-hidden="true" />
+    <div className="site-shell relative min-h-dvh overflow-hidden">
+      <div className="ambient ambient-one" aria-hidden="true" />
+      <div className="ambient ambient-two" aria-hidden="true" />
+      <div className="ambient ambient-three" aria-hidden="true" />
+
+      <div className="grid-overlay" aria-hidden="true" />
+      <div className="noise-overlay" aria-hidden="true" />
 
       <SiteHeader />
 
-      <main className="relative z-10 flex flex-1 flex-col items-center justify-center gap-10 px-6 py-16 text-center">
-        <div className="animate-rise flex flex-col items-center gap-5">
-          <h1 className="max-w-2xl font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl md:text-6xl">
-            {siteConfig.name}
-          </h1>
-          <p className="max-w-lg text-balance text-base text-ink-muted sm:text-lg">
-            {siteConfig.tagline}
-          </p>
-        </div>
+      <main className="relative z-10">
+        <section className="mx-auto flex min-h-[calc(100dvh-96px)] max-w-7xl flex-col items-center justify-center px-6 pb-20 pt-16 text-center sm:px-10 lg:pt-10">
+          <div className="hero-badge animate-rise">
+            <span className="status-dot" />
+            <span>Premium-ready script hub</span>
+            <span className="hero-badge-arrow">↗</span>
+          </div>
 
-        <div className="animate-rise" style={{ animationDelay: "120ms" }}>
-          <GetKeyButton />
-        </div>
+          <div
+            className="mt-8 animate-rise"
+            style={{ animationDelay: "80ms" }}
+          >
+            <p className="eyebrow">ZKX HUB</p>
 
-        <a
-          href="https://zkx.mysellauth.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="animate-rise group w-full max-w-md rounded-2xl border border-keyframe/30 bg-surface/80 p-6 text-left shadow-[0_0_40px_-20px_var(--color-keyframe)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-keyframe/60 hover:shadow-[0_0_50px_-12px_var(--color-keyframe)]"
-          style={{ animationDelay: "220ms" }}
-        >
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="mb-1 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-keyframe">
-                Premium
+            <h1 className="hero-title mt-4">
+              Play smarter.
+              <br />
+              <span>Play different.</span>
+            </h1>
+
+            <p className="hero-description mx-auto mt-6 max-w-2xl">
+              {siteConfig.tagline} Built with a clean interface, smooth
+              interactions, and everything you need in one place.
+            </p>
+          </div>
+
+          <div
+            className="mt-10 flex flex-col items-center gap-4 sm:flex-row animate-rise"
+            style={{ animationDelay: "160ms" }}
+          >
+            <div className="hero-cta">
+              <GetKeyButton />
+            </div>
+
+            <Link
+              href="https://zkx.mysellauth.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="premium-button"
+            >
+              <span className="premium-button-glow" />
+              <span className="premium-button-content">
+                <span className="premium-icon">✦</span>
+                <span>
+                  <strong>Lifetime Premium</strong>
+                  <small>One-time purchase</small>
+                </span>
+                <span className="premium-arrow">→</span>
+              </span>
+            </Link>
+          </div>
+
+          <div
+            className="hero-stats animate-rise"
+            style={{ animationDelay: "240ms" }}
+          >
+            <div className="hero-stat">
+              <span className="hero-stat-value">03</span>
+              <span className="hero-stat-label">Core features</span>
+            </div>
+
+            <div className="hero-stat-divider" />
+
+            <div className="hero-stat">
+              <span className="hero-stat-value">24/7</span>
+              <span className="hero-stat-label">Access</span>
+            </div>
+
+            <div className="hero-stat-divider" />
+
+            <div className="hero-stat">
+              <span className="hero-stat-value">∞</span>
+              <span className="hero-stat-label">Premium lifetime</span>
+            </div>
+          </div>
+
+          <section
+            className="mt-20 w-full max-w-6xl animate-rise"
+            style={{ animationDelay: "320ms" }}
+          >
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow text-left">FEATURES</p>
+                <h2 className="section-title text-left">
+                  Everything you need.
+                </h2>
               </div>
-              <h2 className="font-display text-xl font-semibold text-ink sm:text-2xl">
-                Get a Lifetime Premium Key
-              </h2>
-              <p className="mt-2 text-sm text-ink-muted">
-                Unlock Premium access permanently with a one-time purchase.
+
+              <p className="section-description hidden max-w-sm text-right md:block">
+                Designed to stay clean, fast, and easy to use without covering
+                the screen in unnecessary clutter.
               </p>
             </div>
-        
-            <span className="shrink-0 rounded-lg bg-keyframe px-4 py-2 font-display text-sm font-semibold text-bg transition-transform duration-200 group-hover:scale-105">
-              Buy Now
-            </span>
-          </div>
-        </a>
 
-        <dl
-          className="animate-rise grid grid-cols-1 gap-x-10 gap-y-4 text-sm text-ink-muted sm:grid-cols-3"
-          style={{ animationDelay: "320ms" }}
-        >
-          {FEATURES.map((feature) => (
-            <div key={feature.label} className="flex flex-col items-center gap-1">
-              <dt className="font-mono text-xs uppercase tracking-widest text-keyframe">
-                {feature.label}
-              </dt>
-              <dd>{feature.value}</dd>
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {FEATURES.map((feature, index) => (
+                <article
+                  key={feature.label}
+                  className="feature-card group"
+                  style={{
+                    animationDelay: `${360 + index * 80}ms`,
+                  }}
+                >
+                  <div className="feature-card-shine" />
+
+                  <div className="feature-icon">{feature.icon}</div>
+
+                  <p className="feature-label">{feature.label}</p>
+                  <h3 className="feature-title">{feature.title}</h3>
+
+                  <p className="feature-description">
+                    {feature.description}
+                  </p>
+
+                  <div className="feature-footer">
+                    <span>Explore</span>
+                    <span className="feature-arrow">↗</span>
+                  </div>
+                </article>
+              ))}
             </div>
-          ))}
-        </dl>
+          </section>
+
+          <section
+            className="premium-panel animate-rise"
+            style={{ animationDelay: "440ms" }}
+          >
+            <div className="premium-panel-background" />
+            <div className="premium-panel-content">
+              <div>
+                <div className="premium-label">
+                  <span>✦</span>
+                  PREMIUM
+                </div>
+
+                <h2 className="premium-title">
+                  One key.
+                  <br />
+                  <span>Lifetime access.</span>
+                </h2>
+
+                <p className="premium-description">
+                  Skip the hassle and unlock Premium permanently with a single
+                  purchase.
+                </p>
+              </div>
+
+              <Link
+                href="https://zkx.mysellauth.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="premium-panel-button"
+              >
+                Get Premium
+                <span>↗</span>
+              </Link>
+            </div>
+          </section>
+        </section>
       </main>
 
       <SiteFooter />
