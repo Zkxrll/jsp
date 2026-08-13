@@ -6,6 +6,7 @@ import { GetKeyButton } from "@/components/get-key-button";
 import { FAQ } from "@/components/faq";
 import { CursorGlow } from "@/components/cursor-glow";
 import { siteConfig } from "@/lib/config";
+import { CopyDiscordButton } from "@/components/copy-discord-button";
 
 const FEATURES = [
   {
