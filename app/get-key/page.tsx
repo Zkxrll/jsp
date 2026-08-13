@@ -98,14 +98,12 @@ export default function GetKeyPage() {
               onClick={startVerification}
               className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-[#5865F2]/30 bg-[#5865F2]/10 px-5 py-4 font-display text-sm font-semibold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:border-[#5865F2]/60 hover:bg-[#5865F2]/15"
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 shrink-0 text-[#7289da]"
-                fill="currentColor"
+              <span
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#5865F2] text-[11px] font-bold text-white"
                 aria-hidden="true"
               >
-                <path d="M19.54 5.16a16.94 16.94 0 0 0-4.16-1.3l-.5 1.03a15.12 15.12 0 0 0-5.76 0l-.5-1.03a16.94 16.94 0 0 0-4.16 1.3C2.2 8.15 1.5 11.1 1.77 14.01c1.27.95 2.5 1.53 3.7 1.9l.9-1.22a8.84 8.84 0 0 1-1.4-.67l.35-.26c2.77 1.3 5.76 1.95 8.68 1.95s5.91-.65 8.68-1.95l.35.26c-.45.26-.92.48-1.4.67l.9 1.22c1.2-.37 2.43-.95 3.7-1.9.27-2.91-.43-5.86-2.23-8.85ZM8.36 12.88c-.85 0-1.54-.77-1.54-1.71s.68-1.72 1.54-1.72 1.54.77 1.54 1.72-.69 1.71-1.54 1.71Zm7.28 0c-.85 0-1.54-.77-1.54-1.71s.68-1.72 1.54-1.72 1.54.77 1.54 1.72-.69 1.71-1.54 1.71Z" />
-              </svg>
+                D
+              </span>
 
               Join the Zkx Hub Discord
             </a>
