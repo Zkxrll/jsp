@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 
 type ButtonState = "idle" | "loading" | "error";
 
-const REDIRECT_DELAY_MS = 200;
+const REDIRECT_DELAY_MS = 250;
 
 export function GetKeyButton() {
   const [state, setState] = useState<ButtonState>("idle");
@@ -24,7 +24,6 @@ export function GetKeyButton() {
     }
 
     setState("loading");
-
     track({ name: "get_key_clicked" });
 
     window.setTimeout(() => {
@@ -51,8 +50,7 @@ export function GetKeyButton() {
         </button>
 
         <p className="max-w-xs text-center text-xs text-ink-muted">
-          NEXT_PUBLIC_KEY_SYSTEM_URL isn&apos;t set. Add it in your environment
-          and redeploy.
+          NEXT_PUBLIC_KEY_SYSTEM_URL isn&apos;t configured.
         </p>
       </div>
     );
@@ -65,7 +63,7 @@ export function GetKeyButton() {
       disabled={state === "loading"}
       aria-live="polite"
       aria-busy={state === "loading"}
-      className="group relative inline-flex items-center gap-2.5 rounded-xl bg-keyframe px-8 py-4 font-display text-base font-semibold text-bg transition-all duration-200 hover:bg-keyframe-strong hover:shadow-[0_0_40px_-8px_var(--color-keyframe)] active:scale-[0.98] disabled:cursor-wait disabled:opacity-80"
+      className="group relative inline-flex min-w-[150px] items-center justify-center gap-2.5 rounded-xl bg-keyframe px-8 py-4 font-display text-base font-semibold text-bg transition-all duration-200 hover:-translate-y-0.5 hover:bg-keyframe-strong hover:shadow-[0_0_32px_-10px_var(--color-keyframe)] active:translate-y-0 active:scale-[0.98] disabled:cursor-wait disabled:opacity-80"
     >
       {state === "loading" ? (
         <>
@@ -83,13 +81,14 @@ export function GetKeyButton() {
               stroke="currentColor"
               strokeWidth="3"
             />
+
             <path
-              className="opacity-90"
               fill="currentColor"
               d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4Z"
             />
           </svg>
-          Opening key page…
+
+          Opening…
         </>
       ) : (
         <>
@@ -106,6 +105,7 @@ export function GetKeyButton() {
               stroke="currentColor"
               strokeWidth="1.8"
             />
+
             <path
               d="M11 11l8 8M16 16l2.5 2.5M19 13l2.5 2.5"
               stroke="currentColor"
@@ -113,6 +113,7 @@ export function GetKeyButton() {
               strokeLinecap="round"
             />
           </svg>
+
           Get Key
         </>
       )}
