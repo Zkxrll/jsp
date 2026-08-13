@@ -2,46 +2,71 @@
 
 import { useEffect, useState } from "react";
 
-function checkAdBlock(): boolean {
-  const bait = document.createElement("div");
-
-  bait.className =
-    "ad advertisement adsbox ad-banner ad-container pub_300x250 text-ad";
-  bait.setAttribute("aria-hidden", "true");
-
-  bait.style.position = "absolute";
-  bait.style.left = "-10000px";
-  bait.style.top = "-10000px";
-  bait.style.width = "1px";
-  bait.style.height = "1px";
-  bait.style.pointerEvents = "none";
-
-  document.body.appendChild(bait);
-
-  const blocked =
-    bait.offsetParent === null ||
-    bait.offsetHeight === 0 ||
-    bait.offsetWidth === 0;
-
-  bait.remove();
-
-  return blocked;
-}
-
 export function AdBlockGate() {
-  const [checking, setChecking] = useState(true);
   const [blocked, setBlocked] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const runCheck = () => {
-      const result = checkAdBlock();
+    const checkAdBlock = () => {
+      const script = document.getElementById("monetag-ad");
 
-      setBlocked(result);
-      setChecking(false);
+      // If the script hasn't even been created yet, wait a little longer.
+      if (!script) {
+        setTimeout(checkAdBlock, 1000);
+        return;
+      }
+
+      let finished = false;
+
+      const fail = () => {
+        if (finished) return;
+        finished = true;
+        setBlocked(true);
+        setChecking(false);
+      };
+
+      const success = () => {
+        if (finished) return;
+        finished = true;
+        setBlocked(false);
+        setChecking(false);
+      };
+
+      script.addEventListener("error", fail, { once: true });
+      script.addEventListener("load", success, { once: true });
+
+      // Brave/ad blockers can silently prevent a script from loading,
+      // so don't wait forever.
+      setTimeout(() => {
+        if (finished) return;
+
+        // Check whether the script finished loading.
+        if (script instanceof HTMLScriptElement && script.src) {
+          // If the browser didn't load it, treat it as blocked.
+          const scripts = Array.from(document.scripts);
+          const monetagScript = scripts.find((s) =>
+            s.src.includes("quge5.com/88/tag.min.js")
+          );
+
+          if (!monetagScript) {
+            fail();
+            return;
+          }
+
+          // The script element exists, but we need one more check.
+          // If the ad provider hasn't initialized after this delay,
+          // assume it was blocked.
+          fail();
+        }
+      }, 3000);
+
+      return () => {
+        script.removeEventListener("error", fail);
+        script.removeEventListener("load", success);
+      };
     };
 
-    // Let the ad scripts/content finish initializing first.
-    const timer = window.setTimeout(runCheck, 1200);
+    const timer = window.setTimeout(checkAdBlock, 1500);
 
     return () => window.clearTimeout(timer);
   }, []);
@@ -54,45 +79,28 @@ export function AdBlockGate() {
     <div
       role="alertdialog"
       aria-modal="true"
-      aria-labelledby="adblock-title"
-      className="fixed inset-0 z-[99999] flex min-h-screen items-center justify-center bg-[#05070b]/95 px-6 backdrop-blur-sm"
+      className="fixed inset-0 z-[99999] flex min-h-screen items-center justify-center bg-[#05070b]/95 px-6"
     >
-      <div className="w-full max-w-md rounded-2xl border border-surface-border bg-surface p-7 text-center shadow-2xl sm:p-9">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-keyframe/20 bg-keyframe/10 text-2xl text-keyframe">
+      <div className="w-full max-w-md rounded-2xl border border-surface-border bg-surface p-8 text-center shadow-2xl">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-keyframe/10 text-2xl text-keyframe">
           ⚠
         </div>
 
         <p className="eyebrow mt-6">ACCESS BLOCKED</p>
 
-        <h1
-          id="adblock-title"
-          className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink"
-        >
+        <h1 className="mt-2 font-display text-3xl font-semibold text-ink">
           Ad blocker detected
         </h1>
 
-        <p className="mt-4 text-sm leading-7 text-ink-muted">
-          Please disable your ad blocker to access Zkx Hub. Our ads help
-          support the project and keep the service available.
+        <p className="mt-4 text-sm leading-6 text-ink-muted">
+          Please disable your ad blocker for Zkx Hub. Ads help support the
+          project and keep the service available.
         </p>
-
-        <div className="mt-6 rounded-xl border border-surface-border bg-bg/70 p-4 text-left">
-          <div className="flex items-center gap-3">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-danger" />
-            <span className="text-sm font-medium text-ink">
-              Ad blocker is active
-            </span>
-          </div>
-
-          <p className="mt-2 text-xs leading-5 text-ink-muted">
-            Disable your ad blocker for this website, then reload the page.
-          </p>
-        </div>
 
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="mt-6 w-full rounded-xl bg-keyframe px-5 py-4 font-display text-sm font-semibold text-bg transition-all duration-200 hover:-translate-y-0.5 hover:bg-keyframe-strong"
+          className="mt-6 w-full rounded-xl bg-keyframe px-5 py-4 font-display text-sm font-semibold text-bg transition hover:bg-keyframe-strong"
         >
           Reload Page
         </button>
