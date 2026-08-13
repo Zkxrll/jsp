@@ -80,6 +80,7 @@ export default function RootLayout({
       </head>
     
       <body className="min-h-dvh antialiased">
+        <AdBlockGate />
         {children}
 
   <Script
