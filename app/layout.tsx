@@ -84,6 +84,7 @@ export default function RootLayout({
         {children}
 
   <Script
+    id="monetag-ad"
     src="https://quge5.com/88/tag.min.js"
     data-zone="266006"
     strategy="lazyOnload"
