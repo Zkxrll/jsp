@@ -72,7 +72,7 @@ export default function RootLayout({
   <Script
     src="https://quge5.com/88/tag.min.js"
     data-zone="266006"
-    strategy="afterInteractive"
+    strategy="lazyOnLoad"
     data-cfasync="false"
   />
 </body>
