@@ -56,10 +56,12 @@ export default function GetKeyPage() {
             <div className="mb-7 flex h-12 w-12 items-center justify-center rounded-xl border border-keyframe/20 bg-keyframe/10 text-keyframe">
               <svg
                 viewBox="0 0 24 24"
-                className="h-6 w-6"
-                fill="none"
+                className="h-5 w-5 shrink-0 text-[#7289da]"
+                fill="currentColor"
                 aria-hidden="true"
               >
+                <path d="M19.54 5.16a16.94 16.94 0 0 0-4.16-1.3l-.5 1.03a15.12 15.12 0 0 0-5.76 0l-.5-1.03a16.94 16.94 0 0 0-4.16 1.3C2.2 8.15 1.5 11.1 1.77 14.01c1.27.95 2.5 1.53 3.7 1.9l.9-1.22a8.84 8.84 0 0 1-1.4-.67l.35-.26c2.77 1.3 5.76 1.95 8.68 1.95s5.91-.65 8.68-1.95l.35.26c-.45.26-.92.48-1.4.67l.9 1.22c1.2-.37 2.43-.95 3.7-1.9.27-2.91-.43-5.86-2.23-8.85ZM8.36 12.88c-.85 0-1.54-.77-1.54-1.71s.68-1.72 1.54-1.72 1.54.77 1.54 1.72-.69 1.71-1.54 1.71Zm7.28 0c-.85 0-1.54-.77-1.54-1.71s.68-1.72 1.54-1.72 1.54.77 1.54 1.72-.69 1.71-1.54 1.71Z" />
+              </svg>
                 <circle
                   cx="8"
                   cy="8"
