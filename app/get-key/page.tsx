@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { siteConfig } from "@/lib/config";
 
-const VERIFY_DURATION = 4500;
+const VERIFY_DURATION = 10000;
 
 export default function GetKeyPage() {
   const [started, setStarted] = useState(false);
