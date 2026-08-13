@@ -52,14 +52,10 @@ export default function HomePage() {
             className="mt-8 animate-rise"
             style={{ animationDelay: "80ms" }}
           >
-            <p className="eyebrow">ZKX HUB</p>
-
-            <h1 className="hero-title mt-4">
-              Play smarter.
-              <br />
-              <span>Play different.</span>
+            <h1 className="hero-title">
+              Zkx Hub
             </h1>
-
+          
             <p className="hero-description mx-auto mt-6 max-w-2xl">
               {siteConfig.tagline} Built with a clean interface, smooth
               interactions, and everything you need in one place.
