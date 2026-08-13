@@ -4,7 +4,6 @@ import { siteConfig } from "@/lib/config";
 import Script from "next/script";
 import "./globals.css";
 import { AdBlockGate } from "@/components/adblock-gate";
-import { AdBlockGate } from "@/components/adblock-gate";
 import { PageTransition } from "@/components/page-transition";
 
 
