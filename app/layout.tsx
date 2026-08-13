@@ -83,15 +83,18 @@ export default function RootLayout({
     
       <body className="min-h-dvh antialiased">
         <AdBlockGate />
-        {children}
-
-  <Script
-    id="monetag-ad"
-    src="https://quge5.com/88/tag.min.js"
-    data-zone="266006"
-    strategy="lazyOnload"
-    data-cfasync="false"
-  />
+      
+        <PageTransition>
+          {children}
+        </PageTransition>
+      
+        <Script
+          id="monetag-ad"
+          src="https://quge5.com/88/tag.min.js"
+          data-zone="266006"
+          strategy="lazyOnload"
+          data-cfasync="false"
+        />
 </body>
     </html>
   );
