@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { siteConfig } from "@/lib/config";
 import Script from "next/script";
 import "./globals.css";
+import { AdBlockGate } from "@/components/adblock-gate";
 
 
 const spaceGrotesk = Space_Grotesk({
