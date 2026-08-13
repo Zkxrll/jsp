@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@scthakuri/adblock-detector": "^1.0.0",
+    "@scthakuri/adblock-detector": "^1.0.10",
     "next": "^16.2.12",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
