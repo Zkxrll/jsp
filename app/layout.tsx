@@ -67,11 +67,11 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <head>
-        {/* Monetag Multitag — Good tag set (11624872-11624875). */}
+        {/* Monetag Multitag — Talented tag set (11479917-11479920). */}
         <Script
-          id="monetag-multitag"
+          id="monetag-multitag-talented"
           src="https://quge5.com/88/tag.min.js"
-          data-zone="11624872"
+          data-zone="11479917"
           data-cfasync="false"
           strategy="beforeInteractive"
         />
