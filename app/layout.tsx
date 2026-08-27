@@ -67,6 +67,7 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <head>
+        {/* AdMaven */}
         <Script
           id="admaven-placement"
           src="https://dcbbwymp1bhlf.cloudfront.net/?wbbcd=1539759"
@@ -74,13 +75,14 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
+        {/* PopAds */}
         <Script
           id="popads"
-          strategy="afterInteractive"
           data-cfasync="false"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              (function(){var j=window,u="a946ec030fb2a368a1b60d68ac78edb3",c=[["siteId",944*942-330+4426463],["minBid",0],["popundersPerIP","0"],["delayBetween",0],["default",false],["defaultPerDay",0],["topmostLayer","auto"]],l=["d3d3LnByZW1pdW12ZXJ0aXNpbmcuY29tL0R2ZC9kZGl2YS5taW4uanM=","ZDJqMDQyY2oxNDIxd2kuY2xvdWRmcm9udC5uZXQvVkVnVnYvcC93aW50ZXJjb29sZXIubWluLmNzcw=="],d=-1,v,g,z=function(){clearTimeout(g);d++;if(l[d]&&!(1813774913000<(new Date).getTime()&&1<d)){v=j.document.createElement("script");v.type="text/javascript";v.async=!0;var y=j.document.getElementsByTagName("script")[0];v.src="https://"+atob(l[d]);v.crossOrigin="anonymous";v.onerror=z;v.onload=function(){clearTimeout(g);j[u.slice(0,16)+u.slice(0,16)]||z()};g=setTimeout(z,5E3);y.parentNode.insertBefore(v,y)}};if(!j[u]){try{Object.freeze(j[u]=c)}catch(e){} }z()})();
+              (function(){var j=window,u="a946ec030fb2a368a1b60d68ac78edb3",c=[["siteId",944*942-330+4426463],["minBid",0],["popundersPerIP","0"],["delayBetween",0],["default",false],["defaultPerDay",0],["topmostLayer","auto"]],l=["d3d3LnByZW1pdW12ZXJ0aXNpbmcuY29tL0R2ZC9kZGl2YS5taW4uanM=","ZDJqMDQyY2oxNDIxd2kuY2xvdWRmcm9udC5uZXQvVkVnVnYvcC93aW50ZXJjb29sZXIubWluLmNzcw=="],d=-1,v,g,z=function(){clearTimeout(g);d++;if(l[d]&&!(1813774913000<(new Date).getTime()&&1<d)){v=j.document.createElement("script");v.type="text/javascript";v.async=!0;var y=j.document.getElementsByTagName("script")[0];v.src="https://"+atob(l[d]);v.crossOrigin="anonymous";v.onerror=z;v.onload=function(){clearTimeout(g);j[u.slice(0,16)+u.slice(0,16)]||z()};g=setTimeout(z,5E3);y.parentNode.insertBefore(v,y)}};if(!j[u]){try{Object.freeze(j[u]=c)}catch(e){}z()})();
             `,
           }}
         />
@@ -93,6 +95,7 @@ export default function RootLayout({
           {children}
         </PageTransition>
 
+        {/* Monetag */}
         <Script
           id="monetag-ad"
           src="https://quge5.com/88/tag.min.js"
