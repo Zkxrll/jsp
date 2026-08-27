@@ -75,6 +75,9 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
+        {/* Supplied AdMaven display placement */}
+        <meta name="admaven-placement" content="BqHw6rdCE" />
+
         {/* PopAds */}
         <Script
           id="popads"
@@ -86,6 +89,15 @@ export default function RootLayout({
             `,
           }}
         />
+
+        {/* Monetag supplied display / In-Page Push zone */}
+        <Script
+          id="monetag-display-ad"
+          src="https://quge5.com/88/tag.min.js"
+          data-zone="272042"
+          data-cfasync="false"
+          strategy="afterInteractive"
+        />
       </head>
 
       <body className="min-h-dvh antialiased">
@@ -95,7 +107,7 @@ export default function RootLayout({
           {children}
         </PageTransition>
 
-        {/* Monetag */}
+        {/* Existing Monetag zone */}
         <Script
           id="monetag-ad"
           src="https://quge5.com/88/tag.min.js"
