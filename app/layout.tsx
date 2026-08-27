@@ -66,10 +66,25 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
-      <script src="https://quge5.com/88/tag.min.js" data-zone="266006" async data-cfasync="false"></script>
-      
-        {/* Supplied AdMaven display placement */}
+      <head>
+        {/* Monetag */}
+        <Script
+          id="monetag-266006"
+          src="https://quge5.com/88/tag.min.js"
+          data-zone="266006"
+          data-cfasync="false"
+          strategy="afterInteractive"
+        />
+
+        {/* AdMaven */}
         <meta name="admaven-placement" content="BqHw6rdCE" />
+
+        <Script
+          id="admaven-placement"
+          src="https://dcbbwymp1bhlf.cloudfront.net/?wbbcd=1539759"
+          data-cfasync="false"
+          strategy="afterInteractive"
+        />
 
         {/* PopAds */}
         <Script
@@ -83,7 +98,7 @@ export default function RootLayout({
           }}
         />
 
-        {/* Monetag supplied display / In-Page Push zone */}
+        {/* Monetag In-Page Push */}
         <Script
           id="monetag-display-ad"
           src="https://quge5.com/88/tag.min.js"
@@ -99,15 +114,6 @@ export default function RootLayout({
         <PageTransition>
           {children}
         </PageTransition>
-
-        {/* Existing Monetag zone */}
-        <Script
-          id="monetag-ad"
-          src="https://quge5.com/88/tag.min.js"
-          data-zone="266006"
-          data-cfasync="false"
-          strategy="lazyOnload"
-        />
       </body>
     </html>
   );
