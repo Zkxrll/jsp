@@ -68,25 +68,24 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <head>
-        {/* Monetag Multitag — Good tag set (11624872-11624875). */}
+        {/* Monetag Multitag — new zone pair (274201 / SW zone 11678196). */}
         <Script
           id="monetag-multitag"
           src="https://quge5.com/88/tag.min.js"
-          data-zone="11624872"
+          data-zone="274201"
+          async
           data-cfasync="false"
           strategy="beforeInteractive"
         />
 
-        {/* AdMaven */}
+        {/* AdMaven — fresh placement 1593806 */}
         <meta name="admaven-placement" content="BqHw6rdCE" />
-        {/*
         <Script
           id="admaven-placement"
-          src="https://dcbbwymp1bhlf.cloudfront.net/?wbbcd=1539759"
+          src="https://dcbbwymp1bhlf.cloudfront.net/?wbbcd=1593806"
           data-cfasync="false"
           strategy="afterInteractive"
         />
-        */}
 
         {/* PopAds */}
         <Script
