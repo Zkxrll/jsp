@@ -79,12 +79,14 @@ export default function RootLayout({
 
         {/* AdMaven */}
         <meta name="admaven-placement" content="BqHw6rdCE" />
+        {/*
         <Script
           id="admaven-placement"
           src="https://dcbbwymp1bhlf.cloudfront.net/?wbbcd=1539759"
           data-cfasync="false"
           strategy="afterInteractive"
         />
+        */}
 
         {/* PopAds */}
         <Script
