@@ -5,6 +5,7 @@ import { siteConfig } from "@/lib/config";
 import "./globals.css";
 import { AdBlockGate } from "@/components/adblock-gate";
 import { PageTransition } from "@/components/page-transition";
+import { ServiceWorkerRegister } from "@/components/sw-register";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -99,6 +100,7 @@ export default function RootLayout({
       </head>
 
       <body className="min-h-dvh antialiased">
+        <ServiceWorkerRegister />
         <AdBlockGate />
 
         <PageTransition>
