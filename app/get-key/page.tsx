@@ -158,13 +158,7 @@ export default function GetKeyPage() {
                               ? "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#a78bfa] shadow-[0_0_20px_rgba(139,92,246,0.18)]"
                               : "border-[#5865F2]/20 bg-[#5865F2]/10 text-[#8790ff] group-hover:scale-105"
                         }`}>
-                          {isLoading ? (
-                            <Spinner />
-                          ) : isComplete ? (
-                            <CheckIcon />
-                          ) : (
-                            <DiscordIcon />
-                          )}
+                          {isLoading ? <Spinner /> : isComplete ? <CheckIcon /> : <DiscordIcon />}
                         </div>
 
                         <div className="min-w-0 flex-1">
@@ -173,13 +167,15 @@ export default function GetKeyPage() {
                             <span className="rounded-full border border-white/[0.07] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-ink-muted">Step {index + 1}</span>
                           </div>
                           <p className="mt-1 truncate text-xs text-ink-muted">
-                            {isComplete ? "Verification complete ✓" : isLoading ? "Loading for 10 seconds..." : "Open invite in a new tab"}
+                            {isComplete ? "Verification complete" : isLoading ? "Loading..." : "Open invite in a new tab"}
                           </p>
                         </div>
 
-                        <span className={`shrink-0 text-lg transition-transform duration-300 ${isComplete ? "text-emerald-300" : isLoading ? "text-[#a78bfa]" : "text-[#a78bfa] group-hover:translate-x-1"}`}>
-                          {isComplete ? "✓" : isLoading ? "" : "↗"}
-                        </span>
+                        {!isLoading && (
+                          <span className={`shrink-0 text-lg ${isComplete ? "text-emerald-300" : "text-[#a78bfa] transition-transform duration-300 group-hover:translate-x-1"}`}>
+                            {isComplete ? "✓" : "↗"}
+                          </span>
+                        )}
                       </div>
                     </a>
                   );
