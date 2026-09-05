@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
@@ -8,14 +8,25 @@ import { SiteFooter } from "@/components/site-footer";
 import { siteConfig } from "@/lib/config";
 
 const VERIFY_DURATION = 10000;
+const REQUIRED_SERVERS = 2;
 
 export default function GetKeyPage() {
+  const [joinedServers, setJoinedServers] = useState<boolean[]>([false, false]);
   const [started, setStarted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
 
-  const startVerification = () => {
-    if (started) return;
+  const markServerClicked = (index: number) => {
+    setJoinedServers((current) => {
+      if (current[index]) return current;
+      const next = [...current];
+      next[index] = true;
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (joinedServers.filter(Boolean).length !== REQUIRED_SERVERS || started) return;
 
     setStarted(true);
     setProgress(0);
@@ -41,11 +52,10 @@ export default function GetKeyPage() {
     };
 
     requestAnimationFrame(updateProgress);
-  };
+  }, [joinedServers, started]);
 
   const continueToKey = () => {
     if (!ready) return;
-
     window.location.href = siteConfig.keySystemUrl;
   };
 
@@ -61,7 +71,6 @@ export default function GetKeyPage() {
       <main className="relative z-10 flex min-h-[calc(100dvh-160px)] items-center justify-center px-6 py-16">
         <section className="w-full max-w-xl">
           <div className="animate-rise rounded-2xl border border-surface-border bg-surface p-7 shadow-2xl sm:p-9">
-            {/* Key icon */}
             <div className="mb-7 flex h-12 w-12 items-center justify-center rounded-xl border border-keyframe/20 bg-keyframe/10 text-keyframe">
               <svg
                 viewBox="0 0 24 24"
@@ -87,60 +96,57 @@ export default function GetKeyPage() {
             </h1>
 
             <p className="mt-4 text-sm leading-7 text-ink-muted sm:text-base">
-              Join the Zkx Hub Discord to receive updates, support, and script announcements.
+              Join both Discord servers below to receive updates, support, and script announcements.
             </p>
 
-            {/* Discord button */}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={startVerification}
-              className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-[#5865F2]/30 bg-[#5865F2]/10 px-5 py-4 font-display text-sm font-semibold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:border-[#5865F2]/60 hover:bg-[#5865F2]/15"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5 shrink-0"
-                fill="currentColor"
-                aria-hidden="true"
+            <div className="mt-8 space-y-3">
+              <a
+                href={siteConfig.links.discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => markServerClicked(0)}
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#5865F2]/30 bg-[#5865F2]/10 px-5 py-4 font-display text-sm font-semibold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:border-[#5865F2]/60 hover:bg-[#5865F2]/15"
               >
-                <path d="M19.27 5.33a16.6 16.6 0 0 0-4.12-1.28l-.51 1.04a15.38 15.38 0 0 0-5.28 0L8.85 4.05a16.6 16.6 0 0 0-4.12 1.28C2.13 8.98 1.43 12.6 1.78 16.17a16.68 16.68 0 0 0 5.08 2.55l1.23-1.68c-.68-.25-1.34-.56-1.96-.92l.48-.37c3.79 1.77 8.35 1.77 12.1 0l.49.37c-.63.36-1.28.67-1.96.92l1.23 1.68a16.68 16.68 0 0 0 5.08-2.55c.4-4.14-.68-7.72-2.03-10.84ZM8.67 13.89c-1.12 0-2.04-1.03-2.04-2.3s.9-2.3 2.04-2.3c1.14 0 2.06 1.03 2.04 2.3 0 1.27-.9 2.3-2.04 2.3Zm6.66 0c-1.12 0-2.04-1.03-2.04-2.3s.9-2.3 2.04-2.3c1.14 0 2.04 1.03 2.04 2.3 0 1.27-.9 2.3-2.04 2.3Z" />
-              </svg>
+                <span className="text-lg" aria-hidden="true">◎</span>
+                {joinedServers[0] ? "✓ Zkx Hub Discord opened" : "Join the Zkx Hub Discord"}
+              </a>
 
-              Join the Zkx Hub Discord
-            </a>
+              <a
+                href="https://discord.gg/fhpaqqu3f"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => markServerClicked(1)}
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#5865F2]/30 bg-[#5865F2]/10 px-5 py-4 font-display text-sm font-semibold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:border-[#5865F2]/60 hover:bg-[#5865F2]/15"
+              >
+                <span className="text-lg" aria-hidden="true">◎</span>
+                {joinedServers[1] ? "✓ Second Discord opened" : "Join the second Discord server"}
+              </a>
+            </div>
 
-            {/* Progress section */}
             {started && (
               <div className="mt-6 rounded-xl border border-surface-border bg-bg/60 p-4">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-mono uppercase tracking-wider text-ink-muted">
                     Preparing access
                   </span>
-
-                  <span className="font-mono text-keyframe">
-                    {progress}%
-                  </span>
+                  <span className="font-mono text-keyframe">{progress}%</span>
                 </div>
 
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-border">
                   <div
                     className="h-full rounded-full bg-keyframe transition-[width] duration-75 ease-linear"
-                    style={{
-                      width: `${progress}%`,
-                    }}
+                    style={{ width: `${progress}%` }}
                   />
                 </div>
 
                 <p className="mt-3 text-xs text-ink-muted">
                   {ready
-                    ? "Access is ready. You can continue."
-                    : "Please keep this page open while access is prepared."}
+                    ? "Both Discord steps are complete. You can continue."
+                    : "Both Discord links were opened. Please keep this page open while access is prepared."}
                 </p>
               </div>
             )}
 
-            {/* Continue button */}
             <button
               type="button"
               onClick={continueToKey}
@@ -148,17 +154,11 @@ export default function GetKeyPage() {
               className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-keyframe px-5 py-4 font-display text-sm font-semibold text-bg transition-all duration-200 hover:bg-keyframe-strong disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-keyframe"
             >
               {ready ? "Continue to Key System" : "Continue"}
-
-              {ready && (
-                <span aria-hidden="true">
-                  →
-                </span>
-              )}
+              {ready && <span aria-hidden="true">→</span>}
             </button>
 
             <p className="mt-5 text-center text-xs leading-5 text-ink-muted">
-              The Discord step is required before continuing to the key
-              system.
+              Both Discord steps are required before continuing to the key system.
             </p>
 
             <Link
