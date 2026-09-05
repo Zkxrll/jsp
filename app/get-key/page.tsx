@@ -171,10 +171,8 @@ export default function GetKeyPage() {
                           </p>
                         </div>
 
-                        {!isLoading && (
-                          <span className={`shrink-0 text-lg ${isComplete ? "text-emerald-300" : "text-[#a78bfa] transition-transform duration-300 group-hover:translate-x-1"}`}>
-                            {isComplete ? "✓" : "↗"}
-                          </span>
+                        {!isLoading && !isComplete && (
+                          <span className="shrink-0 text-lg text-[#a78bfa] transition-transform duration-300 group-hover:translate-x-1">↗</span>
                         )}
                       </div>
                     </a>
