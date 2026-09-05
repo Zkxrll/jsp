@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
@@ -9,6 +9,8 @@ import { siteConfig } from "@/lib/config";
 
 const VERIFY_DURATION = 10000;
 const REQUIRED_SERVERS = 2;
+
+type ServerState = "idle" | "loading" | "complete";
 
 const DiscordIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
@@ -30,17 +32,21 @@ const Spinner = () => (
 );
 
 export default function GetKeyPage() {
-  const [serverState, setServerState] = useState<("idle" | "loading" | "complete")[]>(["idle", "idle"]);
+  const [serverState, setServerState] = useState<ServerState[]>(["idle", "idle"]);
   const [serverProgress, setServerProgress] = useState<number[]>([0, 0]);
+  const startTimes = useRef<(number | null)[]>([null, null]);
 
   const startServerVerification = (index: number) => {
     if (serverState[index] !== "idle") return;
+
+    startTimes.current[index] = performance.now();
 
     setServerState((current) => {
       const next = [...current];
       next[index] = "loading";
       return next;
     });
+
     setServerProgress((current) => {
       const next = [...current];
       next[index] = 0;
@@ -55,54 +61,45 @@ export default function GetKeyPage() {
 
     if (activeIndexes.length === 0) return;
 
-    const startTimes = new Map<number, number>();
-    activeIndexes.forEach((index) => startTimes.set(index, performance.now()));
     let frame = 0;
 
     const update = (now: number) => {
-      let finished = false;
+      const nextProgress = [...serverProgress];
 
-      setServerProgress((current) => {
-        const next = [...current];
+      activeIndexes.forEach((index) => {
+        const startedAt = startTimes.current[index];
+        if (startedAt === null) return;
 
-        activeIndexes.forEach((index) => {
-          const startedAt = startTimes.get(index) ?? now;
-          const elapsed = now - startedAt;
-          const nextProgress = Math.min(100, Math.round((elapsed / VERIFY_DURATION) * 100));
-          next[index] = nextProgress;
-
-          if (elapsed >= VERIFY_DURATION) {
-            finished = true;
-          }
-        });
-
-        return next;
+        const elapsed = now - startedAt;
+        nextProgress[index] = Math.min(100, Math.round((elapsed / VERIFY_DURATION) * 100));
       });
 
-      if (finished) {
+      setServerProgress(nextProgress);
+
+      const finishedIndexes = activeIndexes.filter((index) => {
+        const startedAt = startTimes.current[index];
+        return startedAt !== null && now - startedAt >= VERIFY_DURATION;
+      });
+
+      if (finishedIndexes.length > 0) {
         setServerState((current) => {
           const next = [...current];
-          activeIndexes.forEach((index) => {
+          finishedIndexes.forEach((index) => {
             next[index] = "complete";
+            startTimes.current[index] = null;
           });
           return next;
         });
-        setServerProgress((current) => {
-          const next = [...current];
-          activeIndexes.forEach((index) => {
-            next[index] = 100;
-          });
-          return next;
-        });
-        return;
       }
 
-      frame = requestAnimationFrame(update);
+      if (activeIndexes.some((index) => startTimes.current[index] !== null)) {
+        frame = requestAnimationFrame(update);
+      }
     };
 
     frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [serverState]);
+  }, [serverState, serverProgress]);
 
   const completedServers = serverState.filter((state) => state === "complete").length;
   const ready = completedServers === REQUIRED_SERVERS;
@@ -164,7 +161,7 @@ export default function GetKeyPage() {
                   <span className="block bg-gradient-to-r from-white via-[#c4b5fd] to-[#8b5cf6] bg-clip-text text-transparent">in two steps.</span>
                 </h1>
                 <p className="mt-5 max-w-lg text-sm leading-7 text-ink-muted sm:text-base">
-                  Open both Discord communities. Each step will run its own verification timer before becoming complete.
+                  Open both Discord communities. Each step runs its own 10-second verification timer.
                 </p>
               </div>
 
@@ -205,8 +202,8 @@ export default function GetKeyPage() {
                               : "border-[#5865F2]/20 bg-[#5865F2]/10 text-[#8790ff] group-hover:scale-105"
                         }`}>
                           {isLoading ? (
-                            <svg viewBox="0 0 36 36" className="h-8 w-8 -rotate-90" aria-hidden="true">
-                              <circle cx="18" cy="18" r={radius} fill="none" stroke="currentColor" strokeOpacity="0.13" strokeWidth="2.5" />
+                            <svg viewBox="0 0 36 36" className="h-8 w-8 -rotate-90 drop-shadow-[0_0_8px_rgba(139,92,246,0.45)]" aria-hidden="true">
+                              <circle cx="18" cy="18" r={radius} fill="none" stroke="currentColor" strokeOpacity="0.12" strokeWidth="2.5" />
                               <circle cx="18" cy="18" r={radius} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} />
                             </svg>
                           ) : isComplete ? (
@@ -216,8 +213,8 @@ export default function GetKeyPage() {
                           )}
 
                           {isLoading && (
-                            <span className="absolute inset-0 grid place-items-center text-[8px] font-mono font-bold">
-                              {Math.floor(progress / 10)}
+                            <span className="absolute inset-0 grid place-items-center text-[8px] font-mono font-bold text-[#c4b5fd]">
+                              {progress}%
                             </span>
                           )}
                         </div>
@@ -228,7 +225,7 @@ export default function GetKeyPage() {
                             <span className="rounded-full border border-white/[0.07] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-ink-muted">Step {index + 1}</span>
                           </div>
                           <p className="mt-1 truncate text-xs text-ink-muted">
-                            {isComplete ? "Verification complete ✓" : isLoading ? `Verifying... ${progress}%` : "Open invite in a new tab"}
+                            {isComplete ? "Verification complete ✓" : isLoading ? "Verifying access..." : "Open invite in a new tab"}
                           </p>
                         </div>
 
@@ -236,12 +233,6 @@ export default function GetKeyPage() {
                           {isComplete ? "✓" : isLoading ? <Spinner /> : "↗"}
                         </span>
                       </div>
-
-                      {isLoading && (
-                        <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/[0.05]">
-                          <div className="h-full rounded-full bg-gradient-to-r from-[#6d28d9] via-[#8b5cf6] to-[#c4b5fd] transition-[width] duration-75" style={{ width: `${progress}%` }} />
-                        </div>
-                      )}
                     </a>
                   );
                 })}
