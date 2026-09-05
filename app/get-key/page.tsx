@@ -25,21 +25,26 @@ const CheckIcon = () => (
 );
 
 const Spinner = () => (
-  <svg viewBox="0 0 24 24" className="h-5 w-5 animate-spin" fill="none" aria-hidden="true">
-    <circle cx="12" cy="12" r="8" stroke="currentColor" strokeOpacity="0.18" strokeWidth="3" />
-    <path d="M20 12a8 8 0 0 1-8 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+  <svg viewBox="0 0 24 24" className="h-7 w-7 animate-spin" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="8" stroke="currentColor" strokeOpacity="0.16" strokeWidth="2.5" />
+    <path d="M20 12a8 8 0 0 1-8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
   </svg>
 );
 
 export default function GetKeyPage() {
   const [serverState, setServerState] = useState<ServerState[]>(["idle", "idle"]);
-  const [serverProgress, setServerProgress] = useState<number[]>([0, 0]);
-  const startTimes = useRef<(number | null)[]>([null, null]);
+  const timers = useRef<(ReturnType<typeof setTimeout> | null)[]>([null, null]);
+
+  useEffect(() => {
+    return () => {
+      timers.current.forEach((timer) => {
+        if (timer) clearTimeout(timer);
+      });
+    };
+  }, []);
 
   const startServerVerification = (index: number) => {
     if (serverState[index] !== "idle") return;
-
-    startTimes.current[index] = performance.now();
 
     setServerState((current) => {
       const next = [...current];
@@ -47,59 +52,15 @@ export default function GetKeyPage() {
       return next;
     });
 
-    setServerProgress((current) => {
-      const next = [...current];
-      next[index] = 0;
-      return next;
-    });
+    timers.current[index] = setTimeout(() => {
+      setServerState((current) => {
+        const next = [...current];
+        next[index] = "complete";
+        return next;
+      });
+      timers.current[index] = null;
+    }, VERIFY_DURATION);
   };
-
-  useEffect(() => {
-    const activeIndexes = serverState
-      .map((state, index) => (state === "loading" ? index : -1))
-      .filter((index) => index !== -1);
-
-    if (activeIndexes.length === 0) return;
-
-    let frame = 0;
-
-    const update = (now: number) => {
-      const nextProgress = [...serverProgress];
-
-      activeIndexes.forEach((index) => {
-        const startedAt = startTimes.current[index];
-        if (startedAt === null) return;
-
-        const elapsed = now - startedAt;
-        nextProgress[index] = Math.min(100, Math.round((elapsed / VERIFY_DURATION) * 100));
-      });
-
-      setServerProgress(nextProgress);
-
-      const finishedIndexes = activeIndexes.filter((index) => {
-        const startedAt = startTimes.current[index];
-        return startedAt !== null && now - startedAt >= VERIFY_DURATION;
-      });
-
-      if (finishedIndexes.length > 0) {
-        setServerState((current) => {
-          const next = [...current];
-          finishedIndexes.forEach((index) => {
-            next[index] = "complete";
-            startTimes.current[index] = null;
-          });
-          return next;
-        });
-      }
-
-      if (activeIndexes.some((index) => startTimes.current[index] !== null)) {
-        frame = requestAnimationFrame(update);
-      }
-    };
-
-    frame = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(frame);
-  }, [serverState, serverProgress]);
 
   const completedServers = serverState.filter((state) => state === "complete").length;
   const ready = completedServers === REQUIRED_SERVERS;
@@ -161,20 +122,16 @@ export default function GetKeyPage() {
                   <span className="block bg-gradient-to-r from-white via-[#c4b5fd] to-[#8b5cf6] bg-clip-text text-transparent">in two steps.</span>
                 </h1>
                 <p className="mt-5 max-w-lg text-sm leading-7 text-ink-muted sm:text-base">
-                  Open both Discord communities. Each step runs its own 10-second verification timer.
+                  Open both Discord communities. Each step will run its own 10-second loading check before becoming complete.
                 </p>
               </div>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {[0, 1].map((index) => {
                   const state = serverState[index] ?? "idle";
-                  const progress = serverProgress[index] ?? 0;
                   const isSecond = index === 1;
                   const isComplete = state === "complete";
                   const isLoading = state === "loading";
-                  const radius = 15;
-                  const circumference = 2 * Math.PI * radius;
-                  const dashOffset = circumference - (progress / 100) * circumference;
 
                   return (
                     <a
@@ -198,24 +155,15 @@ export default function GetKeyPage() {
                           isComplete
                             ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
                             : isLoading
-                              ? "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#a78bfa]"
+                              ? "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#a78bfa] shadow-[0_0_20px_rgba(139,92,246,0.18)]"
                               : "border-[#5865F2]/20 bg-[#5865F2]/10 text-[#8790ff] group-hover:scale-105"
                         }`}>
                           {isLoading ? (
-                            <svg viewBox="0 0 36 36" className="h-8 w-8 -rotate-90 drop-shadow-[0_0_8px_rgba(139,92,246,0.45)]" aria-hidden="true">
-                              <circle cx="18" cy="18" r={radius} fill="none" stroke="currentColor" strokeOpacity="0.12" strokeWidth="2.5" />
-                              <circle cx="18" cy="18" r={radius} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} />
-                            </svg>
+                            <Spinner />
                           ) : isComplete ? (
                             <CheckIcon />
                           ) : (
                             <DiscordIcon />
-                          )}
-
-                          {isLoading && (
-                            <span className="absolute inset-0 grid place-items-center text-[8px] font-mono font-bold text-[#c4b5fd]">
-                              {progress}%
-                            </span>
                           )}
                         </div>
 
@@ -225,12 +173,12 @@ export default function GetKeyPage() {
                             <span className="rounded-full border border-white/[0.07] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-ink-muted">Step {index + 1}</span>
                           </div>
                           <p className="mt-1 truncate text-xs text-ink-muted">
-                            {isComplete ? "Verification complete ✓" : isLoading ? "Verifying access..." : "Open invite in a new tab"}
+                            {isComplete ? "Verification complete ✓" : isLoading ? "Loading for 10 seconds..." : "Open invite in a new tab"}
                           </p>
                         </div>
 
                         <span className={`shrink-0 text-lg transition-transform duration-300 ${isComplete ? "text-emerald-300" : isLoading ? "text-[#a78bfa]" : "text-[#a78bfa] group-hover:translate-x-1"}`}>
-                          {isComplete ? "✓" : isLoading ? <Spinner /> : "↗"}
+                          {isComplete ? "✓" : isLoading ? "" : "↗"}
                         </span>
                       </div>
                     </a>
