@@ -68,8 +68,8 @@ export default function GetKeyPage() {
         activeIndexes.forEach((index) => {
           const startedAt = startTimes.get(index) ?? now;
           const elapsed = now - startedAt;
-          const progress = Math.min(100, Math.round((elapsed / VERIFY_DURATION) * 100));
-          next[index] = progress;
+          const nextProgress = Math.min(100, Math.round((elapsed / VERIFY_DURATION) * 100));
+          next[index] = nextProgress;
 
           if (elapsed >= VERIFY_DURATION) {
             finished = true;
@@ -170,8 +170,8 @@ export default function GetKeyPage() {
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {[0, 1].map((index) => {
-                  const state = serverState[index];
-                  const progress = serverProgress[index];
+                  const state = serverState[index] ?? "idle";
+                  const progress = serverProgress[index] ?? 0;
                   const isSecond = index === 1;
                   const isComplete = state === "complete";
                   const isLoading = state === "loading";
@@ -258,28 +258,30 @@ export default function GetKeyPage() {
                 <div className={`h-px flex-1 ${serverState[1] !== "idle" ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
               </div>
 
-              <div className="mt-5 rounded-2xl border border-white/[0.07] bg-black/20 p-4 text-center sm:p-5">
-                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ink-muted">
-                  {ready ? "Access ready" : "Waiting for verification"}
-                </p>
-                <p className="mt-1 text-xs leading-6 text-ink-muted">
-                  {ready ? "Both Discord steps are complete. You can continue to the key system." : "Click each Discord server above. Its 10-second loading animation runs independently."}
-                </p>
-              </div>
-
               <button
                 type="button"
                 onClick={continueToKey}
                 disabled={!ready}
-                className={`mt-4 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 font-display text-sm font-semibold transition-all duration-300 ${ready ? "bg-gradient-to-r from-[#7c3aed] via-[#8b5cf6] to-[#a78bfa] text-white shadow-[0_10px_35px_rgba(124,58,237,0.3)] hover:-translate-y-0.5 hover:shadow-[0_15px_45px_rgba(124,58,237,0.4)]" : "cursor-not-allowed border border-white/[0.06] bg-white/[0.04] text-ink-muted"}`}
+                className={`mt-5 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 font-display text-sm font-semibold transition-all duration-300 ${
+                  ready
+                    ? "bg-gradient-to-r from-[#7c3aed] via-[#8b5cf6] to-[#a78bfa] text-white shadow-[0_10px_35px_rgba(124,58,237,0.3)] hover:-translate-y-0.5 hover:shadow-[0_15px_45px_rgba(124,58,237,0.4)]"
+                    : "cursor-not-allowed border border-white/[0.06] bg-white/[0.04] text-ink-muted"
+                }`}
               >
-                <span>{ready ? "Continue to Key System" : "Complete both Discord steps"}</span>
+                <span>{ready ? "Continue to Key System" : "Complete the steps above"}</span>
                 <span aria-hidden="true">{ready ? "→" : "•"}</span>
               </button>
 
               <div className="mt-5 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-5 sm:flex-row">
-                <p className="text-center text-[10px] leading-5 text-ink-muted sm:text-left">Discord verification is used to unlock access to the key system.</p>
-                <Link href="/" className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-muted transition-colors hover:text-ink">← Back to Zkx Hub</Link>
+                <p className="text-center text-[10px] leading-5 text-ink-muted sm:text-left">
+                  Discord verification is used to unlock access to the key system.
+                </p>
+                <Link
+                  href="/"
+                  className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-muted transition-colors hover:text-ink"
+                >
+                  ← Back to Zkx Hub
+                </Link>
               </div>
             </div>
           </div>
