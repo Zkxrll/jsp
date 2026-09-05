@@ -11,85 +11,106 @@ const VERIFY_DURATION = 10000;
 const REQUIRED_SERVERS = 2;
 
 const DiscordIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    className="h-5 w-5"
-    fill="currentColor"
-    aria-hidden="true"
-  >
-    <path d="M19.54 4.34A16.66 16.66 0 0 0 15.4 3l-.5 1.03a15.2 15.2 0 0 0-5.8 0L8.6 3a16.66 16.66 0 0 0-4.14 1.34C1.84 8.38 1.13 12.32 1.5 16.2a16.77 16.77 0 0 0 5.07 2.58l1.23-1.68a10.68 10.68 0 0 1-1.94-.93l.47-.36a11.88 11.88 0 0 0 10.8 0l.48.36c-.62.36-1.27.67-1.94.93l1.23 1.68a16.77 16.77 0 0 0 5.07-2.58c.43-4.5-.73-8.4-2.43-11.86ZM8.58 14.8c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Zm6.84 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2-2.2 2.2-2 2.2Z" />
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+    <path d="M19.54 4.34A16.66 16.66 0 0 0 15.4 3l-.5 1.03a15.2 15.2 0 0 0-5.8 0L8.6 3a16.66 16.66 0 0 0-4.14 1.34C1.84 8.38 1.13 12.32 1.5 16.2a16.77 16.77 0 0 0 5.07 2.58l1.23-1.68a10.68 10.68 0 0 1-1.94-.93l.47-.36a11.88 11.88 0 0 0 10.8 0l.48.36c-.62.36-1.27.67-1.94.93l1.23 1.68a16.77 16.77 0 0 0 5.07-2.58c.43-4.5-.73-8.4-2.43-11.86ZM8.58 14.8c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Zm6.84 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Z" />
   </svg>
 );
 
 const CheckIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    className="h-4 w-4"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
+  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="m5 12 4 4L19 6" />
   </svg>
 );
 
-export default function GetKeyPage() {
-  const [joinedServers, setJoinedServers] = useState<boolean[]>([false, false]);
-  const [started, setStarted] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [ready, setReady] = useState(false);
+const Spinner = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5 animate-spin" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="8" stroke="currentColor" strokeOpacity="0.18" strokeWidth="3" />
+    <path d="M20 12a8 8 0 0 1-8 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+  </svg>
+);
 
-  const markServerClicked = (index: number) => {
-    setJoinedServers((current) => {
-      if (current[index]) return current;
+export default function GetKeyPage() {
+  const [serverState, setServerState] = useState<("idle" | "loading" | "complete")[]>(["idle", "idle"]);
+  const [serverProgress, setServerProgress] = useState<number[]>([0, 0]);
+
+  const startServerVerification = (index: number) => {
+    if (serverState[index] !== "idle") return;
+
+    setServerState((current) => {
       const next = [...current];
-      next[index] = true;
+      next[index] = "loading";
+      return next;
+    });
+    setServerProgress((current) => {
+      const next = [...current];
+      next[index] = 0;
       return next;
     });
   };
 
   useEffect(() => {
-    if (joinedServers.filter(Boolean).length !== REQUIRED_SERVERS || started) return;
+    const activeIndexes = serverState
+      .map((state, index) => (state === "loading" ? index : -1))
+      .filter((index) => index !== -1);
 
-    setStarted(true);
-    setProgress(0);
-    setReady(false);
+    if (activeIndexes.length === 0) return;
 
-    const startTime = performance.now();
+    const startTimes = new Map<number, number>();
+    activeIndexes.forEach((index) => startTimes.set(index, performance.now()));
     let frame = 0;
 
-    const updateProgress = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const nextProgress = Math.min(
-        100,
-        Math.round((elapsed / VERIFY_DURATION) * 100)
-      );
+    const update = (now: number) => {
+      let finished = false;
 
-      setProgress(nextProgress);
+      setServerProgress((current) => {
+        const next = [...current];
 
-      if (elapsed < VERIFY_DURATION) {
-        frame = requestAnimationFrame(updateProgress);
-      } else {
-        setProgress(100);
-        setReady(true);
+        activeIndexes.forEach((index) => {
+          const startedAt = startTimes.get(index) ?? now;
+          const elapsed = now - startedAt;
+          const progress = Math.min(100, Math.round((elapsed / VERIFY_DURATION) * 100));
+          next[index] = progress;
+
+          if (elapsed >= VERIFY_DURATION) {
+            finished = true;
+          }
+        });
+
+        return next;
+      });
+
+      if (finished) {
+        setServerState((current) => {
+          const next = [...current];
+          activeIndexes.forEach((index) => {
+            next[index] = "complete";
+          });
+          return next;
+        });
+        setServerProgress((current) => {
+          const next = [...current];
+          activeIndexes.forEach((index) => {
+            next[index] = 100;
+          });
+          return next;
+        });
+        return;
       }
+
+      frame = requestAnimationFrame(update);
     };
 
-    frame = requestAnimationFrame(updateProgress);
-
+    frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [joinedServers, started]);
+  }, [serverState]);
+
+  const completedServers = serverState.filter((state) => state === "complete").length;
+  const ready = completedServers === REQUIRED_SERVERS;
 
   const continueToKey = () => {
     if (!ready) return;
     window.location.href = siteConfig.keySystemUrl;
   };
-
-  const circumference = 2 * Math.PI * 52;
-  const dashOffset = circumference - (progress / 100) * circumference;
 
   return (
     <div className="site-shell relative min-h-dvh overflow-hidden">
@@ -98,18 +119,9 @@ export default function GetKeyPage() {
       <div className="ambient ambient-three" aria-hidden="true" />
       <div className="grid-overlay" aria-hidden="true" />
 
-      <div
-        className="pointer-events-none absolute left-1/2 top-24 z-0 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-[#7c3aed]/10 blur-[120px]"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute left-1/2 top-[18rem] z-0 h-[25rem] w-[25rem] -translate-x-1/2 rounded-full border border-[#8b5cf6]/10"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute left-1/2 top-[21rem] z-0 h-[19rem] w-[19rem] -translate-x-1/2 rounded-full border border-[#a78bfa]/10"
-        aria-hidden="true"
-      />
+      <div className="pointer-events-none absolute left-1/2 top-24 z-0 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-[#7c3aed]/10 blur-[120px]" aria-hidden="true" />
+      <div className="pointer-events-none absolute left-1/2 top-[18rem] z-0 h-[25rem] w-[25rem] -translate-x-1/2 rounded-full border border-[#8b5cf6]/10" aria-hidden="true" />
+      <div className="pointer-events-none absolute left-1/2 top-[21rem] z-0 h-[19rem] w-[19rem] -translate-x-1/2 rounded-full border border-[#a78bfa]/10" aria-hidden="true" />
 
       <SiteHeader />
 
@@ -128,27 +140,14 @@ export default function GetKeyPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="grid h-11 w-11 place-items-center rounded-xl border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 text-[#a78bfa] shadow-[0_0_30px_rgba(139,92,246,0.12)]">
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
+                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <path d="M12 3 5 6v5c0 4.5 2.8 8.3 7 10 4.2-1.7 7-5.5 7-10V6l-7-3Z" />
                       <path d="m9.5 12 1.7 1.7 3.5-3.5" />
                     </svg>
                   </div>
                   <div>
-                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#a78bfa]">
-                      ZKX HUB / ACCESS
-                    </p>
-                    <p className="mt-1 text-xs text-ink-muted">
-                      Verification required
-                    </p>
+                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#a78bfa]">ZKX HUB / ACCESS</p>
+                    <p className="mt-1 text-xs text-ink-muted">Verification required</p>
                   </div>
                 </div>
 
@@ -162,19 +161,23 @@ export default function GetKeyPage() {
                 <p className="eyebrow">KEY ACCESS</p>
                 <h1 className="mt-2 font-display text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-ink sm:text-6xl">
                   Unlock your access
-                  <span className="block bg-gradient-to-r from-white via-[#c4b5fd] to-[#8b5cf6] bg-clip-text text-transparent">
-                    in two steps.
-                  </span>
+                  <span className="block bg-gradient-to-r from-white via-[#c4b5fd] to-[#8b5cf6] bg-clip-text text-transparent">in two steps.</span>
                 </h1>
                 <p className="mt-5 max-w-lg text-sm leading-7 text-ink-muted sm:text-base">
-                  Join both Discord communities, then keep this page open while your access is prepared.
+                  Open both Discord communities. Each step will run its own verification timer before becoming complete.
                 </p>
               </div>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {[0, 1].map((index) => {
-                  const complete = joinedServers[index];
+                  const state = serverState[index];
+                  const progress = serverProgress[index];
                   const isSecond = index === 1;
+                  const isComplete = state === "complete";
+                  const isLoading = state === "loading";
+                  const radius = 15;
+                  const circumference = 2 * Math.PI * radius;
+                  const dashOffset = circumference - (progress / 100) * circumference;
 
                   return (
                     <a
@@ -182,154 +185,101 @@ export default function GetKeyPage() {
                       href={isSecond ? "https://discord.gg/fhpaqqu3f" : siteConfig.links.discord}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={() => markServerClicked(index)}
-                      className={`group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-1 ${
-                        complete
+                      onClick={() => startServerVerification(index)}
+                      className={`group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 ${
+                        isComplete
                           ? "border-emerald-400/25 bg-emerald-400/[0.06]"
-                          : "border-white/[0.07] bg-white/[0.025] hover:border-[#8b5cf6]/35 hover:bg-[#8b5cf6]/[0.07]"
+                          : isLoading
+                            ? "border-[#8b5cf6]/30 bg-[#8b5cf6]/[0.06]"
+                            : "border-white/[0.07] bg-white/[0.025] hover:-translate-y-1 hover:border-[#8b5cf6]/35 hover:bg-[#8b5cf6]/[0.07]"
                       }`}
                     >
                       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#8b5cf6]/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl border transition-all duration-300 ${
-                            complete
-                              ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                        <div className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border transition-all duration-300 ${
+                          isComplete
+                            ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                            : isLoading
+                              ? "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#a78bfa]"
                               : "border-[#5865F2]/20 bg-[#5865F2]/10 text-[#8790ff] group-hover:scale-105"
-                          }`}
-                        >
-                          {complete ? <CheckIcon /> : <DiscordIcon />}
+                        }`}>
+                          {isLoading ? (
+                            <svg viewBox="0 0 36 36" className="h-8 w-8 -rotate-90" aria-hidden="true">
+                              <circle cx="18" cy="18" r={radius} fill="none" stroke="currentColor" strokeOpacity="0.13" strokeWidth="2.5" />
+                              <circle cx="18" cy="18" r={radius} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} />
+                            </svg>
+                          ) : isComplete ? (
+                            <CheckIcon />
+                          ) : (
+                            <DiscordIcon />
+                          )}
+
+                          {isLoading && (
+                            <span className="absolute inset-0 grid place-items-center text-[8px] font-mono font-bold">
+                              {Math.floor(progress / 10)}
+                            </span>
+                          )}
                         </div>
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <p className="font-display text-sm font-semibold text-ink">
-                              {isSecond ? "Partner Discord" : "Zkx Hub Discord"}
-                            </p>
-                            <span className="rounded-full border border-white/[0.07] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-ink-muted">
-                              Step {index + 1}
-                            </span>
+                            <p className="font-display text-sm font-semibold text-ink">{isSecond ? "Partner Discord" : "Zkx Hub Discord"}</p>
+                            <span className="rounded-full border border-white/[0.07] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-ink-muted">Step {index + 1}</span>
                           </div>
                           <p className="mt-1 truncate text-xs text-ink-muted">
-                            {complete ? "Community opened ✓" : "Open invite in a new tab"}
+                            {isComplete ? "Verification complete ✓" : isLoading ? `Verifying... ${progress}%` : "Open invite in a new tab"}
                           </p>
                         </div>
 
-                        <span className={`text-lg transition-transform duration-300 ${complete ? "text-emerald-300" : "text-[#a78bfa] group-hover:translate-x-1"}`}>
-                          {complete ? "✓" : "↗"}
+                        <span className={`shrink-0 text-lg transition-transform duration-300 ${isComplete ? "text-emerald-300" : isLoading ? "text-[#a78bfa]" : "text-[#a78bfa] group-hover:translate-x-1"}`}>
+                          {isComplete ? "✓" : isLoading ? <Spinner /> : "↗"}
                         </span>
                       </div>
+
+                      {isLoading && (
+                        <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/[0.05]">
+                          <div className="h-full rounded-full bg-gradient-to-r from-[#6d28d9] via-[#8b5cf6] to-[#c4b5fd] transition-[width] duration-75" style={{ width: `${progress}%` }} />
+                        </div>
+                      )}
                     </a>
                   );
                 })}
               </div>
 
               <div className="mt-7 flex items-center gap-3">
-                <div className={`h-px flex-1 ${joinedServers[0] ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
+                <div className={`h-px flex-1 ${serverState[0] !== "idle" ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
                 <div className="flex items-center gap-2 rounded-full border border-white/[0.07] bg-white/[0.02] px-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.16em] text-ink-muted">
-                  <span className="text-[#a78bfa]">{joinedServers.filter(Boolean).length}</span>
+                  <span className="text-[#a78bfa]">{completedServers}</span>
                   <span>/</span>
                   <span>{REQUIRED_SERVERS}</span>
-                  <span>completed</span>
+                  <span>verified</span>
                 </div>
-                <div className={`h-px flex-1 ${joinedServers[1] ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
+                <div className={`h-px flex-1 ${serverState[1] !== "idle" ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
               </div>
 
-              {started ? (
-                <div className="mt-5 rounded-2xl border border-white/[0.07] bg-black/20 p-5 sm:p-6">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="relative grid h-36 w-36 place-items-center sm:h-40 sm:w-40">
-                      <div className="absolute inset-2 rounded-full border border-[#8b5cf6]/10" />
-                      <div className="absolute inset-4 rounded-full border border-white/[0.04]" />
-                      <svg
-                        viewBox="0 0 120 120"
-                        className="h-full w-full -rotate-90 drop-shadow-[0_0_20px_rgba(139,92,246,0.35)]"
-                        aria-hidden="true"
-                      >
-                        <circle
-                          cx="60"
-                          cy="60"
-                          r="52"
-                          fill="none"
-                          stroke="rgba(255,255,255,0.06)"
-                          strokeWidth="6"
-                        />
-                        <circle
-                          cx="60"
-                          cy="60"
-                          r="52"
-                          fill="none"
-                          stroke="url(#verifyGradient)"
-                          strokeWidth="6"
-                          strokeLinecap="round"
-                          strokeDasharray={circumference}
-                          strokeDashoffset={dashOffset}
-                          className="transition-[stroke-dashoffset] duration-75 ease-linear"
-                        />
-                        <defs>
-                          <linearGradient id="verifyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#6d28d9" />
-                            <stop offset="55%" stopColor="#8b5cf6" />
-                            <stop offset="100%" stopColor="#c4b5fd" />
-                          </linearGradient>
-                        </defs>
-                      </svg>
-
-                      <div className="absolute inset-0 grid place-items-center">
-                        <div>
-                          <p className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-                            {progress}%
-                          </p>
-                          <p className="mt-0.5 text-[9px] font-mono uppercase tracking-[0.18em] text-ink-muted">
-                            {ready ? "Complete" : "Loading"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <p className="mt-5 font-display text-sm font-semibold text-ink">
-                      {ready ? "Access ready" : "Preparing your access..."}
-                    </p>
-                    <p className="mt-1 max-w-sm text-xs leading-6 text-ink-muted">
-                      {ready
-                        ? "Verification finished. You can continue to the key system."
-                        : "Please keep this page open while the access check completes."}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-5 rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.015] p-4 text-center">
-                  <p className="text-xs text-ink-muted">
-                    Complete both Discord steps above to start verification.
-                  </p>
-                </div>
-              )}
+              <div className="mt-5 rounded-2xl border border-white/[0.07] bg-black/20 p-4 text-center sm:p-5">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ink-muted">
+                  {ready ? "Access ready" : "Waiting for verification"}
+                </p>
+                <p className="mt-1 text-xs leading-6 text-ink-muted">
+                  {ready ? "Both Discord steps are complete. You can continue to the key system." : "Click each Discord server above. Its 10-second loading animation runs independently."}
+                </p>
+              </div>
 
               <button
                 type="button"
                 onClick={continueToKey}
                 disabled={!ready}
-                className={`mt-4 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 font-display text-sm font-semibold transition-all duration-300 ${
-                  ready
-                    ? "bg-gradient-to-r from-[#7c3aed] via-[#8b5cf6] to-[#a78bfa] text-white shadow-[0_10px_35px_rgba(124,58,237,0.3)] hover:-translate-y-0.5 hover:shadow-[0_15px_45px_rgba(124,58,237,0.4)]"
-                    : "cursor-not-allowed border border-white/[0.06] bg-white/[0.04] text-ink-muted"
-                }`}
+                className={`mt-4 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 font-display text-sm font-semibold transition-all duration-300 ${ready ? "bg-gradient-to-r from-[#7c3aed] via-[#8b5cf6] to-[#a78bfa] text-white shadow-[0_10px_35px_rgba(124,58,237,0.3)] hover:-translate-y-0.5 hover:shadow-[0_15px_45px_rgba(124,58,237,0.4)]" : "cursor-not-allowed border border-white/[0.06] bg-white/[0.04] text-ink-muted"}`}
               >
-                <span>{ready ? "Continue to Key System" : "Complete the steps above"}</span>
+                <span>{ready ? "Continue to Key System" : "Complete both Discord steps"}</span>
                 <span aria-hidden="true">{ready ? "→" : "•"}</span>
               </button>
 
               <div className="mt-5 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-5 sm:flex-row">
-                <p className="text-center text-[10px] leading-5 text-ink-muted sm:text-left">
-                  Discord verification is used to unlock access to the key system.
-                </p>
-                <Link
-                  href="/"
-                  className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-muted transition-colors hover:text-ink"
-                >
-                  ← Back to Zkx Hub
-                </Link>
+                <p className="text-center text-[10px] leading-5 text-ink-muted sm:text-left">Discord verification is used to unlock access to the key system.</p>
+                <Link href="/" className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-muted transition-colors hover:text-ink">← Back to Zkx Hub</Link>
               </div>
             </div>
           </div>
