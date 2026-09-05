@@ -17,7 +17,7 @@ const DiscordIcon = () => (
     fill="currentColor"
     aria-hidden="true"
   >
-    <path d="M19.54 4.34A16.66 16.66 0 0 0 15.4 3l-.5 1.03a15.2 15.2 0 0 0-5.8 0L8.6 3a16.66 16.66 0 0 0-4.14 1.34C1.84 8.38 1.13 12.32 1.5 16.2a16.77 16.77 0 0 0 5.07 2.58l1.23-1.68a10.68 10.68 0 0 1-1.94-.93l.47-.36a11.88 11.88 0 0 0 10.8 0l.48.36c-.62.36-1.27.67-1.94.93l1.23 1.68a16.77 16.77 0 0 0 5.07-2.58c.43-4.5-.73-8.4-2.43-11.86ZM8.58 14.8c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Zm6.84 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Z" />
+    <path d="M19.54 4.34A16.66 16.66 0 0 0 15.4 3l-.5 1.03a15.2 15.2 0 0 0-5.8 0L8.6 3a16.66 16.66 0 0 0-4.14 1.34C1.84 8.38 1.13 12.32 1.5 16.2a16.77 16.77 0 0 0 5.07 2.58l1.23-1.68a10.68 10.68 0 0 1-1.94-.93l.47-.36a11.88 11.88 0 0 0 10.8 0l.48.36c-.62.36-1.27.67-1.94.93l1.23 1.68a16.77 16.77 0 0 0 5.07-2.58c.43-4.5-.73-8.4-2.43-11.86ZM8.58 14.8c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Zm6.84 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2-2.2 2.2-2 2.2Z" />
   </svg>
 );
 
@@ -59,6 +59,7 @@ export default function GetKeyPage() {
     setReady(false);
 
     const startTime = performance.now();
+    let frame = 0;
 
     const updateProgress = (currentTime: number) => {
       const elapsed = currentTime - startTime;
@@ -70,20 +71,25 @@ export default function GetKeyPage() {
       setProgress(nextProgress);
 
       if (elapsed < VERIFY_DURATION) {
-        requestAnimationFrame(updateProgress);
+        frame = requestAnimationFrame(updateProgress);
       } else {
         setProgress(100);
         setReady(true);
       }
     };
 
-    requestAnimationFrame(updateProgress);
+    frame = requestAnimationFrame(updateProgress);
+
+    return () => cancelAnimationFrame(frame);
   }, [joinedServers, started]);
 
   const continueToKey = () => {
     if (!ready) return;
     window.location.href = siteConfig.keySystemUrl;
   };
+
+  const circumference = 2 * Math.PI * 52;
+  const dashOffset = circumference - (progress / 100) * circumference;
 
   return (
     <div className="site-shell relative min-h-dvh overflow-hidden">
@@ -231,28 +237,65 @@ export default function GetKeyPage() {
               </div>
 
               {started ? (
-                <div className="mt-5 rounded-2xl border border-white/[0.07] bg-black/20 p-4 sm:p-5">
-                  <div className="flex items-end justify-between gap-3">
-                    <div>
-                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ink-muted">
-                        {ready ? "Access ready" : "Preparing access"}
-                      </p>
-                      <p className="mt-1 text-xs text-ink-muted">
-                        {ready
-                          ? "Everything is ready. You can continue to the key system."
-                          : "Checking your verification window..."}
-                      </p>
-                    </div>
-                    <span className="font-mono text-sm font-bold text-[#a78bfa]">{progress}%</span>
-                  </div>
+                <div className="mt-5 rounded-2xl border border-white/[0.07] bg-black/20 p-5 sm:p-6">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative grid h-36 w-36 place-items-center sm:h-40 sm:w-40">
+                      <div className="absolute inset-2 rounded-full border border-[#8b5cf6]/10" />
+                      <div className="absolute inset-4 rounded-full border border-white/[0.04]" />
+                      <svg
+                        viewBox="0 0 120 120"
+                        className="h-full w-full -rotate-90 drop-shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+                        aria-hidden="true"
+                      >
+                        <circle
+                          cx="60"
+                          cy="60"
+                          r="52"
+                          fill="none"
+                          stroke="rgba(255,255,255,0.06)"
+                          strokeWidth="6"
+                        />
+                        <circle
+                          cx="60"
+                          cy="60"
+                          r="52"
+                          fill="none"
+                          stroke="url(#verifyGradient)"
+                          strokeWidth="6"
+                          strokeLinecap="round"
+                          strokeDasharray={circumference}
+                          strokeDashoffset={dashOffset}
+                          className="transition-[stroke-dashoffset] duration-75 ease-linear"
+                        />
+                        <defs>
+                          <linearGradient id="verifyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#6d28d9" />
+                            <stop offset="55%" stopColor="#8b5cf6" />
+                            <stop offset="100%" stopColor="#c4b5fd" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
 
-                  <div className="relative mt-4 h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                    <div
-                      className="relative h-full rounded-full bg-gradient-to-r from-[#6d28d9] via-[#8b5cf6] to-[#c4b5fd] transition-[width] duration-75 ease-linear"
-                      style={{ width: `${progress}%` }}
-                    >
-                      <div className="absolute inset-y-0 right-0 w-16 animate-pulse bg-white/30 blur-sm" />
+                      <div className="absolute inset-0 grid place-items-center">
+                        <div>
+                          <p className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+                            {progress}%
+                          </p>
+                          <p className="mt-0.5 text-[9px] font-mono uppercase tracking-[0.18em] text-ink-muted">
+                            {ready ? "Complete" : "Loading"}
+                          </p>
+                        </div>
+                      </div>
                     </div>
+
+                    <p className="mt-5 font-display text-sm font-semibold text-ink">
+                      {ready ? "Access ready" : "Preparing your access..."}
+                    </p>
+                    <p className="mt-1 max-w-sm text-xs leading-6 text-ink-muted">
+                      {ready
+                        ? "Verification finished. You can continue to the key system."
+                        : "Please keep this page open while the access check completes."}
+                    </p>
                   </div>
                 </div>
               ) : (
