@@ -67,16 +67,6 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <head>
-        {/* Monetag Multitag — new zone pair (274201 / SW zone 11678196). */}
-        <Script
-          id="monetag-multitag"
-          src="https://quge5.com/88/tag.min.js"
-          data-zone="274201"
-          async
-          data-cfasync="false"
-          strategy="beforeInteractive"
-        />
-
         {/* PopAds */}
         <Script
           id="popads"
