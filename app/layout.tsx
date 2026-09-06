@@ -33,7 +33,6 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   other: {
-    "admaven-placement": "1539759",
     "monetag": "56c5ac3660d10332ebc79bc7b9892566",
   },
   openGraph: {
@@ -76,15 +75,6 @@ export default function RootLayout({
           async
           data-cfasync="false"
           strategy="beforeInteractive"
-        />
-
-        {/* AdMaven — fresh placement 1593806 */}
-        <meta name="admaven-placement" content="BqHw6rdCE" />
-        <Script
-          id="admaven-placement"
-          src="https://dcbbwymp1bhlf.cloudfront.net/?wbbcd=1593806"
-          data-cfasync="false"
-          strategy="afterInteractive"
         />
 
         {/* PopAds */}
