@@ -6,6 +6,7 @@ import "./globals.css";
 import { AdBlockGate } from "@/components/adblock-gate";
 import { PageTransition } from "@/components/page-transition";
 import { ServiceWorkerRegister } from "@/components/sw-register";
+import { MonetagScript } from "@/components/monetag-script";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   other: {
+    "admaven-placement": "1539759",
     "monetag": "56c5ac3660d10332ebc79bc7b9892566",
   },
   openGraph: {
@@ -67,6 +69,18 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <head>
+        {/* Monetag Multitag — loaded client-side except in Safari to avoid the affected Vignette behavior. */}
+        <MonetagScript />
+
+        {/* AdMaven — fresh placement 1593806 */}
+        <meta name="admaven-placement" content="BqHw6rdCE" />
+        <Script
+          id="admaven-placement"
+          src="https://dcbbwymp1bhlf.cloudfront.net/?wbbcd=1593806"
+          data-cfasync="false"
+          strategy="afterInteractive"
+        />
+
         {/* PopAds */}
         <Script
           id="popads"
