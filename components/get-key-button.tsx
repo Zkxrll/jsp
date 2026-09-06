@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { siteConfig } from "@/lib/config";
 import { track } from "@/lib/analytics";
 
@@ -10,6 +10,19 @@ const REDIRECT_DELAY_MS = 250;
 
 export function GetKeyButton() {
   const [state, setState] = useState<ButtonState>("idle");
+
+  // Safari can restore the homepage from its back/forward cache (bfcache).
+  // In that case React state can be restored as "loading", leaving the button disabled.
+  useEffect(() => {
+    const resetOnPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setState("idle");
+      }
+    };
+
+    window.addEventListener("pageshow", resetOnPageShow);
+    return () => window.removeEventListener("pageshow", resetOnPageShow);
+  }, []);
 
   const handleClick = useCallback(() => {
     if (state === "loading") return;
