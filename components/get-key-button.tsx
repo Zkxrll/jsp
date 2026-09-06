@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { siteConfig } from "@/lib/config";
 import { track } from "@/lib/analytics";
 
@@ -10,12 +10,9 @@ const REDIRECT_DELAY_MS = 250;
 
 export function GetKeyButton() {
   const [state, setState] = useState<ButtonState>("idle");
-  const hasFired = useRef(false);
 
   const handleClick = useCallback(() => {
-    if (hasFired.current || state === "loading") return;
-
-    hasFired.current = true;
+    if (state === "loading") return;
 
     if (!siteConfig.keySystemUrl) {
       setState("error");
@@ -43,8 +40,8 @@ export function GetKeyButton() {
       <div className="flex flex-col items-center gap-2">
         <button
           type="button"
-          disabled
-          className="inline-flex items-center gap-2 rounded-xl bg-surface px-8 py-4 font-display text-base font-medium text-ink-muted"
+          onClick={() => setState("idle")}
+          className="inline-flex items-center gap-2 rounded-xl bg-surface px-8 py-4 font-display text-base font-medium text-ink-muted transition-colors hover:text-ink"
         >
           Key system unavailable
         </button>
@@ -81,13 +78,11 @@ export function GetKeyButton() {
               stroke="currentColor"
               strokeWidth="3"
             />
-
             <path
               fill="currentColor"
               d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4Z"
             />
           </svg>
-
           Opening…
         </>
       ) : (
@@ -105,7 +100,6 @@ export function GetKeyButton() {
               stroke="currentColor"
               strokeWidth="1.8"
             />
-
             <path
               d="M11 11l8 8M16 16l2.5 2.5M19 13l2.5 2.5"
               stroke="currentColor"
@@ -113,7 +107,6 @@ export function GetKeyButton() {
               strokeLinecap="round"
             />
           </svg>
-
           Get Key
         </>
       )}
