@@ -8,13 +8,13 @@ import { SiteFooter } from "@/components/site-footer";
 import { siteConfig } from "@/lib/config";
 
 const VERIFY_DURATION = 10000;
-const REQUIRED_SERVERS = 2;
+const REQUIRED_SERVERS = 1;
 
 type ServerState = "idle" | "loading" | "complete";
 
 const DiscordIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
-    <path d="M19.54 4.34A16.66 16.66 0 0 0 15.4 3l-.5 1.03a15.2 15.2 0 0 0-5.8 0L8.6 3a16.66 16.66 0 0 0-4.14 1.34C1.84 8.38 1.13 12.32 1.5 16.2a16.77 16.77 0 0 0 5.07 2.58l1.23-1.68a10.68 10.68 0 0 1-1.94-.93l.47-.36a11.88 11.88 0 0 0 10.8 0l.48.36c-.62.36-1.27.67-1.94.93l1.23 1.68a16.77 16.77 0 0 0 5.07-2.58c.43-4.5-.73-8.4-2.43-11.86ZM8.58 14.8c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Zm6.84 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Z" />
+    <path d="M19.54 4.34A16.66 16.66 0 0 0 15.4 3l-.5 1.03a15.2 15.2 0 0 0-5.8 0L8.6 3a16.66 16.66 0 0 0-4.14 1.34C1.84 8.38 1.13 12.32 1.5 16.2a16.77 16.77 0 0 0 5.07 2.58l1.23-1.68a10.68 10.68 0 0 1-1.94-.93l.47-.36a11.88 11.88 0 0 0 10.8 0l.48.36c-.62.36-1.27.67-1.94.93l1.23 1.68a16.77 16.77 0 0 0 5.07-2.58c.43-4.5-.73-8.4-2.43-11.86ZM8.58 14.8c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-.89 2.2-2 2.2Zm6.84 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2 2 .99 2 2.2-1 2.2-2 2.2Z" />
   </svg>
 );
 
@@ -32,8 +32,8 @@ const Spinner = () => (
 );
 
 export default function GetKeyPage() {
-  const [serverState, setServerState] = useState<ServerState[]>(["idle", "idle"]);
-  const timers = useRef<(ReturnType<typeof setTimeout> | null)[]>([null, null]);
+  const [serverState, setServerState] = useState<ServerState[]>(["idle"]);
+  const timers = useRef<(ReturnType<typeof setTimeout> | null)[]>([null]);
 
   useEffect(() => {
     return () => {
@@ -43,32 +43,28 @@ export default function GetKeyPage() {
     };
   }, []);
 
-  const startServerVerification = (index: number) => {
-    if (serverState[index] !== "idle") return;
+  const startServerVerification = () => {
+    if (serverState[0] !== "idle") return;
 
-    setServerState((current) => {
-      const next = [...current];
-      next[index] = "loading";
-      return next;
-    });
+    setServerState(["loading"]);
 
-    timers.current[index] = setTimeout(() => {
-      setServerState((current) => {
-        const next = [...current];
-        next[index] = "complete";
-        return next;
-      });
-      timers.current[index] = null;
+    timers.current[0] = setTimeout(() => {
+      setServerState(["complete"]);
+      timers.current[0] = null;
     }, VERIFY_DURATION);
   };
 
-  const completedServers = serverState.filter((state) => state === "complete").length;
+  const completedServers = serverState[0] === "complete" ? 1 : 0;
   const ready = completedServers === REQUIRED_SERVERS;
 
   const continueToKey = () => {
     if (!ready) return;
     window.location.href = siteConfig.keySystemUrl;
   };
+
+  const state = serverState[0] ?? "idle";
+  const isComplete = state === "complete";
+  const isLoading = state === "loading";
 
   return (
     <div className="site-shell relative min-h-dvh overflow-hidden">
@@ -119,76 +115,66 @@ export default function GetKeyPage() {
                 <p className="eyebrow">KEY ACCESS</p>
                 <h1 className="mt-2 font-display text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-ink sm:text-6xl">
                   Unlock your access
-                  <span className="block bg-gradient-to-r from-white via-[#c4b5fd] to-[#8b5cf6] bg-clip-text text-transparent">in two steps.</span>
+                  <span className="block bg-gradient-to-r from-white via-[#c4b5fd] to-[#8b5cf6] bg-clip-text text-transparent">in one step.</span>
                 </h1>
                 <p className="mt-5 max-w-lg text-sm leading-7 text-ink-muted sm:text-base">
-                  Open both Discord communities. Each step will run its own 10-second loading check before becoming complete.
+                  Open the Zkx Hub Discord. The step will run a 10-second loading check before becoming complete.
                 </p>
               </div>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {[0, 1].map((index) => {
-                  const state = serverState[index] ?? "idle";
-                  const isSecond = index === 1;
-                  const isComplete = state === "complete";
-                  const isLoading = state === "loading";
+              <div className="mt-8">
+                <a
+                  href={siteConfig.links.discord}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={startServerVerification}
+                  className={`group relative block overflow-hidden rounded-2xl border p-4 transition-all duration-300 ${
+                    isComplete
+                      ? "border-emerald-400/25 bg-emerald-400/[0.06]"
+                      : isLoading
+                        ? "border-[#8b5cf6]/30 bg-[#8b5cf6]/[0.06]"
+                        : "border-white/[0.07] bg-white/[0.025] hover:-translate-y-1 hover:border-[#8b5cf6]/35 hover:bg-[#8b5cf6]/[0.07]"
+                  }`}
+                >
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#8b5cf6]/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-                  return (
-                    <a
-                      key={index}
-                      href={isSecond ? "https://discord.gg/fhpaqqu3f" : siteConfig.links.discord}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => startServerVerification(index)}
-                      className={`group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 ${
-                        isComplete
-                          ? "border-emerald-400/25 bg-emerald-400/[0.06]"
-                          : isLoading
-                            ? "border-[#8b5cf6]/30 bg-[#8b5cf6]/[0.06]"
-                            : "border-white/[0.07] bg-white/[0.025] hover:-translate-y-1 hover:border-[#8b5cf6]/35 hover:bg-[#8b5cf6]/[0.07]"
-                      }`}
-                    >
-                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#8b5cf6]/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="flex items-center gap-3">
+                    <div className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border transition-all duration-300 ${
+                      isComplete
+                        ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                        : isLoading
+                          ? "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#a78bfa] shadow-[0_0_20px_rgba(139,92,246,0.18)]"
+                          : "border-[#5865F2]/20 bg-[#5865F2]/10 text-[#8790ff] group-hover:scale-105"
+                    }`}>
+                      {isLoading ? <Spinner /> : isComplete ? <CheckIcon /> : <DiscordIcon />}
+                    </div>
 
-                      <div className="flex items-center gap-3">
-                        <div className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border transition-all duration-300 ${
-                          isComplete
-                            ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
-                            : isLoading
-                              ? "border-[#8b5cf6]/25 bg-[#8b5cf6]/10 text-[#a78bfa] shadow-[0_0_20px_rgba(139,92,246,0.18)]"
-                              : "border-[#5865F2]/20 bg-[#5865F2]/10 text-[#8790ff] group-hover:scale-105"
-                        }`}>
-                          {isLoading ? <Spinner /> : isComplete ? <CheckIcon /> : <DiscordIcon />}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="font-display text-sm font-semibold text-ink">{isSecond ? "Partner Discord" : "Zkx Hub Discord"}</p>
-                            <span className="rounded-full border border-white/[0.07] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-ink-muted">Step {index + 1}</span>
-                          </div>
-                          <p className="mt-1 truncate text-xs text-ink-muted">
-                            {isComplete ? "Verification complete" : isLoading ? "Loading..." : "Open invite in a new tab"}
-                          </p>
-                        </div>
-
-                        {!isLoading && !isComplete && (
-                          <span className="shrink-0 text-lg text-[#a78bfa] transition-transform duration-300 group-hover:translate-x-1">↗</span>
-                        )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-display text-sm font-semibold text-ink">Zkx Hub Discord</p>
+                        <span className="rounded-full border border-white/[0.07] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-ink-muted">Step 1</span>
                       </div>
-                    </a>
-                  );
-                })}
+                      <p className="mt-1 truncate text-xs text-ink-muted">
+                        {isComplete ? "Verification complete" : isLoading ? "Loading..." : "Open invite in a new tab"}
+                      </p>
+                    </div>
+
+                    {!isLoading && !isComplete && (
+                      <span className="shrink-0 text-lg text-[#a78bfa] transition-transform duration-300 group-hover:translate-x-1">↗</span>
+                    )}
+                  </div>
+                </a>
               </div>
 
               <div className="mt-7 flex items-center gap-3">
-                <div className={`h-px flex-1 ${serverState[0] !== "idle" ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
+                <div className={`h-px flex-1 ${state !== "idle" ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
                 <div className="flex items-center gap-2 rounded-full border border-white/[0.07] bg-white/[0.02] px-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.16em] text-ink-muted">
                   <span className="text-[#a78bfa]">{completedServers}</span>
                   <span>/</span>
                   <span>{REQUIRED_SERVERS}</span>
                   <span>verified</span>
                 </div>
-                <div className={`h-px flex-1 ${serverState[1] !== "idle" ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
+                <div className={`h-px flex-1 ${state !== "idle" ? "bg-[#8b5cf6]/30" : "bg-white/[0.06]"}`} />
               </div>
 
               <button
@@ -201,7 +187,7 @@ export default function GetKeyPage() {
                     : "cursor-not-allowed border border-white/[0.06] bg-white/[0.04] text-ink-muted"
                 }`}
               >
-                <span>{ready ? "Continue to Key System" : "Complete the steps above"}</span>
+                <span>{ready ? "Continue to Key System" : "Complete the step above"}</span>
                 <span aria-hidden="true">{ready ? "→" : "•"}</span>
               </button>
 
