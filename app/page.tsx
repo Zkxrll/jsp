@@ -8,6 +8,7 @@ import { FAQ } from "@/components/faq";
 import { FeatureGrid } from "@/components/feature-grid";
 import { CopyDiscordButton } from "@/components/copy-discord-button";
 import { DiscordGlyph } from "@/components/discord-glyph";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { siteConfig } from "@/lib/config";
 import { stats, menuTabs } from "@/lib/features";
 
@@ -53,7 +54,10 @@ function CheckMark() {
 export default function HomePage() {
   return (
     <div className="site-shell relative flex min-h-dvh flex-col overflow-hidden">
+      <div className="ambient ambient-one" aria-hidden="true" />
+      <div className="ambient ambient-two" aria-hidden="true" />
       <div className="grid-overlay" aria-hidden="true" />
+      <ScrollReveal />
 
       {/* Top Discord bar: joining is the first thing on the page. */}
       <div className="topbar">
@@ -76,7 +80,7 @@ export default function HomePage() {
       <main className="relative z-10 flex-1">
         {/* Hero */}
         <section className="mx-auto w-full max-w-4xl px-5 pb-20 pt-10 text-center sm:px-8 sm:pt-16">
-          <div className="logo-badge mx-auto">
+          <div className="logo-badge animate-rise mx-auto">
             <Image
               src="/logo.jpg"
               alt="Zkx Hub"
@@ -87,17 +91,23 @@ export default function HomePage() {
             />
           </div>
 
-          <h1 className="mt-2 text-5xl sm:text-6xl">
-            The full <span className="accent">Rivals</span> menu.
+          <h1 className="animate-rise mt-2 text-5xl sm:text-6xl" style={{ animationDelay: "80ms" }}>
+            The full <span className="text-gradient">Rivals</span> menu.
           </h1>
 
-          <p className="lede mx-auto mt-5 max-w-xl">
+          <p
+            className="lede animate-rise mx-auto mt-5 max-w-xl"
+            style={{ animationDelay: "150ms" }}
+          >
             Silent and camera aim, voidspam antihit, weapon mods, ESP, chams, and
             a full world editor. One key, one payment, updated when the game
             changes.
           </p>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div
+            className="animate-rise mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
+            style={{ animationDelay: "220ms" }}
+          >
             <GetKeyButton />
             <a
               href={siteConfig.links.discord}
@@ -111,7 +121,10 @@ export default function HomePage() {
           </div>
 
           {/* Stats */}
-          <div className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
+          <div
+            className="animate-rise mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3"
+            style={{ animationDelay: "300ms" }}
+          >
             {stats.map((stat) => (
               <div key={stat.label} className="card px-5 py-5 text-center">
                 <div className="font-display text-lg font-black tracking-tight text-ink">
@@ -124,24 +137,29 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* The real tabs, listed plainly */}
-          <div className="mx-auto mt-10 max-w-2xl">
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-ink-muted">
+          {/* Menu ticker */}
+          <div className="animate-rise mx-auto mt-10 max-w-3xl" style={{ animationDelay: "360ms" }}>
+            <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.14em] text-ink-muted">
               Eleven tabs in the menu
             </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {menuTabs.map((tab) => (
-                <span key={tab} className="chip">
-                  {tab}
-                </span>
-              ))}
+            <div className="marquee">
+              <div className="marquee-track">
+                {[...menuTabs, ...menuTabs].map((tab, index) => (
+                  <span key={`${tab}-${index}`} className="chip whitespace-nowrap">
+                    {tab}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Feature showcase */}
         <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
-          <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div
+            className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
+            data-reveal
+          >
             <div>
               <p className="eyebrow">Everything inside</p>
               <h2 className="section-title mt-3">What the menu does.</h2>
@@ -155,9 +173,9 @@ export default function HomePage() {
           <FeatureGrid />
         </section>
 
-        {/* Defense spotlight (text, no menu mock) */}
+        {/* Defense spotlight */}
         <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
-          <div className="card p-6 sm:p-10">
+          <div className="card p-6 sm:p-10" data-reveal>
             <p className="eyebrow">Defense</p>
             <h2 className="section-title mt-4 max-w-3xl">Most scripts stop at silent aim.</h2>
 
@@ -189,12 +207,12 @@ export default function HomePage() {
 
         {/* Premium */}
         <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
-          <div className="card p-6 sm:p-10">
+          <div className="card p-6 sm:p-10" data-reveal>
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-xl">
                 <p className="eyebrow">Premium</p>
                 <h2 className="section-title mt-4">
-                  One purchase. <span className="accent">No subscription.</span>
+                  One purchase. <span className="text-gradient">No subscription.</span>
                 </h2>
                 <p className="lede mt-5">
                   Premium is a single payment that stays yours. No monthly key, no
@@ -224,7 +242,10 @@ export default function HomePage() {
 
         {/* Community + access */}
         <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
-          <div className="card flex flex-col gap-8 p-6 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+          <div
+            className="card flex flex-col gap-8 p-6 sm:p-10 lg:flex-row lg:items-center lg:justify-between"
+            data-reveal
+          >
             <div className="max-w-lg">
               <h2 className="section-title">Get your key in the Discord.</h2>
               <p className="lede mt-4">
@@ -254,11 +275,13 @@ export default function HomePage() {
 
         {/* Changelog */}
         <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
-          <p className="eyebrow">Updates</p>
-          <h2 className="section-title mt-3">Latest changes.</h2>
+          <div data-reveal>
+            <p className="eyebrow">Updates</p>
+            <h2 className="section-title mt-3">Latest changes.</h2>
+          </div>
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {CHANGELOG.map((entry) => (
-              <article key={entry.title} className="card card-hover p-6">
+              <article key={entry.title} className="card card-hover p-6" data-reveal>
                 <span className="text-xs font-bold uppercase tracking-[0.12em] text-keyframe-strong">
                   {entry.tag}
                 </span>
@@ -271,11 +294,13 @@ export default function HomePage() {
 
         {/* FAQ */}
         <section className="mx-auto w-full max-w-3xl px-5 py-20 sm:px-8 sm:py-24">
-          <div className="mb-8 text-center">
+          <div className="mb-8 text-center" data-reveal>
             <p className="eyebrow">FAQ</p>
             <h2 className="section-title mt-3">Before you grab a key.</h2>
           </div>
-          <FAQ />
+          <div data-reveal>
+            <FAQ />
+          </div>
         </section>
       </main>
 

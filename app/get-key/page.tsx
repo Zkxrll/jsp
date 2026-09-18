@@ -69,7 +69,7 @@ export default function GetKeyPage() {
 
       <main className="relative z-10 flex flex-1 items-center justify-center px-5 py-16 sm:px-8">
         <section className="w-full max-w-xl">
-          <div className="card p-6 sm:p-8">
+          <div className="card animate-rise p-6 sm:p-8">
             <p className="eyebrow">Zkx Hub / Access</p>
             <h1 className="mt-3 text-4xl sm:text-5xl">
               Unlock your <span className="accent">access.</span>

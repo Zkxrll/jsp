@@ -2,8 +2,8 @@
 
 /* ------------------------------------------------------------------ *
  * Design tokens. One source of truth for color, type, radius, and
- * elevation. The rules that follow reuse these and never improvise, so
- * the whole site reads as one intentional system.
+ * elevation. Depth and motion are intentional here, not decoration for
+ * its own sake: entrance reveals, hover lift, and soft ambient light.
  * ------------------------------------------------------------------ */
 @theme {
   --color-ink: #f4f1fb;
@@ -14,7 +14,7 @@
   --color-surface: #0d0b14;
   --color-surface-2: #14101d;
   --color-surface-border: #241c31;
-  --color-surface-border-strong: #35294a;
+  --color-surface-border-strong: #38294f;
 
   --color-keyframe: #9a5cff;
   --color-keyframe-strong: #b892ff;
@@ -26,12 +26,15 @@
   --font-mono: ui-monospace, "Cascadia Code", "Segoe UI Mono", Consolas, monospace;
 }
 
-/* One radius, one elevation. Reused everywhere. Pills are the only
-   intentional exception. */
+/* One radius, two elevation levels (resting and lifted). Reused
+   everywhere. Pills are the only intentional radius exception. */
 :root {
   --radius: 0.875rem;
   --radius-pill: 999px;
-  --shadow: 0 16px 40px -20px rgba(2, 1, 6, 0.8);
+  --shadow: 0 16px 40px -22px rgba(2, 1, 6, 0.8);
+  --shadow-lift: 0 26px 60px -24px rgba(2, 1, 6, 0.9),
+    0 10px 34px -16px color-mix(in srgb, var(--color-keyframe) 22%, transparent);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ------------------------------------------------------------------ *
@@ -100,14 +103,43 @@
  * Components
  * ------------------------------------------------------------------ */
 @layer components {
-  /* Calm, static page background. One faint wash, no drifting orbs. */
   .site-shell {
     position: relative;
     isolation: isolate;
     min-height: 100dvh;
     background:
-      radial-gradient(900px 520px at 50% -12%, color-mix(in srgb, var(--color-keyframe) 11%, transparent), transparent 62%),
+      radial-gradient(1000px 560px at 50% -12%, color-mix(in srgb, var(--color-keyframe) 13%, transparent), transparent 62%),
       var(--color-bg);
+  }
+
+  /* Soft ambient light for depth. Slow, low-opacity, transform-only so
+     it composites on the GPU. */
+  .ambient {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -2;
+    filter: blur(72px);
+    opacity: 0.5;
+    will-change: transform;
+  }
+
+  .ambient-one {
+    width: 22rem;
+    height: 22rem;
+    top: -6rem;
+    left: -8rem;
+    background: color-mix(in srgb, var(--color-keyframe) 42%, transparent);
+    animation: drift 18s ease-in-out infinite;
+  }
+
+  .ambient-two {
+    width: 20rem;
+    height: 20rem;
+    top: 28%;
+    right: -9rem;
+    background: color-mix(in srgb, var(--color-keyframe) 24%, transparent);
+    animation: drift 23s ease-in-out infinite reverse;
   }
 
   .grid-overlay {
@@ -115,7 +147,7 @@
     inset: 0;
     pointer-events: none;
     z-index: -1;
-    opacity: 0.6;
+    opacity: 0.55;
     background-image:
       linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
@@ -127,11 +159,21 @@
     animation: page-enter 320ms ease both;
   }
 
-  /* Logo art blended into the page. The radial mask dissolves the black
-     square edges. No glow. */
+  /* Logo art blended into the page with a soft glow behind it. */
   .logo-badge {
+    position: relative;
     display: grid;
     place-items: center;
+  }
+
+  .logo-badge::after {
+    content: "";
+    position: absolute;
+    inset: 12%;
+    z-index: -1;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-keyframe) 24%, transparent);
+    filter: blur(58px);
   }
 
   .logo-badge img {
@@ -139,7 +181,6 @@
     mask-image: radial-gradient(closest-side, #000 70%, transparent 92%);
   }
 
-  /* Top Discord bar. */
   .topbar {
     position: relative;
     z-index: 20;
@@ -184,24 +225,34 @@
     color: var(--color-keyframe-strong);
   }
 
-  /* One card style, one radius, one shadow. */
+  /* One tasteful gradient, used only on lead words. */
+  .text-gradient {
+    background: linear-gradient(100deg, var(--color-ink) 8%, var(--color-keyframe-strong) 58%, var(--color-keyframe) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Card: subtle surface gradient for depth, one radius, one shadow. */
   .card {
     position: relative;
     border: 1px solid var(--color-surface-border);
     border-radius: var(--radius);
-    background: var(--color-surface);
+    background: linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
     box-shadow: var(--shadow);
   }
 
   .card-hover {
-    transition: border-color 200ms ease;
+    transition: transform 280ms var(--ease), border-color 220ms ease, box-shadow 280ms ease;
   }
 
   .card-hover:hover {
+    transform: translateY(-4px);
     border-color: var(--color-surface-border-strong);
+    box-shadow: var(--shadow-lift);
   }
 
-  /* One button system. Subtle hover, no lift, no bounce. */
+  /* One button system. Subtle lift, not a bounce. */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -216,7 +267,12 @@
     line-height: 1;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 180ms ease, border-color 180ms ease, filter 180ms ease;
+    transition: transform 220ms var(--ease), background 180ms ease, border-color 180ms ease,
+      filter 180ms ease, box-shadow 220ms ease;
+  }
+
+  .btn:active {
+    transform: translateY(0) scale(0.98);
   }
 
   .btn-primary {
@@ -226,7 +282,9 @@
   }
 
   .btn-primary:hover {
-    filter: brightness(1.08);
+    transform: translateY(-2px);
+    filter: brightness(1.07);
+    box-shadow: var(--shadow-lift);
   }
 
   .btn-ghost {
@@ -236,16 +294,17 @@
   }
 
   .btn-ghost:hover {
+    transform: translateY(-2px);
     background: var(--color-surface-2);
   }
 
-  /* Discord brand blue so the action reads instantly. */
   .btn-discord {
     background: #5865f2;
     color: #fff;
   }
 
   .btn-discord:hover {
+    transform: translateY(-2px);
     background: #4f5bda;
   }
 
@@ -271,8 +330,13 @@
     flex: 0 0 auto;
     border: 1px solid var(--color-surface-border-strong);
     border-radius: var(--radius);
-    background: var(--color-surface-2);
+    background: color-mix(in srgb, var(--color-keyframe) 10%, var(--color-surface-2));
     color: var(--color-keyframe-strong);
+    transition: transform 280ms var(--ease);
+  }
+
+  .card-hover:hover .icon-tile {
+    transform: scale(1.06);
   }
 
   .icon-tile svg {
@@ -280,7 +344,6 @@
     height: 1.35rem;
   }
 
-  /* Copy-invite button (community section). */
   .copy-button {
     display: inline-flex;
     align-items: center;
@@ -296,10 +359,11 @@
     font-size: 0.875rem;
     font-weight: 900;
     text-transform: uppercase;
-    transition: background 180ms ease, border-color 180ms ease;
+    transition: transform 220ms var(--ease), background 180ms ease, border-color 180ms ease;
   }
 
   .copy-button:hover {
+    transform: translateY(-2px);
     background: var(--color-surface-2);
   }
 
@@ -307,7 +371,25 @@
     color: var(--color-keyframe-strong);
   }
 
-  /* FAQ accordion. Motion is tied to intent (open/close) only. */
+  /* Menu ticker: a slow, continuous scroll of the real tabs. Pauses on
+     hover. Duplicated track keeps the loop unbroken. */
+  .marquee {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 0.6rem;
+    animation: marquee 42s linear infinite;
+  }
+
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* FAQ accordion. */
   .faq-list {
     display: grid;
     gap: 0.75rem;
@@ -358,7 +440,7 @@
     border-radius: var(--radius-pill);
     color: var(--color-keyframe-strong);
     font-size: 1rem;
-    transition: transform 200ms ease;
+    transition: transform 240ms var(--ease);
   }
 
   .faq-item-open .faq-icon {
@@ -369,7 +451,7 @@
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 260ms ease, opacity 200ms ease;
+    transition: grid-template-rows 280ms var(--ease), opacity 220ms ease;
   }
 
   .faq-item-open .faq-panel {
@@ -389,11 +471,28 @@
   .faq-item-open .faq-answer {
     padding-bottom: 1.125rem;
   }
+
+  /* Entrance motion. .animate-rise plays on load for above-the-fold
+     content; [data-reveal] fades up as it scrolls into view (the
+     ScrollReveal component adds .reveal-on once, only when motion is OK). */
+  .animate-rise {
+    animation: rise 640ms var(--ease) both;
+  }
+
+  .reveal-on [data-reveal] {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 720ms var(--ease), transform 720ms var(--ease);
+  }
+
+  .reveal-on [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ------------------------------------------------------------------ *
- * Keyframes. Only what is tied to intent: page load, accordion,
- * loading spinner (Tailwind's animate-spin).
+ * Keyframes
  * ------------------------------------------------------------------ */
 @keyframes page-enter {
   from {
@@ -404,6 +503,39 @@
   }
 }
 
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(26px, 18px, 0) scale(1.05);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Reduced motion: strip all of it, keep everything visible.
+ * ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -415,5 +547,14 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .ambient {
+    display: none;
+  }
+
+  .reveal-on [data-reveal] {
+    opacity: 1;
+    transform: none;
   }
 }

@@ -98,6 +98,7 @@ export function FeatureGrid() {
       {features.map((feature) => (
         <article
           key={feature.title}
+          data-reveal
           className={`card card-hover flex flex-col p-6 ${
             feature.featured ? "sm:col-span-2" : ""
           }`}
