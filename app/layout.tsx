@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { siteConfig } from "@/lib/config";
 import "./globals.css";
@@ -7,30 +6,13 @@ import { AdBlockGate } from "@/components/adblock-gate";
 import { PageTransition } from "@/components/page-transition";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { MonetagScript } from "@/components/monetag-script";
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
-  display: "swap",
-});
+import { PopAdsScript } from "@/components/popads-script";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} — ${siteConfig.tagline}`,
-    template: `%s — ${siteConfig.name}`,
+    default: siteConfig.name,
+    template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
   other: {
@@ -43,11 +25,13 @@ export const metadata: Metadata = {
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: "website",
+    images: [{ url: "/logo.jpg", width: 1024, height: 1024, alt: siteConfig.name }],
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
+    images: ["/logo.jpg"],
   },
   robots: {
     index: true,
@@ -56,7 +40,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#09050d",
+  themeColor: "#050409",
   colorScheme: "dark",
 };
 
@@ -64,15 +48,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
-    >
+    <html lang="en">
       <head>
-        {/* Monetag Multitag — loaded client-side except in Safari to avoid the affected Vignette behavior. */}
+        {/* Monetag Multitag, client-side except in Safari (Vignette behavior). */}
         <MonetagScript />
 
-        {/* AdMaven — fresh placement 1593806 */}
+        {/* AdMaven placement 1593806 */}
         <meta name="admaven-placement" content="BqHw6rdCE" />
         <Script
           id="admaven-placement"
@@ -80,27 +61,16 @@ export default function RootLayout({
           data-cfasync="false"
           strategy="afterInteractive"
         />
-
-        {/* PopAds */}
-        <Script
-          id="popads"
-          data-cfasync="false"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(){var j=window,u="a946ec030fb2a368a1b60d68ac78edb3",c=[["siteId",944*942-330+4426463],["minBid",0],["popundersPerIP","0"],["delayBetween",0],["default",false],["defaultPerDay",0],["topmostLayer","auto"]],l=["d3d3LnByZW1pdW12ZXJ0aXNpbmcuY29tL0R2ZC9kaXZhLm1pbi5qcw==","ZDJqMDQyY2oxNDIxd2kuY2xvdWRmcm9udC5uZXQvVkVnVnYvcC93aW50ZXJjb29sZXIubWluLmNzcw=="],d=-1,v,g,z=function(){clearTimeout(g);d++;if(l[d]&&!(1813774913000<(new Date).getTime()&&1<d)){v=j.document.createElement("script");v.type="text/javascript";v.async=!0;var y=j.document.getElementsByTagName("script")[0];v.src="https://"+atob(l[d]);v.crossOrigin="anonymous";v.onerror=z;v.onload=function(){clearTimeout(g);j[u.slice(0,16)+u.slice(0,16)]||z()};g=setTimeout(z,5E3);y.parentNode.insertBefore(v,y)}};if(!j[u]){try{Object.freeze(j[u]=c)}catch(e){}z()})();
-            `,
-          }}
-        />
       </head>
 
       <body className="min-h-dvh antialiased">
         <ServiceWorkerRegister />
         <AdBlockGate />
 
-        <PageTransition>
-          {children}
-        </PageTransition>
+        {/* PopAds, injected on the client to avoid the next/script head crash. */}
+        <PopAdsScript />
+
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );

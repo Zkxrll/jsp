@@ -25,12 +25,12 @@ const checks: StatusCheck[] = [
   {
     name: "Key system",
     status: siteConfig.status,
-    note: "Third-party — see their own status page for incident history.",
+    note: "Third-party. See their own status page for incident history.",
   },
 ];
 
 const STATUS_STYLES: Record<ServiceStatus, string> = {
-  operational: "text-online",
+  operational: "text-keyframe-strong",
   degraded: "text-keyframe",
   offline: "text-danger",
 };
