@@ -20,7 +20,6 @@ type AnalyticsEvent =
 
 export function track(event: AnalyticsEvent): void {
   if (process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line no-console
     console.debug("[analytics]", event.name, "props" in event ? event.props : undefined);
     return;
   }

@@ -8,10 +8,10 @@ function readStatus(value: string | undefined): ServiceStatus {
 export const siteConfig = {
   name: "Zkx Hub",
 
-  tagline: "The one Rivals script every exploiters need.",
+  tagline: "Silent aim, a real antihit, and a full menu for Rivals.",
 
   description:
-    "Zkx Hub gives you access to one of the most advanced free Rivals script.",
+    "Zkx Hub is a Rivals script with silent and camera aimbot, voidspam antihit, anti-aim, weapon mods, ESP, chams, bullet tracers, a full lighting suite, and background automation.",
 
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://zkxhub.vercel.app",
 
