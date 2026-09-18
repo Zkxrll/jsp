@@ -130,7 +130,7 @@ export const stats: readonly Stat[] = [
   { value: "Lifetime", label: "One key, one payment" },
 ] as const;
 
-/** The real top-level tabs, in menu order. Used for the marquee strip. */
+/** The real top-level tabs, in menu order. Listed on the landing page. */
 export const menuTabs = [
   "ESP",
   "Combat",

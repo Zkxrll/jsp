@@ -1,34 +1,37 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ *
- * Design tokens. One source of truth for color and type. Every purple
- * comes from --color-keyframe / -strong / --color-curve. Fonts are the
- * system Arial family: Arial Black for headings, Arial for body. No web
- * font is downloaded, so text paints instantly and never shifts.
+ * Design tokens. One source of truth for color, type, radius, and
+ * elevation. The rules that follow reuse these and never improvise, so
+ * the whole site reads as one intentional system.
  * ------------------------------------------------------------------ */
 @theme {
   --color-ink: #f4f1fb;
-  --color-ink-soft: #cdc7db;
-  --color-ink-muted: #9a92ac;
+  --color-ink-soft: #c9c3d6;
+  --color-ink-muted: #948da4;
 
-  --color-bg: #050409;
-  --color-surface: #0b0913;
-  --color-surface-2: #120e1d;
-  --color-surface-border: #241b33;
+  --color-bg: #060509;
+  --color-surface: #0d0b14;
+  --color-surface-2: #14101d;
+  --color-surface-border: #241c31;
+  --color-surface-border-strong: #35294a;
 
   --color-keyframe: #9a5cff;
-  --color-keyframe-strong: #c4a3ff;
-  --color-curve: #a78bfa;
-
-  --color-danger: #f87171;
+  --color-keyframe-strong: #b892ff;
+  --color-danger: #f2777a;
   --color-online: #4ade80;
 
   --font-display: "Arial Black", "Arial Bold", Gadget, "Helvetica Neue", Arial, sans-serif;
   --font-body: Arial, "Helvetica Neue", Helvetica, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "Segoe UI Mono", Consolas, monospace;
+}
 
-  --animate-rise: rise 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-marquee: marquee 34s linear infinite;
+/* One radius, one elevation. Reused everywhere. Pills are the only
+   intentional exception. */
+:root {
+  --radius: 0.875rem;
+  --radius-pill: 999px;
+  --shadow: 0 16px 40px -20px rgba(2, 1, 6, 0.8);
 }
 
 /* ------------------------------------------------------------------ *
@@ -55,6 +58,7 @@
     background: var(--color-bg);
     color: var(--color-ink);
     font-family: var(--font-body);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -69,16 +73,17 @@
     font-family: var(--font-display);
     font-weight: 900;
     letter-spacing: -0.02em;
+    line-height: 1.05;
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--color-keyframe) 40%, transparent);
+    background: color-mix(in srgb, var(--color-keyframe) 38%, transparent);
     color: #fff;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-curve);
-    outline-offset: 3px;
+    outline: 2px solid var(--color-keyframe);
+    outline-offset: 2px;
   }
 
   a,
@@ -95,44 +100,14 @@
  * Components
  * ------------------------------------------------------------------ */
 @layer components {
+  /* Calm, static page background. One faint wash, no drifting orbs. */
   .site-shell {
     position: relative;
     isolation: isolate;
     min-height: 100dvh;
     background:
-      radial-gradient(1200px 640px at 50% -10%, color-mix(in srgb, var(--color-keyframe) 16%, transparent), transparent 60%),
-      radial-gradient(780px 520px at 100% 8%, color-mix(in srgb, var(--color-keyframe) 8%, transparent), transparent 62%),
-      radial-gradient(860px 640px at 0% 92%, color-mix(in srgb, var(--color-curve) 7%, transparent), transparent 60%),
+      radial-gradient(900px 520px at 50% -12%, color-mix(in srgb, var(--color-keyframe) 11%, transparent), transparent 62%),
       var(--color-bg);
-  }
-
-  .ambient {
-    position: absolute;
-    width: 20rem;
-    height: 20rem;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: -2;
-    filter: blur(64px);
-    opacity: 0.55;
-  }
-
-  .ambient-one {
-    top: -8rem;
-    left: -7rem;
-    background: color-mix(in srgb, var(--color-keyframe) 42%, transparent);
-    animation: drift 16s ease-in-out infinite;
-  }
-
-  .ambient-two {
-    top: 44%;
-    right: -10rem;
-    background: color-mix(in srgb, var(--color-keyframe) 26%, transparent);
-    animation: drift 20s ease-in-out infinite reverse;
-  }
-
-  .ambient-three {
-    display: none;
   }
 
   .grid-overlay {
@@ -140,39 +115,28 @@
     inset: 0;
     pointer-events: none;
     z-index: -1;
-    opacity: 0.5;
+    opacity: 0.6;
     background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(120% 90% at 50% 0%, black 40%, transparent 82%);
+      linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(120% 80% at 50% 0%, black 35%, transparent 80%);
   }
 
   .page-transition {
-    animation: page-enter 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: page-enter 320ms ease both;
   }
 
-  /* Logo badge: the black-background logo art blended into the dark page.
-     The radial mask dissolves the square edges so no seam shows. */
+  /* Logo art blended into the page. The radial mask dissolves the black
+     square edges. No glow. */
   .logo-badge {
-    position: relative;
     display: grid;
     place-items: center;
   }
 
-  .logo-badge::after {
-    content: "";
-    position: absolute;
-    inset: 8%;
-    z-index: -1;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--color-keyframe) 30%, transparent);
-    filter: blur(60px);
-  }
-
   .logo-badge img {
-    -webkit-mask-image: radial-gradient(closest-side, #000 68%, transparent 90%);
-    mask-image: radial-gradient(closest-side, #000 68%, transparent 90%);
+    -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 92%);
+    mask-image: radial-gradient(closest-side, #000 70%, transparent 92%);
   }
 
   /* Top Discord bar. */
@@ -182,34 +146,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.7rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
-    padding: 0.65rem 1rem;
+    padding: 0.625rem 1rem;
     border-bottom: 1px solid var(--color-surface-border);
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-keyframe) 16%, transparent),
-      color-mix(in srgb, var(--color-keyframe) 7%, transparent)
-    );
-    font-size: 0.83rem;
-    color: var(--color-ink);
+    background: var(--color-surface);
+    font-size: 0.85rem;
+    color: var(--color-ink-soft);
   }
 
   .eyebrow {
     font-family: var(--font-display);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 900;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-keyframe-strong);
   }
 
   .section-title {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 4.4vw, 3.2rem);
+    font-size: clamp(1.9rem, 4vw, 3rem);
     font-weight: 900;
     letter-spacing: -0.025em;
-    line-height: 1;
+    line-height: 1.02;
     color: var(--color-ink);
     text-transform: uppercase;
   }
@@ -217,109 +177,76 @@
   .lede {
     color: var(--color-ink-soft);
     font-size: 1rem;
-    line-height: 1.7;
+    line-height: 1.65;
   }
 
-  .text-gradient {
-    background: linear-gradient(100deg, var(--color-ink) 6%, var(--color-keyframe-strong) 58%, var(--color-keyframe) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .accent {
+    color: var(--color-keyframe-strong);
   }
 
+  /* One card style, one radius, one shadow. */
   .card {
     position: relative;
     border: 1px solid var(--color-surface-border);
-    border-radius: 1.15rem;
-    background: linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
-    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    box-shadow: var(--shadow);
   }
 
   .card-hover {
-    transition:
-      transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 260ms ease,
-      background 260ms ease;
+    transition: border-color 200ms ease;
   }
 
   .card-hover:hover {
-    transform: translateY(-3px);
-    border-color: color-mix(in srgb, var(--color-keyframe) 42%, transparent);
+    border-color: var(--color-surface-border-strong);
   }
 
-  .edge-lit::before {
-    content: "";
-    position: absolute;
-    inset-inline: 12%;
-    top: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--color-keyframe), transparent);
-    opacity: 0;
-    transition: opacity 260ms ease;
-  }
-
-  .edge-lit:hover::before {
-    opacity: 0.8;
-  }
-
+  /* One button system. Subtle hover, no lift, no bounce. */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: 0.8rem;
-    padding: 0.9rem 1.4rem;
+    border-radius: var(--radius);
+    padding: 0.875rem 1.5rem;
     font-family: var(--font-display);
-    font-size: 0.86rem;
+    font-size: 0.875rem;
     font-weight: 900;
     letter-spacing: 0.01em;
     line-height: 1;
     text-transform: uppercase;
     cursor: pointer;
-    transition:
-      transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
-      background 200ms ease,
-      border-color 200ms ease,
-      box-shadow 200ms ease;
-  }
-
-  .btn:active {
-    transform: translateY(0) scale(0.985);
+    transition: background 180ms ease, border-color 180ms ease, filter 180ms ease;
   }
 
   .btn-primary {
-    background: linear-gradient(180deg, var(--color-keyframe-strong), var(--color-keyframe));
-    color: #170c2b;
-    box-shadow: 0 12px 34px -12px color-mix(in srgb, var(--color-keyframe) 82%, transparent);
+    background: var(--color-keyframe);
+    color: #140a24;
+    box-shadow: var(--shadow);
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 46px -12px color-mix(in srgb, var(--color-keyframe) 92%, transparent);
+    filter: brightness(1.08);
   }
 
   .btn-ghost {
-    border: 1px solid var(--color-surface-border);
-    background: color-mix(in srgb, var(--color-surface-2) 70%, transparent);
+    border: 1px solid var(--color-surface-border-strong);
+    background: transparent;
     color: var(--color-ink);
   }
 
   .btn-ghost:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--color-keyframe) 46%, transparent);
     background: var(--color-surface-2);
   }
 
-  /* Discord uses its own brand blue so it reads as Discord instantly. */
+  /* Discord brand blue so the action reads instantly. */
   .btn-discord {
     background: #5865f2;
     color: #fff;
-    box-shadow: 0 12px 34px -14px #5865f2;
   }
 
   .btn-discord:hover {
-    transform: translateY(-2px);
-    background: #6b76f5;
+    background: #4f5bda;
   }
 
   .chip {
@@ -327,11 +254,11 @@
     align-items: center;
     gap: 0.4rem;
     border: 1px solid var(--color-surface-border);
-    border-radius: 999px;
-    padding: 0.32rem 0.7rem;
-    background: color-mix(in srgb, var(--color-keyframe) 6%, transparent);
+    border-radius: var(--radius-pill);
+    padding: 0.375rem 0.75rem;
+    background: var(--color-surface-2);
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--color-ink-soft);
   }
@@ -342,9 +269,9 @@
     width: 2.75rem;
     height: 2.75rem;
     flex: 0 0 auto;
-    border: 1px solid color-mix(in srgb, var(--color-keyframe) 24%, transparent);
-    border-radius: 0.8rem;
-    background: color-mix(in srgb, var(--color-keyframe) 10%, transparent);
+    border: 1px solid var(--color-surface-border-strong);
+    border-radius: var(--radius);
+    background: var(--color-surface-2);
     color: var(--color-keyframe-strong);
   }
 
@@ -353,68 +280,50 @@
     height: 1.35rem;
   }
 
-  .marquee {
-    overflow: hidden;
-    mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
-  }
-
-  .marquee-track {
-    display: flex;
-    width: max-content;
-    gap: 0.6rem;
-    animation: var(--animate-marquee);
-  }
-
-  .marquee:hover .marquee-track {
-    animation-play-state: paused;
-  }
-
+  /* Copy-invite button (community section). */
   .copy-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-width: 130px;
-    border: 1px solid var(--color-surface-border);
-    border-radius: 0.8rem;
-    padding: 0.9rem 1.3rem;
-    background: color-mix(in srgb, var(--color-surface-2) 70%, transparent);
+    min-width: 132px;
+    border: 1px solid var(--color-surface-border-strong);
+    border-radius: var(--radius);
+    padding: 0.875rem 1.5rem;
+    background: transparent;
     color: var(--color-ink);
     font-family: var(--font-display);
-    font-size: 0.82rem;
+    font-size: 0.875rem;
     font-weight: 900;
     text-transform: uppercase;
-    transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease, background 200ms ease;
+    transition: background 180ms ease, border-color 180ms ease;
   }
 
   .copy-button:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--color-keyframe) 44%, transparent);
     background: var(--color-surface-2);
   }
 
   .copy-success {
-    color: var(--color-online);
-    animation: success-pop 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    color: var(--color-keyframe-strong);
   }
 
+  /* FAQ accordion. Motion is tied to intent (open/close) only. */
   .faq-list {
     display: grid;
-    gap: 0.7rem;
+    gap: 0.75rem;
   }
 
   .faq-item {
     overflow: hidden;
     border: 1px solid var(--color-surface-border);
-    border-radius: 0.95rem;
+    border-radius: var(--radius);
     background: var(--color-surface);
-    transition: border-color 240ms ease, background 240ms ease;
+    transition: border-color 200ms ease;
   }
 
   .faq-item:hover,
   .faq-item-open {
-    border-color: color-mix(in srgb, var(--color-keyframe) 36%, transparent);
-    background: var(--color-surface-2);
+    border-color: var(--color-surface-border-strong);
   }
 
   .faq-trigger {
@@ -423,7 +332,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.05rem 1.2rem;
+    padding: 1.125rem 1.25rem;
     text-align: left;
     color: var(--color-ink);
     font-family: var(--font-display);
@@ -435,7 +344,7 @@
   }
 
   .faq-trigger:focus-visible {
-    outline: 2px solid var(--color-curve);
+    outline: 2px solid var(--color-keyframe);
     outline-offset: -2px;
   }
 
@@ -445,23 +354,22 @@
     width: 1.5rem;
     height: 1.5rem;
     flex: 0 0 auto;
-    border: 1px solid color-mix(in srgb, var(--color-keyframe) 30%, transparent);
-    border-radius: 50%;
+    border: 1px solid var(--color-surface-border-strong);
+    border-radius: var(--radius-pill);
     color: var(--color-keyframe-strong);
     font-size: 1rem;
-    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), background 240ms ease;
+    transition: transform 200ms ease;
   }
 
   .faq-item-open .faq-icon {
     transform: rotate(45deg);
-    background: color-mix(in srgb, var(--color-keyframe) 12%, transparent);
   }
 
   .faq-panel {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
+    transition: grid-template-rows 260ms ease, opacity 200ms ease;
   }
 
   .faq-item-open .faq-panel {
@@ -472,90 +380,30 @@
   .faq-answer {
     min-height: 0;
     overflow: hidden;
-    padding: 0 1.2rem;
+    padding: 0 1.25rem;
     color: var(--color-ink-soft);
     font-size: 0.9rem;
-    line-height: 1.7;
+    line-height: 1.65;
   }
 
   .faq-item-open .faq-answer {
-    padding-bottom: 1.1rem;
-  }
-
-  .cursor-glow {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    opacity: 0;
-    background: radial-gradient(300px circle at var(--cursor-x) var(--cursor-y), color-mix(in srgb, var(--color-keyframe) 7%, transparent), transparent 70%);
-  }
-
-  @media (pointer: fine) {
-    .cursor-glow {
-      opacity: 1;
-    }
+    padding-bottom: 1.125rem;
   }
 }
 
 /* ------------------------------------------------------------------ *
- * Keyframes
+ * Keyframes. Only what is tied to intent: page load, accordion,
+ * loading spinner (Tailwind's animate-spin).
  * ------------------------------------------------------------------ */
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(9px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
-@keyframes success-pop {
-  from {
-    opacity: 0;
-    transform: translateY(3px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes drift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(28px, 18px, 0) scale(1.05);
-  }
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* ------------------------------------------------------------------ *
- * Reduced motion
- * ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -567,10 +415,5 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-
-  .ambient,
-  .cursor-glow {
-    display: none;
   }
 }

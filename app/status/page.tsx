@@ -15,7 +15,7 @@ interface StatusCheck {
 }
 
 /**
- * Static for now — swap this array for a fetch against a real
+ * Static for now. Swap this array for a fetch against a real
  * monitoring endpoint (Better Stack, status.io, your own health-check
  * route) once one exists. The shape below matches what most of those
  * return, so the swap is a data-source change, not a UI rewrite.

@@ -63,18 +63,16 @@ export default function GetKeyPage() {
 
   return (
     <div className="site-shell relative flex min-h-dvh flex-col overflow-hidden">
-      <div className="ambient ambient-one" aria-hidden="true" />
-      <div className="ambient ambient-two" aria-hidden="true" />
       <div className="grid-overlay" aria-hidden="true" />
 
       <SiteHeader />
 
-      <main className="relative z-10 flex flex-1 items-center justify-center px-5 py-12 sm:px-8">
+      <main className="relative z-10 flex flex-1 items-center justify-center px-5 py-16 sm:px-8">
         <section className="w-full max-w-xl">
-          <div className="card edge-lit animate-rise p-6 sm:p-8">
+          <div className="card p-6 sm:p-8">
             <p className="eyebrow">Zkx Hub / Access</p>
             <h1 className="mt-3 text-4xl sm:text-5xl">
-              Unlock your <span className="text-gradient">access.</span>
+              Unlock your <span className="accent">access.</span>
             </h1>
             <p className="lede mt-4">
               Open the Zkx Hub Discord below. The step runs a short check, then the
@@ -87,16 +85,14 @@ export default function GetKeyPage() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={startVerification}
-              className={`group mt-8 block rounded-2xl border p-4 transition-all duration-300 ${
-                state === "complete"
-                  ? "border-keyframe/40 bg-keyframe/10"
-                  : state === "loading"
-                    ? "border-keyframe/30 bg-keyframe/[0.07]"
-                    : "border-surface-border bg-surface-2/60 hover:-translate-y-0.5 hover:border-keyframe/40"
+              className={`mt-8 block rounded-[var(--radius)] border p-4 transition-colors duration-200 ${
+                state === "idle"
+                  ? "border-surface-border bg-surface-2 hover:border-surface-border-strong"
+                  : "border-surface-border-strong bg-surface-2"
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-surface-border bg-surface text-keyframe-strong">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--radius)] border border-surface-border-strong bg-surface text-keyframe-strong">
                   {state === "loading" ? (
                     <Spinner />
                   ) : state === "complete" ? (
@@ -115,14 +111,6 @@ export default function GetKeyPage() {
                         : "Open the invite in a new tab"}
                   </p>
                 </div>
-                {state === "idle" && (
-                  <span
-                    className="shrink-0 text-lg text-keyframe-strong transition-transform duration-300 group-hover:translate-x-1"
-                    aria-hidden="true"
-                  >
-                    ↗
-                  </span>
-                )}
               </div>
             </a>
 
@@ -133,19 +121,19 @@ export default function GetKeyPage() {
               className={`btn mt-4 w-full ${
                 ready
                   ? "btn-primary"
-                  : "cursor-not-allowed border border-surface-border bg-surface-2/60 text-ink-muted"
+                  : "cursor-not-allowed border border-surface-border bg-surface-2 text-ink-muted"
               }`}
             >
               {ready ? "Continue to Key System" : "Complete the step above"}
             </button>
 
             <div className="mt-6 flex items-center justify-between gap-3 border-t border-surface-border pt-5">
-              <p className="text-[11px] leading-5 text-ink-muted">
+              <p className="text-xs leading-5 text-ink-muted">
                 Discord verification unlocks access to the key system.
               </p>
               <Link
                 href="/"
-                className="shrink-0 text-[11px] font-bold uppercase tracking-[0.12em] text-ink-muted transition-colors hover:text-ink"
+                className="shrink-0 text-xs font-bold uppercase tracking-[0.1em] text-ink-muted transition-colors hover:text-ink"
               >
                 Back
               </Link>

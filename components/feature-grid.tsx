@@ -98,7 +98,7 @@ export function FeatureGrid() {
       {features.map((feature) => (
         <article
           key={feature.title}
-          className={`card card-hover edge-lit flex flex-col p-6 ${
+          className={`card card-hover flex flex-col p-6 ${
             feature.featured ? "sm:col-span-2" : ""
           }`}
         >
