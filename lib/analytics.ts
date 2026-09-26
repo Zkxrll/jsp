@@ -15,8 +15,8 @@
 
 type AnalyticsEvent =
   | { name: "get_key_clicked"; props?: { source?: string } }
-  | { name: "get_key_redirected"; props: { destination: string } }
-  | { name: "get_key_blocked_no_url" };
+  | { name: "get_key_discord_opened" }
+  | { name: "get_key_redirected"; props: { destination: string } };
 
 export function track(event: AnalyticsEvent): void {
   if (process.env.NODE_ENV !== "production") {

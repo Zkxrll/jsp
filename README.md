@@ -23,11 +23,13 @@ one you add is a thing to keep updated.
 
 ```
 app/
-  layout.tsx        Fonts, <head> metadata, global providers (none yet)
-  page.tsx           The landing page itself
-  globals.css        Tailwind import + all design tokens (@theme)
-  status/page.tsx     Example second page — see "Adding a page" below
+  layout.tsx          Fonts (next/font), <head> metadata, ad scripts
+  page.tsx            The landing page itself
+  globals.css         Tailwind import + the design system (tokens, type ramp, components)
+  get-key/page.tsx    Get Key flow (UI in components/get-key-flow.tsx)
+  status/page.tsx     Status page — also the template for new pages
   not-found.tsx       Custom 404
+  opengraph-image.tsx 1200×630 share card, generated at build time
   robots.ts           robots.txt, generated
   sitemap.ts          sitemap.xml, generated
 components/          UI pieces — presentational, import from lib/ for data
@@ -98,21 +100,18 @@ change or rebuild logic needed.
 
 ## Updating branding
 
-- **Colors / fonts** — `app/globals.css`, inside the `@theme` block.
-  Tailwind v4 generates every `bg-*` / `text-*` / `font-*` utility used
-  across the app directly from those values; there's no separate config
-  file to keep in sync.
-- **Logo** — `components/logo.tsx` is one inline SVG (`currentColor`,
-  so it inherits whatever text color wraps it). Swap the `<path>`/`<rect>`
-  contents for your own mark, or replace the component body with an
-  `<Image>` if you'd rather ship a raster/logo file.
-- **Hero copy, feature row** — `app/page.tsx`. The three feature
-  entries near the bottom of the hero are placeholder copy — replace
-  with whatever's actually true of your product.
-- **Favicon / OG image** — not included; drop `favicon.ico` and an
-  `opengraph-image.png` into `app/` and Next.js will pick them up
-  automatically (this is a Next.js file-convention, not something to
-  wire up manually).
+- **Colors** — `app/globals.css`, inside the `@theme` block.
+  Tailwind v4 generates every `bg-*` / `text-*` utility from those values.
+- **Fonts** — `app/layout.tsx`: Archivo (display) and Inter (body) via
+  `next/font`. One display face, one body face; don't add a third.
+- **Design rules** — documented at the top of `app/globals.css`: 4pt
+  spacing (whole Tailwind steps only), the type ramp, one radius, one
+  button system (`.btn` + `.btn-primary` / `.btn-ghost`, `.btn-sm`).
+- **Logo** — `public/logo.jpg` (hero and share card). Favicon is
+  `app/icon.png`, iOS home-screen icon `app/apple-icon.png`.
+- **Hero copy, features, stats** — `app/page.tsx` and `lib/features.ts`.
+- **Share image** — `app/opengraph-image.tsx` renders it from the logo,
+  name, and tagline in `lib/config.ts`.
 
 ## Adding a page
 
@@ -125,11 +124,17 @@ new route.
 
 ## Ad providers (Monetag, PopAds, AdMaven, or anything else)
 
-Nothing is wired in. See **`lib/ads/README.md`** for the exact steps —
-it's a three-line change in `lib/ads/ad-slot.tsx` and one commented-out
-line in `components/site-footer.tsx` to uncomment. That file also has
-a note on why some networks are worth avoiding regardless of what
-they'll accept — worth reading before picking one.
+Currently live: Monetag (multitag in `components/monetag-script.tsx`
+and the push service worker in `public/sw.js`), PopAds
+(`components/popads-script.tsx`), and AdMaven (`app/layout.tsx`; its
+verification file is `public/BqHw6rdCE.js`). `components/adblock-gate.tsx`
+shows a notice to visitors with a blocker.
+
+`public/sw.js` runs third-party code as a service worker scoped to the
+whole site, which can see every request made on this origin. Keep that
+in mind before adding anything sensitive here.
+
+For display slots, see **`lib/ads/README.md`**.
 
 ## Analytics
 
@@ -138,16 +143,3 @@ just logs to the console outside production. The **Get Key** button
 already calls it at the three points that matter (clicked, blocked
 because no URL is configured, redirected) — wiring in a real provider
 means filling in the body of `track()`, not touching the button.
-
-## A note on this build
-
-I wrote and statically checked every file in this project (import
-resolution, bracket balance, correct `"use client"` placement, and
-every Tailwind utility class cross-referenced against the tokens that
-generate it), and confirmed current package versions against Next.js
-and Tailwind's own release pages before pinning them. I could not run
-an actual `npm install` / `next build` in the sandbox this was built
-in — outbound network access is disabled there — so the one thing I
-haven't done is a real compiler/bundler pass. Run `npm install && npm run typecheck && npm run build`
-as your first step; if anything surfaces, it'll be something narrower
-than "the architecture is wrong."

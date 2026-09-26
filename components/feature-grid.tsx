@@ -28,9 +28,9 @@ const ICONS: Record<FeatureIcon, ReactNode> = {
   sliders: (
     <>
       <path d="M5 6h14M5 12h14M5 18h14" />
-      <circle cx="9" cy="6" r="1.9" fill="var(--color-surface)" />
-      <circle cx="15" cy="12" r="1.9" fill="var(--color-surface)" />
-      <circle cx="8" cy="18" r="1.9" fill="var(--color-surface)" />
+      <circle cx="9" cy="6" r="1.9" fill="var(--tile-bg)" />
+      <circle cx="15" cy="12" r="1.9" fill="var(--tile-bg)" />
+      <circle cx="8" cy="18" r="1.9" fill="var(--tile-bg)" />
     </>
   ),
   eye: (
@@ -99,26 +99,18 @@ export function FeatureGrid() {
         <article
           key={feature.title}
           data-reveal
-          className={`card card-hover flex flex-col p-6 ${
-            feature.featured ? "sm:col-span-2" : ""
-          }`}
+          className={`card flex flex-col p-6 ${feature.featured ? "sm:col-span-2" : ""}`}
         >
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-4">
             <FeatureIconMark icon={feature.icon} />
-            <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-ink-muted">
-              {feature.tab}
-            </span>
+            <span className="label">{feature.tab}</span>
           </div>
 
-          <h3 className="mt-5 font-display text-xl font-semibold tracking-tight text-ink">
-            {feature.title}
-          </h3>
+          <h3 className="card-title mt-4">{feature.title}</h3>
 
-          <p className="mt-2.5 flex-1 text-sm leading-7 text-ink-soft">
-            {feature.blurb}
-          </p>
+          <p className="body-sm mt-2 flex-1">{feature.blurb}</p>
 
-          <div className="mt-5 flex flex-wrap gap-1.5">
+          <div className="mt-4 flex flex-wrap gap-2">
             {feature.tags.map((tag) => (
               <span key={tag} className="chip">
                 {tag}

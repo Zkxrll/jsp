@@ -1,23 +1,24 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { ArrowLeftIcon } from "@/components/icons";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="site-shell">
+      <div className="grid-overlay" aria-hidden="true" />
+
       <SiteHeader />
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="font-mono text-sm text-keyframe">404</p>
-        <h1 className="font-display text-2xl font-semibold text-ink">Nothing on this frame.</h1>
-        <p className="max-w-sm text-ink-muted">
-          The page you&apos;re looking for doesn&apos;t exist, or moved.
+      <main className="wrap relative z-10 flex flex-1 flex-col items-center justify-center py-16 text-center">
+        <p className="label label-accent">404</p>
+        <h1 className="section-title mt-3">Page not found.</h1>
+        <p className="lede mt-4 max-w-sm">
+          This page doesn&apos;t exist or has moved.
         </p>
-        <Link
-          href="/"
-          className="mt-2 rounded-lg border border-surface-border px-4 py-2 text-sm text-ink transition-colors hover:border-ink-muted"
-        >
-          Back home
+        <Link href="/" className="btn btn-ghost mt-8">
+          <ArrowLeftIcon />
+          Back to home
         </Link>
       </main>
 

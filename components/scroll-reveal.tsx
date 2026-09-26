@@ -5,28 +5,18 @@ import { useEffect } from "react";
 /**
  * Reveals [data-reveal] elements as they scroll into view.
  *
- * Renders nothing. On mount it flags the document with `reveal-on` so the
- * hide-then-reveal styling only applies when JS runs, which means content is
- * always visible without JS and never gets stuck hidden. Honors
- * prefers-reduced-motion by leaving everything visible and skipping the
- * observer entirely.
+ * Renders nothing. The inline bootstrap script in app/layout.tsx decides,
+ * before first paint, whether reveal is on (`reveal-on` on <html>): only when
+ * JS runs and motion is allowed. This component just observes, and marks the
+ * page as hydrated so the bootstrap's safety timeout doesn't fire.
  */
 export function ScrollReveal() {
   useEffect(() => {
     const root = document.documentElement;
-
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
+    root.dataset.revealReady = "1";
+    if (!root.classList.contains("reveal-on")) return;
 
     const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
-    if (elements.length === 0) return;
-
-    root.classList.add("reveal-on");
-
-    if (!("IntersectionObserver" in window)) {
-      elements.forEach((el) => el.classList.add("is-visible"));
-      return;
-    }
 
     const observer = new IntersectionObserver(
       (entries) => {
