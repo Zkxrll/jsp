@@ -1,32 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { PlusIcon } from "./icons";
 
 const FAQ_ITEMS = [
   {
     question: "How do I get a key?",
     answer:
-      "Click Get Key on the homepage, join the Zkx Hub Discord, wait for the access check to finish, then continue to the key system.",
+      "Click Get Key, open the Zkx Hub Discord invite, then continue to the key system. The key system issues your key; paste it into the script when it asks.",
   },
   {
     question: "Is Premium lifetime?",
     answer:
-      "Yes. Premium is a one-time purchase that gives you lifetime access. There is no recurring subscription.",
+      "Yes. Premium is a single payment for lifetime access with every future update included. There is no subscription and nothing renews.",
   },
   {
-    question: "Where can I get support?",
+    question: "My key stopped working. What now?",
     answer:
-      "Join the Zkx Hub Discord for support, updates, announcements, and help with the key system.",
-  },
-  {
-    question: "What should I do if my key does not work?",
-    answer:
-      "First make sure you are using the latest key flow. If the problem continues, contact the Zkx Hub team through Discord.",
+      "Get a fresh one through Get Key. If a new key still fails, ask in the Discord and include which executor you are using so the team can reproduce it.",
   },
   {
     question: "How often is Zkx Hub updated?",
     answer:
-      "Updates are released when needed to improve compatibility, fix issues, and add or improve features.",
+      "Whenever a Rivals update breaks something, and when new features are ready. Fixed builds are posted in the Discord first, and the latest changes are listed in Updates above.",
+  },
+  {
+    question: "Where do I get support?",
+    answer:
+      "In the Discord. Keys, update announcements, and support all run through the same server.",
   },
 ] as const;
 
@@ -41,37 +42,32 @@ export function FAQ() {
         const buttonId = `faq-button-${index}`;
 
         return (
-          <div
-            key={item.question}
-            className={`faq-item ${isOpen ? "faq-item-open" : ""}`}
-          >
-            <button
-              id={buttonId}
-              type="button"
-              className="faq-trigger"
-              aria-expanded={isOpen}
-              aria-controls={panelId}
-              onClick={() =>
-                setOpenIndex((current) =>
-                  current === index ? null : index
-                )
-              }
-            >
-              <span>{item.question}</span>
-
-              <span className="faq-icon" aria-hidden="true">
-                +
-              </span>
-            </button>
+          <div key={item.question} className={`faq-item ${isOpen ? "faq-item-open" : ""}`}>
+            <h3 className="text-base">
+              <button
+                id={buttonId}
+                type="button"
+                className="faq-trigger"
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setOpenIndex((current) => (current === index ? null : index))}
+              >
+                <span>{item.question}</span>
+                <span className="faq-icon" aria-hidden="true">
+                  <PlusIcon />
+                </span>
+              </button>
+            </h3>
 
             <div
               id={panelId}
               role="region"
               aria-labelledby={buttonId}
               className="faq-panel"
+              inert={!isOpen}
             >
               <div className="faq-answer">
-                {item.answer}
+                <p className="faq-answer-inner">{item.answer}</p>
               </div>
             </div>
           </div>

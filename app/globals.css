@@ -2,8 +2,15 @@
 
 /* ------------------------------------------------------------------ *
  * Design tokens. One source of truth for color, type, radius, and
- * elevation. Depth and motion are intentional here, not decoration for
- * its own sake: entrance reveals, hover lift, and soft ambient light.
+ * elevation.
+ *
+ * Spacing: 4pt grid. Every margin, padding, and gap is a multiple of
+ * 0.25rem. Tailwind's default scale already is, so stick to whole steps
+ * (no 1.5 / 2.5 / 3.5) and never hand-write off-grid rem values here.
+ *
+ * Type ramp (the only sizes used on the site):
+ *   12 label · 14 small body · 16 body · 18 card title
+ *   28–44 section title · 40–64 display
  * ------------------------------------------------------------------ */
 @theme {
   --color-ink: #f4f1fb;
@@ -19,22 +26,26 @@
   --color-keyframe: #9a5cff;
   --color-keyframe-strong: #b892ff;
   --color-danger: #f2777a;
+  --color-warning: #f2c66d;
   --color-online: #4ade80;
-
-  --font-display: "Arial Black", "Arial Bold", Gadget, "Helvetica Neue", Arial, sans-serif;
-  --font-body: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "Segoe UI Mono", Consolas, monospace;
 }
 
-/* One radius, two elevation levels (resting and lifted). Reused
-   everywhere. Pills are the only intentional radius exception. */
+/* Fonts come from next/font (app/layout.tsx), which sets these variables
+   on <html>. `inline` so utilities resolve to the real family names. */
+@theme inline {
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+}
+
+/* One radius, two elevation levels (resting and modal). Pills are the
+   only intentional radius exception. */
 :root {
-  --radius: 0.875rem;
+  --radius: 0.75rem;
   --radius-pill: 999px;
-  --shadow: 0 16px 40px -22px rgba(2, 1, 6, 0.8);
-  --shadow-lift: 0 26px 60px -24px rgba(2, 1, 6, 0.9),
-    0 10px 34px -16px color-mix(in srgb, var(--color-keyframe) 22%, transparent);
+  --shadow: 0 16px 40px -24px rgba(2, 1, 6, 0.8);
+  --shadow-modal: 0 32px 80px -24px rgba(2, 1, 6, 0.95);
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --header-height: 4rem;
 }
 
 /* ------------------------------------------------------------------ *
@@ -50,6 +61,7 @@
   html {
     color-scheme: dark;
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 1rem);
     background: var(--color-bg);
     -webkit-text-size-adjust: 100%;
   }
@@ -57,11 +69,12 @@
   body {
     margin: 0;
     min-height: 100dvh;
-    overflow-x: hidden;
+    overflow-x: clip;
     background: var(--color-bg);
     color: var(--color-ink);
     font-family: var(--font-body);
-    line-height: 1.6;
+    font-size: 1rem;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -73,10 +86,16 @@
   h1,
   h2,
   h3 {
+    margin: 0;
     font-family: var(--font-display);
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
+    font-weight: 800;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+    text-wrap: pretty;
   }
 
   ::selection {
@@ -103,43 +122,39 @@
  * Components
  * ------------------------------------------------------------------ */
 @layer components {
+  /* Layout ------------------------------------------------------------ */
+
+  /* One container. Header, sections, and footer all share it, so their
+     edges line up at every width. */
+  .wrap {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  .wrap-narrow {
+    max-width: 48rem;
+  }
+
+  @media (min-width: 640px) {
+    .wrap {
+      padding-inline: 2rem;
+    }
+  }
+
   .site-shell {
     position: relative;
     isolation: isolate;
+    display: flex;
+    flex-direction: column;
     min-height: 100dvh;
+    /* clip, not hidden: hidden creates a scroll container and breaks the
+       sticky header. */
+    overflow-x: clip;
     background:
       radial-gradient(1000px 560px at 50% -12%, color-mix(in srgb, var(--color-keyframe) 13%, transparent), transparent 62%),
       var(--color-bg);
-  }
-
-  /* Soft ambient light for depth. Slow, low-opacity, transform-only so
-     it composites on the GPU. */
-  .ambient {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: -2;
-    filter: blur(72px);
-    opacity: 0.5;
-    will-change: transform;
-  }
-
-  .ambient-one {
-    width: 22rem;
-    height: 22rem;
-    top: -6rem;
-    left: -8rem;
-    background: color-mix(in srgb, var(--color-keyframe) 42%, transparent);
-    animation: drift 18s ease-in-out infinite;
-  }
-
-  .ambient-two {
-    width: 20rem;
-    height: 20rem;
-    top: 28%;
-    right: -9rem;
-    background: color-mix(in srgb, var(--color-keyframe) 24%, transparent);
-    animation: drift 23s ease-in-out infinite reverse;
   }
 
   .grid-overlay {
@@ -152,11 +167,42 @@
       linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
     background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(120% 80% at 50% 0%, black 35%, transparent 80%);
     mask-image: radial-gradient(120% 80% at 50% 0%, black 35%, transparent 80%);
   }
 
-  .page-transition {
-    animation: page-enter 320ms ease both;
+  /* Header: a translucent layer content scrolls under. A hairline that
+     fades at the edges marks where chrome meets content, instead of a
+     hard full-width rule. */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in srgb, var(--color-bg) 72%, transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+  }
+
+  .site-header::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-surface-border) 20%, var(--color-surface-border) 80%, transparent);
+  }
+
+  .nav-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+    transition: color 160ms ease;
+  }
+
+  @media (hover: hover) {
+    .nav-link:hover {
+      color: var(--color-ink);
+    }
   }
 
   /* Logo art blended into the page with a soft glow behind it. */
@@ -173,7 +219,7 @@
     z-index: -1;
     border-radius: 50%;
     background: color-mix(in srgb, var(--color-keyframe) 24%, transparent);
-    filter: blur(58px);
+    filter: blur(56px);
   }
 
   .logo-badge img {
@@ -181,51 +227,63 @@
     mask-image: radial-gradient(closest-side, #000 70%, transparent 92%);
   }
 
-  .topbar {
-    position: relative;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    padding: 0.625rem 1rem;
-    border-bottom: 1px solid var(--color-surface-border);
-    background: var(--color-surface);
-    font-size: 0.85rem;
-    color: var(--color-ink-soft);
+  /* Type -------------------------------------------------------------- */
+
+  /* Small uppercase kicker. One size, one tracking, everywhere. Caps get
+     positive tracking; large display text gets negative. */
+  .label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
   }
 
-  .eyebrow {
-    font-family: var(--font-display);
-    font-size: 0.75rem;
-    font-weight: 900;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+  .label-accent {
     color: var(--color-keyframe-strong);
   }
 
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(1.9rem, 4vw, 3rem);
-    font-weight: 900;
-    letter-spacing: -0.025em;
+  .display {
+    font-size: clamp(2.5rem, 7vw, 4rem);
     line-height: 1.02;
-    color: var(--color-ink);
-    text-transform: uppercase;
+    letter-spacing: -0.035em;
+  }
+
+  .section-title {
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    letter-spacing: -0.01em;
   }
 
   .lede {
     color: var(--color-ink-soft);
     font-size: 1rem;
-    line-height: 1.65;
+    line-height: 1.625rem;
   }
 
-  .accent {
-    color: var(--color-keyframe-strong);
+  @media (min-width: 640px) {
+    .lede {
+      font-size: 1.125rem;
+      line-height: 1.75rem;
+    }
   }
 
-  /* One tasteful gradient, used only on lead words. */
+  .body-sm {
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  /* The only gradient on the site, used once on the hero's lead word. */
   .text-gradient {
     background: linear-gradient(100deg, var(--color-ink) 8%, var(--color-keyframe-strong) 58%, var(--color-keyframe) 100%);
     -webkit-background-clip: text;
@@ -233,7 +291,8 @@
     color: transparent;
   }
 
-  /* Card: subtle surface gradient for depth, one radius, one shadow. */
+  /* Surfaces ---------------------------------------------------------- */
+
   .card {
     position: relative;
     border: 1px solid var(--color-surface-border);
@@ -242,191 +301,224 @@
     box-shadow: var(--shadow);
   }
 
-  .card-hover {
-    transition: transform 280ms var(--ease), border-color 220ms ease, box-shadow 280ms ease;
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-pill);
+    padding: 0.25rem 0.75rem;
+    background: var(--color-surface-2);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+    color: var(--color-ink-soft);
+    white-space: nowrap;
   }
 
-  .card-hover:hover {
-    transform: translateY(-4px);
-    border-color: var(--color-surface-border-strong);
-    box-shadow: var(--shadow-lift);
+  .icon-tile {
+    --tile-bg: color-mix(in srgb, var(--color-keyframe) 10%, var(--color-surface-2));
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 auto;
+    border: 1px solid var(--color-surface-border-strong);
+    border-radius: var(--radius);
+    background: var(--tile-bg);
+    color: var(--color-keyframe-strong);
   }
 
-  /* One button system. Subtle lift, not a bounce. */
+  .icon-tile svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Buttons ----------------------------------------------------------- */
+
+  /* One button system. Feedback lands on press (scale), not on hover
+     (no lift, no layout movement). Hover only changes color, and only
+     on devices that actually hover. */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0 1.5rem;
+    border: 1px solid transparent;
     border-radius: var(--radius);
-    padding: 0.875rem 1.5rem;
     font-family: var(--font-display);
     font-size: 0.875rem;
-    font-weight: 900;
-    letter-spacing: 0.01em;
+    font-weight: 800;
     line-height: 1;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
+    white-space: nowrap;
     cursor: pointer;
-    transition: transform 220ms var(--ease), background 180ms ease, border-color 180ms ease,
-      filter 180ms ease, box-shadow 220ms ease;
+    user-select: none;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease,
+      transform 100ms ease-out;
+  }
+
+  .btn svg {
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
   }
 
   .btn:active {
-    transform: translateY(0) scale(0.98);
+    transform: scale(0.97);
+  }
+
+  .btn-sm {
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-icon {
+    width: 2.75rem;
+    padding: 0;
   }
 
   .btn-primary {
     background: var(--color-keyframe);
     color: #140a24;
-    box-shadow: var(--shadow);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.07);
-    box-shadow: var(--shadow-lift);
   }
 
   .btn-ghost {
-    border: 1px solid var(--color-surface-border-strong);
-    background: transparent;
+    border-color: var(--color-surface-border-strong);
+    background: color-mix(in srgb, var(--color-surface-2) 60%, transparent);
     color: var(--color-ink);
   }
 
-  .btn-ghost:hover {
-    transform: translateY(-2px);
+  @media (hover: hover) {
+    .btn-primary:hover {
+      background: var(--color-keyframe-strong);
+    }
+
+    .btn-ghost:hover {
+      border-color: color-mix(in srgb, var(--color-keyframe) 45%, var(--color-surface-border-strong));
+      background: var(--color-surface-2);
+    }
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    border-color: var(--color-surface-border);
     background: var(--color-surface-2);
+    color: var(--color-ink-muted);
+    cursor: not-allowed;
+    transform: none;
   }
 
-  .btn-discord {
-    background: #5865f2;
-    color: #fff;
+  .btn[aria-busy="true"] {
+    cursor: progress;
   }
 
-  .btn-discord:hover {
-    transform: translateY(-2px);
-    background: #4f5bda;
+  .text-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink-muted);
+    text-underline-offset: 4px;
+    transition: color 160ms ease;
   }
 
-  .chip {
-    display: inline-flex;
+  @media (hover: hover) {
+    .text-link:hover {
+      color: var(--color-ink);
+      text-decoration: underline;
+    }
+  }
+
+  /* Get Key step ------------------------------------------------------ */
+
+  .step {
+    display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 1rem;
+    padding: 1rem;
     border: 1px solid var(--color-surface-border);
-    border-radius: var(--radius-pill);
-    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius);
     background: var(--color-surface-2);
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--color-ink-soft);
+    transition: border-color 160ms ease;
   }
 
-  .icon-tile {
+  @media (hover: hover) {
+    .step:hover {
+      border-color: var(--color-surface-border-strong);
+    }
+  }
+
+  .step[data-done="true"] {
+    border-color: color-mix(in srgb, var(--color-keyframe) 45%, var(--color-surface-border));
+  }
+
+  .step-badge {
     display: grid;
     place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 2.5rem;
+    height: 2.5rem;
     flex: 0 0 auto;
     border: 1px solid var(--color-surface-border-strong);
-    border-radius: var(--radius);
-    background: color-mix(in srgb, var(--color-keyframe) 10%, var(--color-surface-2));
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
     color: var(--color-keyframe-strong);
-    transition: transform 280ms var(--ease);
-  }
-
-  .card-hover:hover .icon-tile {
-    transform: scale(1.06);
-  }
-
-  .icon-tile svg {
-    width: 1.35rem;
-    height: 1.35rem;
-  }
-
-  .copy-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    min-width: 132px;
-    border: 1px solid var(--color-surface-border-strong);
-    border-radius: var(--radius);
-    padding: 0.875rem 1.5rem;
-    background: transparent;
-    color: var(--color-ink);
     font-family: var(--font-display);
     font-size: 0.875rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    transition: transform 220ms var(--ease), background 180ms ease, border-color 180ms ease;
+    font-weight: 800;
   }
 
-  .copy-button:hover {
-    transform: translateY(-2px);
-    background: var(--color-surface-2);
+  .step-badge svg {
+    width: 1rem;
+    height: 1rem;
   }
 
-  .copy-success {
-    color: var(--color-keyframe-strong);
-  }
+  /* FAQ accordion ----------------------------------------------------- */
 
-  /* Menu ticker: a slow, continuous scroll of the real tabs. Pauses on
-     hover. Duplicated track keeps the loop unbroken. */
-  .marquee {
-    overflow: hidden;
-    mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
-  }
-
-  .marquee-track {
-    display: flex;
-    width: max-content;
-    gap: 0.6rem;
-    animation: marquee 42s linear infinite;
-  }
-
-  .marquee:hover .marquee-track {
-    animation-play-state: paused;
-  }
-
-  /* FAQ accordion. */
   .faq-list {
     display: grid;
     gap: 0.75rem;
   }
 
   .faq-item {
-    overflow: hidden;
     border: 1px solid var(--color-surface-border);
     border-radius: var(--radius);
     background: var(--color-surface);
-    transition: border-color 200ms ease;
+    transition: border-color 160ms ease;
   }
 
-  .faq-item:hover,
   .faq-item-open {
     border-color: var(--color-surface-border-strong);
+  }
+
+  @media (hover: hover) {
+    .faq-item:hover {
+      border-color: var(--color-surface-border-strong);
+    }
   }
 
   .faq-trigger {
     display: flex;
     width: 100%;
+    min-height: 3.5rem;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.125rem 1.25rem;
-    text-align: left;
+    padding: 1rem 1.5rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: transparent;
     color: var(--color-ink);
     font-family: var(--font-display);
-    font-size: 0.95rem;
-    font-weight: 900;
-    background: transparent;
-    border: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    text-align: left;
     cursor: pointer;
   }
 
   .faq-trigger:focus-visible {
-    outline: 2px solid var(--color-keyframe);
     outline-offset: -2px;
   }
 
@@ -439,19 +531,25 @@
     border: 1px solid var(--color-surface-border-strong);
     border-radius: var(--radius-pill);
     color: var(--color-keyframe-strong);
-    font-size: 1rem;
     transition: transform 240ms var(--ease);
+  }
+
+  .faq-icon svg {
+    width: 0.75rem;
+    height: 0.75rem;
   }
 
   .faq-item-open .faq-icon {
     transform: rotate(45deg);
   }
 
+  /* Height animates via grid rows. CSS transitions reverse from their
+     current value, so a mid-flight toggle redirects instead of jumping. */
   .faq-panel {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 280ms var(--ease), opacity 220ms ease;
+    transition: grid-template-rows 320ms var(--ease), opacity 240ms ease;
   }
 
   .faq-item-open .faq-panel {
@@ -462,39 +560,79 @@
   .faq-answer {
     min-height: 0;
     overflow: hidden;
-    padding: 0 1.25rem;
+  }
+
+  /* Padding lives on an inner element that is always present, so nothing
+     snaps when the panel opens or closes. */
+  .faq-answer-inner {
+    padding: 0 1.5rem 1.25rem;
     color: var(--color-ink-soft);
-    font-size: 0.9rem;
-    line-height: 1.65;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
   }
 
-  .faq-item-open .faq-answer {
-    padding-bottom: 1.125rem;
+  /* Modal (ad blocker notice) ----------------------------------------- */
+
+  .modal-scrim {
+    position: fixed;
+    inset: 0;
+    /* Above any overlay an ad network injects. */
+    z-index: 99999;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    animation: fade 200ms ease both;
   }
 
-  /* Entrance motion. .animate-rise plays on load for above-the-fold
-     content; [data-reveal] fades up as it scrolls into view (the
-     ScrollReveal component adds .reveal-on once, only when motion is OK). */
+  .modal-card {
+    width: 100%;
+    max-width: 28rem;
+    box-shadow: var(--shadow-modal);
+    animation: materialize 320ms var(--ease) both;
+  }
+
+  /* Status ------------------------------------------------------------ */
+
+  .status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-pill);
+    background: currentColor;
+    box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 18%, transparent);
+  }
+
+  .spinner {
+    animation: spin 800ms linear infinite;
+  }
+
+  /* Entrance motion --------------------------------------------------- */
+
+  /* .animate-rise plays once on load for above-the-fold content. Short
+     and small: the page should feel ready, not performed. */
   .animate-rise {
-    animation: rise 640ms var(--ease) both;
+    animation: rise 480ms var(--ease) both;
   }
 
+  /* [data-reveal] fades up as it scrolls into view. `reveal-on` is set
+     by an inline script in <head> before first paint (so nothing
+     flashes visible and then hides), and only when motion is allowed. */
   .reveal-on [data-reveal] {
-    opacity: 0;
-    transform: translateY(22px);
-    transition: opacity 720ms var(--ease), transform 720ms var(--ease);
+    transition: opacity 480ms var(--ease), transform 480ms var(--ease);
   }
 
-  .reveal-on [data-reveal].is-visible {
-    opacity: 1;
-    transform: none;
+  .reveal-on [data-reveal]:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(16px);
   }
 }
 
 /* ------------------------------------------------------------------ *
  * Keyframes
  * ------------------------------------------------------------------ */
-@keyframes page-enter {
+@keyframes fade {
   from {
     opacity: 0;
   }
@@ -506,7 +644,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -514,47 +652,77 @@
   }
 }
 
-@keyframes drift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
+/* Surfaces arrive as material: scale and blur resolve together. */
+@keyframes materialize {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(6px);
   }
-  50% {
-    transform: translate3d(26px, 18px, 0) scale(1.05);
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
   }
 }
 
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
+@keyframes spin {
   to {
-    transform: translateX(-50%);
+    transform: rotate(360deg);
   }
 }
 
 /* ------------------------------------------------------------------ *
- * Reduced motion: strip all of it, keep everything visible.
+ * Accessibility preferences
  * ------------------------------------------------------------------ */
+
+/* Reduced motion is not "no feedback": swap movement for a short
+   cross-fade, keep color and opacity changes that aid comprehension. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+  .animate-rise,
+  .modal-card {
+    animation: fade 200ms ease both;
   }
 
-  .ambient {
-    display: none;
+  .faq-icon,
+  .faq-panel {
+    transition-duration: 0ms;
   }
 
-  .reveal-on [data-reveal] {
-    opacity: 1;
+  .btn:active {
     transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .site-header,
+  .modal-scrim {
+    background: var(--color-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .site-header {
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-ink-muted);
+  }
+
+  .card,
+  .faq-item,
+  .step,
+  .chip {
+    border-color: var(--color-ink-muted);
+  }
+
+  .lede,
+  .body-sm,
+  .faq-answer-inner {
+    color: var(--color-ink);
   }
 }

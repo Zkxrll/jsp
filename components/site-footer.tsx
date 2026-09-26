@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { siteConfig } from "@/lib/config";
 // import { AdSlot } from "@/lib/ads/ad-slot";
 
@@ -10,28 +11,36 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   const links: FooterLink[] = [
-    siteConfig.links.discord ? { label: "Discord", href: siteConfig.links.discord } : null,
-    siteConfig.links.docs ? { label: "Docs", href: siteConfig.links.docs } : null,
+    { label: "Get Key", href: "/get-key" },
     { label: "Status", href: "/status" },
+    siteConfig.links.docs ? { label: "Docs", href: siteConfig.links.docs } : null,
+    siteConfig.links.discord ? { label: "Discord", href: siteConfig.links.discord } : null,
   ].filter((link): link is FooterLink => link !== null);
 
   return (
-    <footer className="relative z-10 border-t border-surface-border px-6 py-8 sm:px-10">
-      <div className="flex flex-col items-center gap-4 text-sm text-ink-muted sm:flex-row sm:justify-between">
+    <footer className="relative z-10 mt-16 border-t border-surface-border">
+      <div className="wrap flex flex-col items-center gap-4 py-8 text-sm text-ink-muted sm:flex-row sm:justify-between">
         <p>
           © {year} {siteConfig.name}. All rights reserved.
         </p>
-        <nav className="flex items-center gap-5" aria-label="Footer">
-          {links.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="transition-colors hover:text-ink"
-              {...(link.href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
-            >
-              {link.label}
-            </a>
-          ))}
+        <nav className="flex items-center gap-6" aria-label="Footer">
+          {links.map((link) =>
+            link.href.startsWith("http") ? (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-link"
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link key={link.label} href={link.href} className="text-link">
+                {link.label}
+              </Link>
+            ),
+          )}
         </nav>
       </div>
 

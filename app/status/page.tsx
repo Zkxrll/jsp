@@ -5,7 +5,7 @@ import { siteConfig, type ServiceStatus } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Status",
-  description: `Live status for ${siteConfig.name} and its key system.`,
+  description: `Current status of ${siteConfig.name} and its key system.`,
 };
 
 interface StatusCheck {
@@ -21,17 +21,18 @@ interface StatusCheck {
  * return, so the swap is a data-source change, not a UI rewrite.
  */
 const checks: StatusCheck[] = [
-  { name: "Landing page", status: "operational", note: "Served from Vercel's edge network." },
+  { name: "Website", status: "operational", note: "This site and the Get Key page." },
   {
     name: "Key system",
     status: siteConfig.status,
-    note: "Third-party. See their own status page for incident history.",
+    note: "Issues keys. Run by a third party; outages there show up here.",
   },
 ];
 
+// Three states, three distinct colors: green, amber, red.
 const STATUS_STYLES: Record<ServiceStatus, string> = {
-  operational: "text-keyframe-strong",
-  degraded: "text-keyframe",
+  operational: "text-online",
+  degraded: "text-warning",
   offline: "text-danger",
 };
 
@@ -43,23 +44,27 @@ const STATUS_LABEL: Record<ServiceStatus, string> = {
 
 export default function StatusPage() {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="site-shell">
+      <div className="grid-overlay" aria-hidden="true" />
+
       <SiteHeader />
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
-        <h1 className="font-display text-3xl font-semibold text-ink">System status</h1>
-        <p className="mt-2 text-ink-muted">Current status of every service this page depends on.</p>
+      <main className="wrap wrap-narrow relative z-10 flex-1 py-16">
+        <p className="label label-accent">Status</p>
+        <h1 className="section-title mt-3">System status.</h1>
+        <p className="lede mt-4">Every service the site and key flow depend on.</p>
 
-        <ul className="mt-10 divide-y divide-surface-border rounded-xl border border-surface-border">
+        <ul className="card mt-8 divide-y divide-surface-border">
           {checks.map((check) => (
-            <li key={check.name} className="flex items-center justify-between gap-4 p-5">
+            <li key={check.name} className="flex items-center justify-between gap-4 px-6 py-5">
               <div>
-                <p className="font-medium text-ink">{check.name}</p>
-                <p className="text-sm text-ink-muted">{check.note}</p>
+                <p className="card-title">{check.name}</p>
+                <p className="body-sm mt-1">{check.note}</p>
               </div>
               <span
-                className={`shrink-0 font-mono text-sm font-medium ${STATUS_STYLES[check.status]}`}
+                className={`inline-flex shrink-0 items-center gap-2 text-sm font-semibold ${STATUS_STYLES[check.status]}`}
               >
+                <span className="status-dot" aria-hidden="true" />
                 {STATUS_LABEL[check.status]}
               </span>
             </li>

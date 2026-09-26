@@ -1,20 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DetectAdblock } from "@scthakuri/adblock-detector";
+import { AlertIcon } from "./icons";
 
 export function AdBlockGate() {
-  const [checking, setChecking] = useState(true);
   const [blocked, setBlocked] = useState(false);
+  const reloadRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let mounted = true;
 
     DetectAdblock((detected: boolean) => {
-      if (!mounted) return;
-
-      setBlocked(detected);
-      setChecking(false);
+      if (mounted) setBlocked(detected);
     });
 
     return () => {
@@ -22,55 +20,57 @@ export function AdBlockGate() {
     };
   }, []);
 
-  if (checking || !blocked) {
-    return null;
-  }
+  // While the notice is up: lock page scroll and keep focus on the dialog's
+  // only action, so keyboard users can't tab into the page behind it.
+  useEffect(() => {
+    if (!blocked) return;
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+    reloadRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [blocked]);
+
+  if (!blocked) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[99999] flex min-h-dvh items-center justify-center bg-[#05070b]/95 px-6"
+      className="modal-scrim"
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="adblock-title"
+      aria-describedby="adblock-body"
+      onKeyDown={(event) => {
+        if (event.key === "Tab") {
+          event.preventDefault();
+          reloadRef.current?.focus();
+        }
+      }}
     >
-      <div className="w-full max-w-md rounded-2xl border border-surface-border bg-surface p-8 text-center shadow-2xl">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-keyframe/10 text-2xl text-keyframe">
-          ⚠
-        </div>
+      <div className="card modal-card p-8 text-center">
+        <span className="icon-tile mx-auto text-danger">
+          <AlertIcon />
+        </span>
 
-        <p className="eyebrow mt-6">ACCESS BLOCKED</p>
-
-        <h1
-          id="adblock-title"
-          className="mt-2 font-display text-3xl font-semibold text-ink"
-        >
+        <h2 id="adblock-title" className="section-title mt-6">
           Ad blocker detected
-        </h1>
+        </h2>
 
-        <p className="mt-4 text-sm leading-6 text-ink-muted">
-          Please disable your ad blocker for Zkx Hub. Ads help support the
-          project and keep the site available.
+        <p id="adblock-body" className="body-sm mt-4">
+          Ads keep Zkx Hub and the free key system running. Allow ads for this
+          site in your blocker, then reload the page.
         </p>
 
-        <div className="mt-6 rounded-xl border border-surface-border bg-bg/60 p-4 text-left">
-          <div className="flex items-center gap-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-danger" />
-            <span className="text-sm font-medium text-ink">
-              Ad blocker is enabled
-            </span>
-          </div>
-
-          <p className="mt-2 text-xs leading-5 text-ink-muted">
-            Disable it for this website, then reload the page.
-          </p>
-        </div>
-
         <button
+          ref={reloadRef}
           type="button"
           onClick={() => window.location.reload()}
-          className="mt-6 w-full rounded-xl bg-keyframe px-5 py-4 font-display text-sm font-semibold text-bg transition-all duration-200 hover:-translate-y-0.5 hover:bg-keyframe-strong"
+          className="btn btn-primary mt-8 w-full"
         >
-          Reload Page
+          Reload page
         </button>
       </div>
     </div>

@@ -123,24 +123,9 @@ export interface Stat {
   label: string;
 }
 
-/** Honest numbers only. Counted from the menu, nothing inflated. */
+/** Honest numbers only, all counted from the menu and this file. */
 export const stats: readonly Stat[] = [
-  { value: "11", label: "Feature tabs" },
-  { value: "Silent + Camera", label: "Aim modes" },
-  { value: "Lifetime", label: "One key, one payment" },
-] as const;
-
-/** The real top-level tabs, in menu order. Listed on the landing page. */
-export const menuTabs = [
-  "ESP",
-  "Combat",
-  "Client Effects",
-  "Crosshair",
-  "World",
-  "Core",
-  "Defense",
-  "Automation",
-  "Movement",
-  "Misc",
-  "Debug",
+  { value: "11", label: "Menu tabs" },
+  { value: String(features.length), label: "Feature groups" },
+  { value: "2", label: "Aim modes" },
 ] as const;

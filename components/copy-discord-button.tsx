@@ -1,41 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { siteConfig } from "@/lib/config";
+import { CheckIcon, CopyIcon } from "./icons";
+
+type CopyState = "idle" | "copied" | "failed";
+
+const ANNOUNCEMENT: Record<CopyState, string> = {
+  idle: "",
+  copied: "Discord invite link copied",
+  failed: "Couldn't copy the invite link. Use Join Discord instead.",
+};
 
 export function CopyDiscordButton() {
-  const [copied, setCopied] = useState(false);
+  const [state, setState] = useState<CopyState>("idle");
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
 
   async function copyInvite() {
+    let next: CopyState = "copied";
     try {
       await navigator.clipboard.writeText(siteConfig.links.discord);
-
-      setCopied(true);
-
-      window.setTimeout(() => {
-        setCopied(false);
-      }, 1800);
     } catch {
-      setCopied(false);
+      next = "failed";
     }
+
+    setState(next);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setState("idle"), 2000);
   }
 
   return (
-    <button
-      type="button"
-      onClick={copyInvite}
-      className="copy-button"
-      aria-label="Copy Discord invite"
-    >
-      {copied ? (
-        <span className="copy-success">
-          Copied ✓
-        </span>
-      ) : (
-        <span className="copy-default">
-          Copy Invite
-        </span>
-      )}
-    </button>
+    <>
+      {/* Fixed min width so the label swap never shifts its neighbours. */}
+      <button type="button" onClick={copyInvite} className="btn btn-ghost w-full min-w-44 sm:w-auto">
+        {state === "copied" ? (
+          <>
+            <CheckIcon className="text-keyframe-strong" />
+            Copied
+          </>
+        ) : state === "failed" ? (
+          "Copy failed"
+        ) : (
+          <>
+            <CopyIcon />
+            Copy invite
+          </>
+        )}
+      </button>
+      <span className="sr-only" role="status" aria-live="polite">
+        {ANNOUNCEMENT[state]}
+      </span>
+    </>
   );
 }

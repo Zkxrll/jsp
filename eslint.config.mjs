@@ -13,7 +13,7 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   {
     // BqHw6rdCE.js is an AdMaven verification file (plain text, not JS).
-    ignores: [".next/**", "out/**", "build/**", "node_modules/**", "BqHw6rdCE.js"],
+    ignores: [".next/**", "out/**", "build/**", "node_modules/**", "public/BqHw6rdCE.js"],
   },
   ...tseslint.configs.recommended,
   {
