@@ -1,21 +1,19 @@
-import Image from "next/image";
-
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { GetKeyButton } from "@/components/get-key-button";
 import { FAQ } from "@/components/faq";
 import { FeatureGrid } from "@/components/feature-grid";
+import { MenuPreview } from "@/components/menu-preview";
 import { CopyDiscordButton } from "@/components/copy-discord-button";
 import { DiscordGlyph } from "@/components/discord-glyph";
 import { ArrowUpRightIcon, CheckIcon } from "@/components/icons";
-import { ScrollReveal } from "@/components/scroll-reveal";
+import { RouteTransition } from "@/components/route-transition";
 import { siteConfig } from "@/lib/config";
-import { stats } from "@/lib/features";
+import { features } from "@/lib/features";
 
 const PREMIUM_URL = "https://zkx.mysellauth.com/";
 
 // TODO: give each entry a real version number and release date. Undated
-// "Recent" entries read as filler.
+// entries read as filler.
 const CHANGELOG = [
   {
     tag: "Current build",
@@ -36,24 +34,35 @@ const PREMIUM_PERKS = [
   "All future updates",
 ] as const;
 
-/** Section heading pattern, identical everywhere: label, title, optional lede. */
+const DEFENSE = [
+  {
+    title: "Voidspam",
+    body: "Teleports the root you replicate far into the void on every server tick, so the shots people land hit a copy that is not where you are standing.",
+  },
+  {
+    title: "Anti-Aim",
+    body: "Spoofs the yaw you send with spin, jitter, or a fake backwards facing, and can forge the server look angle so peek logic and aim assists resolve the wrong way.",
+  },
+] as const;
+
+/** Section heading, identical everywhere: label, title, optional lede. */
 function SectionHeader({ label, title, children }: { label: string; title: string; children?: React.ReactNode }) {
   return (
-    <div data-reveal>
+    <div className="mx-auto max-w-2xl text-center" data-reveal>
       <p className="label label-accent">{label}</p>
-      <h2 className="section-title mt-3">{title}</h2>
-      {children}
+      <h2 className="section-title mt-4">{title}</h2>
+      {children && <p className="lede mt-4">{children}</p>}
     </div>
   );
 }
 
-function DiscordButton({ className = "" }: { className?: string }) {
+function DiscordButton({ size = "md", className = "" }: { size?: "md" | "lg"; className?: string }) {
   return (
     <a
       href={siteConfig.links.discord}
       target="_blank"
       rel="noopener noreferrer"
-      className={`btn btn-ghost ${className}`}
+      className={`btn btn-glass ${size === "lg" ? "btn-lg" : ""} ${className}`}
     >
       <DiscordGlyph />
       Join Discord
@@ -63,160 +72,132 @@ function DiscordButton({ className = "" }: { className?: string }) {
 
 export default function HomePage() {
   return (
-    <div className="site-shell">
-      <div className="grid-overlay" aria-hidden="true" />
-      <ScrollReveal />
-
-      <SiteHeader />
-
-      <main className="relative z-10 flex-1">
+    <RouteTransition>
+      <main className="flex-1">
         {/* Hero */}
-        <section className="wrap pb-12 pt-8 text-center sm:pb-16 sm:pt-16">
-          <div className="logo-badge animate-rise mx-auto">
-            <Image
-              src="/logo.jpg"
-              alt=""
-              width={384}
-              height={384}
-              priority
-              className="h-auto w-32 sm:w-48"
-            />
-          </div>
+        <section className="pb-16 pt-32 sm:pb-24 sm:pt-40">
+          <div className="hero-copy wrap text-center">
+            <p className="chip animate-rise">Built for Roblox Rivals</p>
 
-          <h1 className="display animate-rise mt-4" style={{ animationDelay: "40ms" }}>
-            The full <span className="text-gradient">Rivals</span> menu.
-          </h1>
+            <h1 className="display animate-rise mt-6" style={{ animationDelay: "40ms" }}>
+              The full <span className="text-gradient">Rivals</span> menu.
+            </h1>
 
-          <p className="lede animate-rise mx-auto mt-4 max-w-xl" style={{ animationDelay: "80ms" }}>
-            Silent and camera aim, voidspam antihit, weapon mods, ESP, chams, and a
-            full world editor. Free with a key from the Discord, or pay once for
-            lifetime Premium.
-          </p>
-
-          <div
-            className="animate-rise mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
-            style={{ animationDelay: "120ms" }}
-          >
-            <GetKeyButton source="hero" className="w-full sm:w-auto" />
-            <DiscordButton className="w-full sm:w-auto" />
-          </div>
-
-          <dl
-            className="card animate-rise mx-auto mt-12 grid max-w-xl grid-cols-3 divide-x divide-surface-border"
-            style={{ animationDelay: "160ms" }}
-          >
-            {stats.map((stat) => (
-              <div key={stat.label} className="flex flex-col-reverse justify-end gap-1 px-2 py-5 sm:px-4">
-                <dt className="label">{stat.label}</dt>
-                <dd className="m-0 font-display text-2xl font-extrabold tracking-tight text-ink">
-                  {stat.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-
-        {/* Features */}
-        <section id="features" className="wrap py-12 sm:py-16">
-          <div className="grid gap-4 md:grid-cols-2 md:items-end md:gap-8">
-            <SectionHeader label="Everything inside" title="What the menu does." />
-            <p className="lede max-w-md md:justify-self-end" data-reveal>
-              Ten feature groups, pulled straight from the in-game menu. Nothing
-              here is a feature the script does not have.
+            <p className="lede animate-rise mx-auto mt-6 max-w-2xl" style={{ animationDelay: "80ms" }}>
+              Silent and camera aim, voidspam antihit, weapon mods, ESP, chams, and
+              a full world editor. Free with a key from the Discord, or pay once
+              for lifetime Premium.
             </p>
+
+            <div
+              className="animate-rise mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+              style={{ animationDelay: "120ms" }}
+            >
+              <GetKeyButton source="hero" size="lg" morph className="w-full sm:w-auto" />
+              <DiscordButton size="lg" className="w-full sm:w-auto" />
+            </div>
           </div>
 
-          <div className="mt-8">
-            <FeatureGrid />
-          </div>
-        </section>
-
-        {/* Defense spotlight */}
-        <section className="wrap py-12 sm:py-16">
-          <div className="card p-6 sm:p-12" data-reveal>
-            <p className="label label-accent">Defense</p>
-            <h2 className="section-title mt-3 max-w-2xl">Most scripts stop at silent aim.</h2>
-
-            <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-12">
-              <p className="lede">
-                Zkx Hub ships a working antihit. Voidspam teleports the root you
-                replicate far into the void on every server tick, so the shots
-                people land hit a copy that is not where you are standing.
-              </p>
-              <p className="lede">
-                Anti-Aim runs on top of it. It spoofs the yaw you send with spin,
-                jitter, or a fake backwards facing, and can forge the server look
-                angle so peek logic and aim assists resolve the wrong direction.
-              </p>
+          <div className="wrap mt-16 sm:mt-24">
+            <div className="hero-window mx-auto max-w-4xl">
+              <div className="animate-rise" style={{ animationDelay: "200ms" }}>
+                <MenuPreview />
+              </div>
             </div>
           </div>
         </section>
 
+        {/* Features */}
+        <section id="features" className="wrap py-16 sm:py-24">
+          <SectionHeader label="Everything inside" title="What the menu does.">
+            {`${features.length} feature groups, pulled straight from the in-game menu. Nothing here is a feature the script does not have.`}
+          </SectionHeader>
+
+          <div className="mt-12 sm:mt-16">
+            <FeatureGrid />
+          </div>
+        </section>
+
+        {/* Defense */}
+        <section className="wrap py-16 sm:py-24">
+          <SectionHeader label="Defense" title="Most scripts stop at silent aim.">
+            Zkx Hub ships a working antihit, with anti-aim running on top of it.
+          </SectionHeader>
+
+          <div className="mt-12 grid gap-4 sm:mt-16 md:grid-cols-2">
+            {DEFENSE.map((item) => (
+              <article key={item.title} className="card p-8" data-reveal data-spotlight>
+                <h3 className="section-title">{item.title}</h3>
+                <p className="lede mt-4">{item.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         {/* Premium */}
-        <section id="premium" className="wrap py-12 sm:py-16">
-          <div className="card p-6 sm:p-12" data-reveal>
-            <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-xl">
+        <section id="premium" className="wrap py-16 sm:py-24">
+          <div className="card overflow-hidden p-8 sm:p-12" data-reveal data-spotlight>
+            <div
+              className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-keyframe/20 blur-3xl"
+              aria-hidden="true"
+            />
+            <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
+              <div>
                 <p className="label label-accent">Premium</p>
-                <h2 className="section-title mt-3">One purchase. No subscription.</h2>
+                <h2 className="section-title mt-4">One purchase. No subscription.</h2>
                 <p className="lede mt-4">
                   Premium is a single payment that stays yours. No monthly key, no
                   renewal, and every future update is included.
                 </p>
               </div>
-              <a
-                href={PREMIUM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary w-full shrink-0 sm:w-auto"
-              >
-                Get lifetime Premium
-                <ArrowUpRightIcon />
-              </a>
-            </div>
 
-            <ul className="mt-8 grid gap-4 border-t border-surface-border pt-6 sm:grid-cols-2 lg:grid-cols-4">
-              {PREMIUM_PERKS.map((perk) => (
-                <li key={perk} className="flex items-center gap-3 text-sm text-ink-soft">
-                  <CheckIcon className="h-4 w-4 shrink-0 text-keyframe-strong" />
-                  {perk}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* Community + access */}
-        <section className="wrap py-12 sm:py-16">
-          <div
-            className="card flex flex-col gap-8 p-6 sm:p-12 lg:flex-row lg:items-center lg:justify-between"
-            data-reveal
-          >
-            <div className="max-w-lg">
-              <p className="label label-accent">Community</p>
-              <h2 className="section-title mt-3">Get your key in the Discord.</h2>
-              <p className="lede mt-4">
-                Keys, updates, and support all live in one server. New builds are
-                posted there first.
-              </p>
-            </div>
-
-            <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-              <GetKeyButton source="community" className="w-full sm:w-auto" />
-              <DiscordButton className="w-full sm:w-auto" />
-              <CopyDiscordButton />
+              <div>
+                <ul className="grid gap-4">
+                  {PREMIUM_PERKS.map((perk) => (
+                    <li key={perk} className="flex items-center gap-3 text-ink">
+                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-keyframe/15 text-keyframe-strong">
+                        <CheckIcon className="h-3 w-3" />
+                      </span>
+                      {perk}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={PREMIUM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary btn-lg mt-8 w-full sm:w-auto"
+                >
+                  Get lifetime Premium
+                  <ArrowUpRightIcon />
+                </a>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Changelog */}
-        <section id="updates" className="wrap py-12 sm:py-16">
+        {/* Community */}
+        <section className="wrap py-16 sm:py-24">
+          <SectionHeader label="Community" title="Get your key in the Discord.">
+            Keys, updates, and support all live in one server. New builds are posted
+            there first.
+          </SectionHeader>
+
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row" data-reveal>
+            <GetKeyButton source="community" className="w-full sm:w-auto" />
+            <DiscordButton className="w-full sm:w-auto" />
+            <CopyDiscordButton />
+          </div>
+        </section>
+
+        {/* Updates */}
+        <section id="updates" className="wrap py-16 sm:py-24">
           <SectionHeader label="Updates" title="Latest changes." />
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <div className="mt-12 grid gap-4 sm:mt-16 md:grid-cols-2">
             {CHANGELOG.map((entry) => (
-              <article key={entry.title} className="card p-6" data-reveal>
+              <article key={entry.title} className="card p-8" data-reveal data-spotlight>
                 <p className="label label-accent">{entry.tag}</p>
-                <h3 className="card-title mt-3">{entry.title}</h3>
+                <h3 className="title-sm mt-4">{entry.title}</h3>
                 <p className="body-sm mt-2">{entry.body}</p>
               </article>
             ))}
@@ -224,15 +205,15 @@ export default function HomePage() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="wrap wrap-narrow py-12 sm:py-16">
+        <section id="faq" className="wrap wrap-narrow py-16 sm:py-24">
           <SectionHeader label="FAQ" title="Before you grab a key." />
-          <div className="mt-8" data-reveal>
+          <div className="mt-12" data-reveal>
             <FAQ />
           </div>
         </section>
       </main>
 
       <SiteFooter />
-    </div>
+    </RouteTransition>
   );
 }

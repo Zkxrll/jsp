@@ -36,7 +36,7 @@ export function CopyDiscordButton() {
   return (
     <>
       {/* Fixed min width so the label swap never shifts its neighbours. */}
-      <button type="button" onClick={copyInvite} className="btn btn-ghost w-full min-w-44 sm:w-auto">
+      <button type="button" onClick={copyInvite} className="btn btn-glass w-full min-w-40 sm:w-auto">
         {state === "copied" ? (
           <>
             <CheckIcon className="text-keyframe-strong" />

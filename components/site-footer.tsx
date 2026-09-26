@@ -18,7 +18,7 @@ export function SiteFooter() {
   ].filter((link): link is FooterLink => link !== null);
 
   return (
-    <footer className="relative z-10 mt-16 border-t border-surface-border">
+    <footer className="relative z-10 mt-16 border-t border-white/5">
       <div className="wrap flex flex-col items-center gap-4 py-8 text-sm text-ink-muted sm:flex-row sm:justify-between">
         <p>
           © {year} {siteConfig.name}. All rights reserved.
@@ -36,7 +36,7 @@ export function SiteFooter() {
                 {link.label}
               </a>
             ) : (
-              <Link key={link.label} href={link.href} className="text-link">
+              <Link key={link.label} href={link.href} transitionTypes={["nav-forward"]} className="text-link">
                 {link.label}
               </Link>
             ),

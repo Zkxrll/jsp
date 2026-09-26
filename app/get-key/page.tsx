@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { GetKeyFlow } from "@/components/get-key-flow";
+import { RouteTransition } from "@/components/route-transition";
 import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -12,18 +12,14 @@ export const metadata: Metadata = {
 
 export default function GetKeyPage() {
   return (
-    <div className="site-shell">
-      <div className="grid-overlay" aria-hidden="true" />
-
-      <SiteHeader showGetKey={false} />
-
-      <main className="wrap relative z-10 flex flex-1 items-center justify-center py-16">
+    <RouteTransition>
+      <main className="wrap flex flex-1 items-center justify-center pb-16 pt-32">
         <section className="w-full max-w-xl">
           <GetKeyFlow />
         </section>
       </main>
 
       <SiteFooter />
-    </div>
+    </RouteTransition>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SiteHeader } from "@/components/site-header";
+import { RouteTransition } from "@/components/route-transition";
 import { SiteFooter } from "@/components/site-footer";
 import { siteConfig, type ServiceStatus } from "@/lib/config";
 
@@ -44,21 +44,17 @@ const STATUS_LABEL: Record<ServiceStatus, string> = {
 
 export default function StatusPage() {
   return (
-    <div className="site-shell">
-      <div className="grid-overlay" aria-hidden="true" />
-
-      <SiteHeader />
-
-      <main className="wrap wrap-narrow relative z-10 flex-1 py-16">
+    <RouteTransition>
+      <main className="wrap wrap-narrow flex-1 pb-16 pt-32">
         <p className="label label-accent">Status</p>
-        <h1 className="section-title mt-3">System status.</h1>
+        <h1 className="section-title mt-4">System status.</h1>
         <p className="lede mt-4">Every service the site and key flow depend on.</p>
 
         <ul className="card mt-8 divide-y divide-surface-border">
           {checks.map((check) => (
             <li key={check.name} className="flex items-center justify-between gap-4 px-6 py-5">
               <div>
-                <p className="card-title">{check.name}</p>
+                <p className="title-sm">{check.name}</p>
                 <p className="body-sm mt-1">{check.note}</p>
               </div>
               <span
@@ -73,6 +69,6 @@ export default function StatusPage() {
       </main>
 
       <SiteFooter />
-    </div>
+    </RouteTransition>
   );
 }

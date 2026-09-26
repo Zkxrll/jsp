@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlusIcon } from "./icons";
+import { ChevronDownIcon } from "./icons";
 
 const FAQ_ITEMS = [
   {
@@ -31,11 +31,12 @@ const FAQ_ITEMS = [
   },
 ] as const;
 
+/** An inset grouped list: one surface, rows separated by hairlines. */
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <div className="faq-list">
+    <div className="card faq-group">
       {FAQ_ITEMS.map((item, index) => {
         const isOpen = openIndex === index;
         const panelId = `faq-panel-${index}`;
@@ -53,19 +54,11 @@ export function FAQ() {
                 onClick={() => setOpenIndex((current) => (current === index ? null : index))}
               >
                 <span>{item.question}</span>
-                <span className="faq-icon" aria-hidden="true">
-                  <PlusIcon />
-                </span>
+                <ChevronDownIcon className="faq-chevron" />
               </button>
             </h3>
 
-            <div
-              id={panelId}
-              role="region"
-              aria-labelledby={buttonId}
-              className="faq-panel"
-              inert={!isOpen}
-            >
+            <div id={panelId} role="region" aria-labelledby={buttonId} className="faq-panel" inert={!isOpen}>
               <div className="faq-answer">
                 <p className="faq-answer-inner">{item.answer}</p>
               </div>
