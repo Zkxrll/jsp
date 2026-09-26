@@ -1,51 +1,68 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ *
- * Design tokens. One source of truth for color, type, radius, and
- * elevation.
+ * Zkx Hub design system
  *
- * Spacing: 4pt grid. Every margin, padding, and gap is a multiple of
- * 0.25rem. Tailwind's default scale already is, so stick to whole steps
- * (no 1.5 / 2.5 / 3.5) and never hand-write off-grid rem values here.
- *
- * Type ramp (the only sizes used on the site):
- *   12 label · 14 small body · 16 body · 18 card title
- *   28–44 section title · 40–64 display
+ * Spacing: 4pt grid. Whole Tailwind steps only (no 1.5 / 2.5 / 3.5).
+ * Type: Inter with optical sizing. One family, the ramp below:
+ *   12 label · 14 small · 16 body · 18 title-sm · 20 lede
+ *   28–48 section title · 48–96 display
+ * Radius: 24 surfaces · 12 inner tiles · pill for every control.
+ * Materials: glass (.glass) is for the floating functional layer only:
+ *   header, controls, the menu preview, sheets. Content sits on solid
+ *   surfaces (.card). Glass is never stacked on glass.
+ * Motion: springs, expressed as CSS linear() curves.
+ *   --spring        critically damped (damping 1.0, response 0.4s)
+ *   --spring-bouncy damping 0.8, response 0.35s, ~1.5% overshoot.
+ *                   Only for release after a press.
  * ------------------------------------------------------------------ */
 @theme {
-  --color-ink: #f4f1fb;
-  --color-ink-soft: #c9c3d6;
-  --color-ink-muted: #948da4;
+  --color-ink: #f5f3fa;
+  --color-ink-soft: #c4bfd1;
+  --color-ink-muted: #8e889e;
 
   --color-bg: #060509;
-  --color-surface: #0d0b14;
-  --color-surface-2: #14101d;
-  --color-surface-border: #241c31;
-  --color-surface-border-strong: #38294f;
+  --color-surface: #0e0c15;
+  --color-surface-2: #16121f;
+  --color-surface-border: #231d2f;
 
   --color-keyframe: #9a5cff;
   --color-keyframe-strong: #b892ff;
-  --color-danger: #f2777a;
-  --color-warning: #f2c66d;
+  --color-danger: #ff7a7d;
+  --color-warning: #f5c76b;
   --color-online: #4ade80;
 }
 
-/* Fonts come from next/font (app/layout.tsx), which sets these variables
-   on <html>. `inline` so utilities resolve to the real family names. */
 @theme inline {
-  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-display: var(--font-inter), system-ui, sans-serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
 }
 
-/* One radius, two elevation levels (resting and modal). Pills are the
-   only intentional radius exception. */
+/* Registered so the header can animate its tint smoothly on scroll. */
+@property --glass-tint {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(14, 12, 21, 0.5);
+}
+
 :root {
+  --radius-lg: 1.5rem;
   --radius: 0.75rem;
   --radius-pill: 999px;
-  --shadow: 0 16px 40px -24px rgba(2, 1, 6, 0.8);
-  --shadow-modal: 0 32px 80px -24px rgba(2, 1, 6, 0.95);
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --header-height: 4rem;
+
+  --spring: linear(0, 0.046, 0.149, 0.272, 0.395, 0.507, 0.605, 0.688, 0.755, 0.81, 0.854, 0.888, 0.914, 0.935, 0.951, 0.963, 0.972, 0.979, 0.984, 0.988, 0.991, 0.994, 0.995, 0.996, 1);
+  --spring-duration: 520ms;
+  --spring-bouncy: linear(0, 0.035, 0.121, 0.233, 0.354, 0.473, 0.583, 0.679, 0.761, 0.829, 0.883, 0.925, 0.956, 0.979, 0.994, 1.005, 1.011, 1.014, 1.015, 1.015, 1.014, 1.012, 1.01, 1.008, 1.007, 1.005, 1.004, 1.003, 1.002, 1.001, 1.001, 1);
+  --spring-bouncy-duration: 640ms;
+
+  /* Glass material */
+  --glass-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035));
+  --glass-tint: rgba(14, 12, 21, 0.5);
+  --glass-blur: blur(24px) saturate(180%);
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 16px 48px -16px rgba(0, 0, 0, 0.6);
+
+  --header-top: 0.75rem;
+  --header-height: 3.5rem;
 }
 
 /* ------------------------------------------------------------------ *
@@ -61,7 +78,7 @@
   html {
     color-scheme: dark;
     scroll-behavior: smooth;
-    scroll-padding-top: calc(var(--header-height) + 1rem);
+    scroll-padding-top: calc(var(--header-top) + var(--header-height) + 1.5rem);
     background: var(--color-bg);
     -webkit-text-size-adjust: 100%;
   }
@@ -75,6 +92,7 @@
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.5;
+    font-optical-sizing: auto;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -88,7 +106,7 @@
   h3 {
     margin: 0;
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 700;
     color: var(--color-ink);
     text-wrap: balance;
   }
@@ -104,7 +122,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-keyframe);
+    outline: 2px solid var(--color-keyframe-strong);
     outline-offset: 2px;
   }
 
@@ -124,8 +142,6 @@
 @layer components {
   /* Layout ------------------------------------------------------------ */
 
-  /* One container. Header, sections, and footer all share it, so their
-     edges line up at every width. */
   .wrap {
     width: 100%;
     max-width: 72rem;
@@ -149,54 +165,138 @@
     display: flex;
     flex-direction: column;
     min-height: 100dvh;
-    /* clip, not hidden: hidden creates a scroll container and breaks the
-       sticky header. */
     overflow-x: clip;
-    background:
-      radial-gradient(1000px 560px at 50% -12%, color-mix(in srgb, var(--color-keyframe) 13%, transparent), transparent 62%),
-      var(--color-bg);
+    background: var(--color-bg);
   }
 
-  .grid-overlay {
+  /* Static ambient light at the top of every page. Gives the glass above
+     it something to refract. It never moves: full-viewport motion is a
+     vestibular trigger and adds nothing. */
+  .aurora {
     position: absolute;
-    inset: 0;
-    pointer-events: none;
+    inset: 0 0 auto;
+    height: 64rem;
     z-index: -1;
-    opacity: 0.55;
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-    background-size: 64px 64px;
-    -webkit-mask-image: radial-gradient(120% 80% at 50% 0%, black 35%, transparent 80%);
-    mask-image: radial-gradient(120% 80% at 50% 0%, black 35%, transparent 80%);
+    pointer-events: none;
+    background:
+      radial-gradient(40rem 24rem at 50% 8rem, color-mix(in srgb, var(--color-keyframe) 26%, transparent), transparent 70%),
+      radial-gradient(28rem 20rem at 18% 20rem, color-mix(in srgb, #5b3bff 18%, transparent), transparent 70%),
+      radial-gradient(28rem 20rem at 84% 26rem, color-mix(in srgb, #d05bff 14%, transparent), transparent 70%);
   }
 
-  /* Header: a translucent layer content scrolls under. A hairline that
-     fades at the edges marks where chrome meets content, instead of a
-     hard full-width rule. */
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    background: color-mix(in srgb, var(--color-bg) 72%, transparent);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-    backdrop-filter: blur(16px) saturate(160%);
+  /* Materials --------------------------------------------------------- */
+
+  /* Liquid glass: blurred, saturated backdrop, a light fill, and a rim
+     that catches light on the top-left edge and fades around the shape. */
+  .glass {
+    position: relative;
+    background: var(--glass-fill), var(--glass-tint);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-shadow);
   }
 
-  .site-header::after {
+  .glass::after {
     content: "";
     position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.08) 28%,
+      rgba(255, 255, 255, 0.02) 60%,
+      rgba(255, 255, 255, 0.14)
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  }
+
+  /* Solid content surface. */
+  .card {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+      var(--color-surface);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 24px 48px -32px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Pointer-following light on surfaces (set by <PointerLight>). Light,
+     not movement: the card itself never shifts. */
+  [data-spotlight] {
+    isolation: isolate;
+  }
+
+  [data-spotlight]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      28rem circle at var(--mx, 50%) var(--my, 0%),
+      color-mix(in srgb, var(--color-keyframe) 12%, transparent),
+      transparent 45%
+    );
+    transition: opacity 320ms ease;
+  }
+
+  @media (hover: hover) {
+    [data-spotlight]:hover::before {
+      opacity: 1;
+    }
+  }
+
+  /* Header ------------------------------------------------------------ */
+
+  /* A floating glass capsule, not a bar. Content scrolls beneath it. */
+  .site-header {
+    position: fixed;
+    top: var(--header-top);
     inset-inline: 0;
-    top: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--color-surface-border) 20%, var(--color-surface-border) 80%, transparent);
+    z-index: 50;
+    width: min(100% - 1.5rem, 64rem);
+    height: var(--header-height);
+    margin-inline: auto;
+    border-radius: var(--radius-pill);
+    view-transition-name: site-header;
+  }
+
+  .site-header-inner {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 0.5rem 0 1.25rem;
+  }
+
+  .nav {
+    position: relative;
+    display: flex;
+    align-items: center;
   }
 
   .nav-link {
+    position: relative;
+    z-index: 1;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-pill);
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-ink-soft);
-    transition: color 160ms ease;
+    transition: color 200ms ease;
+  }
+
+  .nav-link[aria-current="true"] {
+    color: var(--color-ink);
   }
 
   @media (hover: hover) {
@@ -205,38 +305,30 @@
     }
   }
 
-  /* Logo art blended into the page with a soft glow behind it. */
-  .logo-badge {
-    position: relative;
-    display: grid;
-    place-items: center;
-  }
-
-  .logo-badge::after {
-    content: "";
+  /* The lens behind the active link. Moves on a spring; a CSS transition
+     retargets from its current value, so fast scrolling never makes it
+     jump. */
+  .nav-indicator {
     position: absolute;
-    inset: 12%;
-    z-index: -1;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--color-keyframe) 24%, transparent);
-    filter: blur(56px);
-  }
-
-  .logo-badge img {
-    -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 92%);
-    mask-image: radial-gradient(closest-side, #000 70%, transparent 92%);
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition:
+      transform var(--spring-duration) var(--spring),
+      width var(--spring-duration) var(--spring),
+      opacity 200ms ease;
   }
 
   /* Type -------------------------------------------------------------- */
 
-  /* Small uppercase kicker. One size, one tracking, everywhere. Caps get
-     positive tracking; large display text gets negative. */
   .label {
-    font-family: var(--font-body);
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1rem;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-ink-muted);
   }
@@ -246,34 +338,36 @@
   }
 
   .display {
-    font-size: clamp(2.5rem, 7vw, 4rem);
-    line-height: 1.02;
-    letter-spacing: -0.035em;
+    font-size: clamp(3rem, 9vw, 6rem);
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
   }
 
   .section-title {
-    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
-    line-height: 1.08;
-    letter-spacing: -0.03em;
+    font-size: clamp(1.75rem, 4.5vw, 3rem);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
   }
 
-  .card-title {
+  .title-sm {
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.5rem;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   .lede {
     color: var(--color-ink-soft);
     font-size: 1rem;
     line-height: 1.625rem;
+    letter-spacing: -0.005em;
   }
 
   @media (min-width: 640px) {
     .lede {
-      font-size: 1.125rem;
-      line-height: 1.75rem;
+      font-size: 1.25rem;
+      line-height: 1.875rem;
     }
   }
 
@@ -283,48 +377,39 @@
     line-height: 1.5rem;
   }
 
-  /* The only gradient on the site, used once on the hero's lead word. */
   .text-gradient {
-    background: linear-gradient(100deg, var(--color-ink) 8%, var(--color-keyframe-strong) 58%, var(--color-keyframe) 100%);
+    background: linear-gradient(100deg, #f5f3fa 0%, var(--color-keyframe-strong) 45%, var(--color-keyframe) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
-  /* Surfaces ---------------------------------------------------------- */
-
-  .card {
-    position: relative;
-    border: 1px solid var(--color-surface-border);
-    border-radius: var(--radius);
-    background: linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
-    box-shadow: var(--shadow);
-  }
+  /* Small elements ---------------------------------------------------- */
 
   .chip {
     display: inline-flex;
     align-items: center;
-    border: 1px solid var(--color-surface-border);
     border-radius: var(--radius-pill);
     padding: 0.25rem 0.75rem;
-    background: var(--color-surface-2);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1rem;
     color: var(--color-ink-soft);
     white-space: nowrap;
   }
 
   .icon-tile {
-    --tile-bg: color-mix(in srgb, var(--color-keyframe) 10%, var(--color-surface-2));
+    --tile-bg: color-mix(in srgb, var(--color-keyframe) 14%, var(--color-surface-2));
     display: grid;
     place-items: center;
     width: 2.5rem;
     height: 2.5rem;
     flex: 0 0 auto;
-    border: 1px solid var(--color-surface-border-strong);
     border-radius: var(--radius);
     background: var(--tile-bg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     color: var(--color-keyframe-strong);
   }
 
@@ -335,29 +420,37 @@
 
   /* Buttons ----------------------------------------------------------- */
 
-  /* One button system. Feedback lands on press (scale), not on hover
-     (no lift, no layout movement). Hover only changes color, and only
-     on devices that actually hover. */
+  /* Capsules, sentence case. Press compresses instantly (pointer-down
+     feedback); release springs back with a hint of overshoot. */
   .btn {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     min-height: 3rem;
     padding: 0 1.5rem;
-    border: 1px solid transparent;
-    border-radius: var(--radius);
-    font-family: var(--font-display);
-    font-size: 0.875rem;
-    font-weight: 800;
+    border: 0;
+    border-radius: var(--radius-pill);
+    font-size: 1rem;
+    font-weight: 600;
     line-height: 1;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: -0.01em;
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
-    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease,
-      transform 100ms ease-out;
+    transition:
+      transform var(--spring-bouncy-duration) var(--spring-bouncy),
+      background-color 200ms ease,
+      box-shadow 200ms ease,
+      color 200ms ease,
+      opacity 200ms ease;
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+    transition-duration: 80ms, 200ms, 200ms, 200ms, 200ms;
+    transition-timing-function: ease-out;
   }
 
   .btn svg {
@@ -366,47 +459,57 @@
     flex: 0 0 auto;
   }
 
-  .btn:active {
-    transform: scale(0.97);
-  }
-
   .btn-sm {
-    min-height: 2.75rem;
+    min-height: 2.5rem;
     padding: 0 1rem;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
 
   .btn-icon {
-    width: 2.75rem;
+    width: 2.5rem;
     padding: 0;
   }
 
-  .btn-primary {
-    background: var(--color-keyframe);
-    color: #140a24;
+  .btn-lg {
+    min-height: 3.5rem;
+    padding: 0 2rem;
+    font-size: 1.0625rem;
   }
 
-  .btn-ghost {
-    border-color: var(--color-surface-border-strong);
-    background: color-mix(in srgb, var(--color-surface-2) 60%, transparent);
+  .btn-primary {
+    background: linear-gradient(180deg, #9a62ff, #7440ec);
+    color: #fff;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+      0 8px 24px -8px color-mix(in srgb, var(--color-keyframe) 70%, transparent);
+  }
+
+  .btn-glass {
+    background: var(--glass-fill), rgba(255, 255, 255, 0.02);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
     color: var(--color-ink);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   }
 
   @media (hover: hover) {
     .btn-primary:hover {
-      background: var(--color-keyframe-strong);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+        0 12px 32px -8px color-mix(in srgb, var(--color-keyframe) 90%, transparent);
     }
 
-    .btn-ghost:hover {
-      border-color: color-mix(in srgb, var(--color-keyframe) 45%, var(--color-surface-border-strong));
-      background: var(--color-surface-2);
+    .btn-glass:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)), rgba(255, 255, 255, 0.02);
     }
   }
 
   .btn:disabled,
   .btn[aria-disabled="true"] {
-    border-color: var(--color-surface-border);
-    background: var(--color-surface-2);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     color: var(--color-ink-muted);
     cursor: not-allowed;
     transform: none;
@@ -421,37 +524,163 @@
     font-weight: 500;
     color: var(--color-ink-muted);
     text-underline-offset: 4px;
-    transition: color 160ms ease;
+    transition: color 200ms ease;
   }
 
   @media (hover: hover) {
     .text-link:hover {
       color: var(--color-ink);
-      text-decoration: underline;
     }
   }
 
-  /* Get Key step ------------------------------------------------------ */
+  /* Menu preview ------------------------------------------------------ */
+
+  .menu-window {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-align: left;
+  }
+
+  .menu-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .menu-tab {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 200ms ease;
+  }
+
+  .menu-tab[aria-selected="true"] {
+    color: var(--color-ink);
+  }
+
+  @media (hover: hover) {
+    .menu-tab:hover {
+      color: var(--color-ink);
+    }
+  }
+
+  .menu-tab-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2.5rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: transform var(--spring-duration) var(--spring);
+  }
+
+  /* Panel content arrives from the direction of travel: moving down the
+     tab list, content rises; moving up, it drops. */
+  .menu-panel {
+    animation: panel-in 360ms var(--spring) both;
+  }
+
+  .menu-panel[data-dir="up"] {
+    animation-name: panel-in-down;
+  }
+
+  .menu-row {
+    display: flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.875rem;
+    color: var(--color-ink-soft);
+  }
+
+  .menu-row:last-child {
+    border-bottom: 0;
+  }
+
+  /* iOS-style switch. The thumb stretches while pressed and springs to
+     its new side on release. */
+  .switch {
+    position: relative;
+    width: 3rem;
+    height: 1.75rem;
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    transition: background-color 240ms ease;
+  }
+
+  .switch[aria-checked="true"] {
+    background: var(--color-keyframe);
+  }
+
+  .switch-thumb {
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-pill);
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition:
+      transform var(--spring-bouncy-duration) var(--spring-bouncy),
+      width 200ms var(--spring);
+  }
+
+  .switch[aria-checked="true"] .switch-thumb {
+    transform: translateX(1.25rem);
+  }
+
+  .switch:active .switch-thumb {
+    width: 1.875rem;
+  }
+
+  .switch[aria-checked="true"]:active .switch-thumb {
+    transform: translateX(0.875rem);
+  }
+
+  /* Get Key steps ----------------------------------------------------- */
 
   .step {
     display: flex;
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    border: 1px solid var(--color-surface-border);
-    border-radius: var(--radius);
-    background: var(--color-surface-2);
-    transition: border-color 160ms ease;
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+    transition: box-shadow 240ms ease, background-color 240ms ease;
   }
 
   @media (hover: hover) {
     .step:hover {
-      border-color: var(--color-surface-border-strong);
+      background: rgba(255, 255, 255, 0.06);
     }
   }
 
   .step[data-done="true"] {
-    border-color: color-mix(in srgb, var(--color-keyframe) 45%, var(--color-surface-border));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-keyframe) 50%, transparent);
   }
 
   .step-badge {
@@ -460,13 +689,9 @@
     width: 2.5rem;
     height: 2.5rem;
     flex: 0 0 auto;
-    border: 1px solid var(--color-surface-border-strong);
     border-radius: var(--radius-pill);
-    background: var(--color-surface);
+    background: color-mix(in srgb, var(--color-keyframe) 16%, transparent);
     color: var(--color-keyframe-strong);
-    font-family: var(--font-display);
-    font-size: 0.875rem;
-    font-weight: 800;
   }
 
   .step-badge svg {
@@ -474,28 +699,18 @@
     height: 1rem;
   }
 
-  /* FAQ accordion ----------------------------------------------------- */
-
-  .faq-list {
-    display: grid;
-    gap: 0.75rem;
+  .step-badge[data-done="true"] svg {
+    animation: pop-in var(--spring-bouncy-duration) var(--spring-bouncy) both;
   }
 
-  .faq-item {
-    border: 1px solid var(--color-surface-border);
-    border-radius: var(--radius);
-    background: var(--color-surface);
-    transition: border-color 160ms ease;
+  /* FAQ: an inset grouped list ---------------------------------------- */
+
+  .faq-group {
+    overflow: hidden;
   }
 
-  .faq-item-open {
-    border-color: var(--color-surface-border-strong);
-  }
-
-  @media (hover: hover) {
-    .faq-item:hover {
-      border-color: var(--color-surface-border-strong);
-    }
+  .faq-item + .faq-item {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .faq-trigger {
@@ -507,49 +722,46 @@
     gap: 1rem;
     padding: 1rem 1.5rem;
     border: 0;
-    border-radius: var(--radius);
     background: transparent;
     color: var(--color-ink);
-    font-family: var(--font-display);
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.5rem;
+    letter-spacing: -0.01em;
     text-align: left;
     cursor: pointer;
+    transition: background-color 200ms ease;
+  }
+
+  @media (hover: hover) {
+    .faq-trigger:hover {
+      background: rgba(255, 255, 255, 0.025);
+    }
   }
 
   .faq-trigger:focus-visible {
     outline-offset: -2px;
   }
 
-  .faq-icon {
-    display: grid;
-    place-items: center;
-    width: 1.5rem;
-    height: 1.5rem;
+  .faq-chevron {
+    width: 1rem;
+    height: 1rem;
     flex: 0 0 auto;
-    border: 1px solid var(--color-surface-border-strong);
-    border-radius: var(--radius-pill);
-    color: var(--color-keyframe-strong);
-    transition: transform 240ms var(--ease);
+    color: var(--color-ink-muted);
+    transition: transform var(--spring-duration) var(--spring);
   }
 
-  .faq-icon svg {
-    width: 0.75rem;
-    height: 0.75rem;
+  .faq-item-open .faq-chevron {
+    transform: rotate(180deg);
   }
 
-  .faq-item-open .faq-icon {
-    transform: rotate(45deg);
-  }
-
-  /* Height animates via grid rows. CSS transitions reverse from their
-     current value, so a mid-flight toggle redirects instead of jumping. */
   .faq-panel {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 320ms var(--ease), opacity 240ms ease;
+    transition:
+      grid-template-rows var(--spring-duration) var(--spring),
+      opacity 240ms ease;
   }
 
   .faq-item-open .faq-panel {
@@ -562,16 +774,14 @@
     overflow: hidden;
   }
 
-  /* Padding lives on an inner element that is always present, so nothing
-     snaps when the panel opens or closes. */
   .faq-answer-inner {
     padding: 0 1.5rem 1.25rem;
     color: var(--color-ink-soft);
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     line-height: 1.5rem;
   }
 
-  /* Modal (ad blocker notice) ----------------------------------------- */
+  /* Sheet (ad blocker notice) ----------------------------------------- */
 
   .modal-scrim {
     position: fixed;
@@ -581,17 +791,17 @@
     display: grid;
     place-items: center;
     padding: 1.5rem;
-    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    animation: fade 200ms ease both;
+    background: rgba(6, 5, 9, 0.6);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    animation: fade 240ms ease both;
   }
 
   .modal-card {
     width: 100%;
-    max-width: 28rem;
-    box-shadow: var(--shadow-modal);
-    animation: materialize 320ms var(--ease) both;
+    max-width: 26rem;
+    border-radius: 2rem;
+    animation: materialize var(--spring-duration) var(--spring) both;
   }
 
   /* Status ------------------------------------------------------------ */
@@ -608,25 +818,93 @@
     animation: spin 800ms linear infinite;
   }
 
-  /* Entrance motion --------------------------------------------------- */
+  /* Entrance ---------------------------------------------------------- */
 
-  /* .animate-rise plays once on load for above-the-fold content. Short
-     and small: the page should feel ready, not performed. */
   .animate-rise {
-    animation: rise 480ms var(--ease) both;
+    animation: rise 640ms var(--spring) both;
   }
+}
 
-  /* [data-reveal] fades up as it scrolls into view. `reveal-on` is set
-     by an inline script in <head> before first paint (so nothing
-     flashes visible and then hides), and only when motion is allowed. */
-  .reveal-on [data-reveal] {
-    transition: opacity 480ms var(--ease), transform 480ms var(--ease);
-  }
+/* ------------------------------------------------------------------ *
+ * Scroll-driven motion.
+ *
+ * Tied 1:1 to the scroll position instead of fired by a timer, so it is
+ * directly manipulated: scroll back and it reverses, stop and it stops.
+ * Runs on the compositor with no JavaScript. Browsers without support
+ * simply show everything in its final state.
+ * ------------------------------------------------------------------ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
 
-  .reveal-on [data-reveal]:not(.is-visible) {
-    opacity: 0;
-    transform: translateY(16px);
+    /* The menu preview starts tilted back and settles flat as it scrolls
+       into view. */
+    .hero-window {
+      animation: settle linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+
+    /* Hero copy recedes as the page scrolls away from it. */
+    .hero-copy {
+      animation: recede linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 60vh;
+    }
+
+    /* The header's glass thickens once content is underneath it. */
+    .site-header {
+      animation: header-thicken linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 12rem;
+    }
   }
+}
+
+/* ------------------------------------------------------------------ *
+ * Route transitions (React <ViewTransition>, see components/route-transition.tsx)
+ * Forward goes deeper: the old page recedes, the new one rises in front.
+ * Back reverses it. The header is its own layer and never moves.
+ * ------------------------------------------------------------------ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 10;
+}
+
+::view-transition-old(.nav-forward) {
+  animation: 200ms ease-out both vt-recede;
+}
+
+::view-transition-new(.nav-forward) {
+  animation: 480ms var(--spring) 60ms both vt-arrive;
+}
+
+::view-transition-old(.nav-back) {
+  animation: 200ms ease-out both vt-leave-down;
+}
+
+::view-transition-new(.nav-back) {
+  animation: 480ms var(--spring) 60ms both vt-return;
+}
+
+/* Shared element: the Get Key button grows into the Get Key card. */
+::view-transition-group(.key-morph) {
+  animation-duration: var(--spring-duration);
+  animation-timing-function: var(--spring);
+}
+
+::view-transition-image-pair(.key-morph) {
+  animation-name: via-blur;
+  animation-duration: var(--spring-duration);
 }
 
 /* ------------------------------------------------------------------ *
@@ -636,33 +914,72 @@
   from {
     opacity: 0;
   }
-  to {
-    opacity: 1;
-  }
 }
 
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
+    transform: translateY(16px);
+    filter: blur(6px);
   }
 }
 
-/* Surfaces arrive as material: scale and blur resolve together. */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.98);
+  }
+}
+
+@keyframes settle {
+  from {
+    transform: perspective(1400px) rotateX(18deg) scale(0.92);
+    opacity: 0.4;
+  }
+}
+
+@keyframes recede {
+  to {
+    transform: translateY(-48px) scale(0.97);
+    opacity: 0.2;
+  }
+}
+
+@keyframes header-thicken {
+  from {
+    --glass-tint: rgba(14, 12, 21, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+}
+
+@keyframes panel-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+    filter: blur(4px);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+
 @keyframes materialize {
   from {
     opacity: 0;
-    transform: scale(0.96);
-    filter: blur(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
+    transform: scale(0.94);
+    filter: blur(8px);
   }
 }
 
@@ -672,23 +989,65 @@
   }
 }
 
+@keyframes vt-recede {
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+    filter: blur(4px);
+  }
+}
+
+@keyframes vt-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@keyframes vt-leave-down {
+  to {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@keyframes vt-return {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+    filter: blur(4px);
+  }
+}
+
+@keyframes via-blur {
+  30% {
+    filter: blur(4px);
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Accessibility preferences
  * ------------------------------------------------------------------ */
 
-/* Reduced motion is not "no feedback": swap movement for a short
-   cross-fade, keep color and opacity changes that aid comprehension. */
+/* Reduced motion: movement becomes a short cross-fade. Color and
+   opacity changes that carry meaning stay. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
   .animate-rise,
-  .modal-card {
+  .modal-card,
+  .menu-panel {
     animation: fade 200ms ease both;
   }
 
-  .faq-icon,
+  .btn,
+  .btn:active,
+  .switch-thumb,
+  .nav-indicator,
+  .menu-tab-indicator,
+  .faq-chevron,
   .faq-panel {
     transition-duration: 0ms;
   }
@@ -696,33 +1055,52 @@
   .btn:active {
     transform: none;
   }
+
+  ::view-transition-group(*) {
+    animation-duration: 0ms;
+  }
+
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: 160ms ease both fade;
+  }
+
+  ::view-transition-old(*) {
+    animation-direction: reverse;
+  }
 }
 
+/* Reduced transparency: glass becomes a frosted solid. */
 @media (prefers-reduced-transparency: reduce) {
-  .site-header,
+  .glass,
+  .btn-glass,
   .modal-scrim {
-    background: var(--color-bg);
+    background: var(--color-surface-2);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 }
 
+/* Increased contrast: solid fills, defined borders, full-strength text. */
 @media (prefers-contrast: more) {
-  .site-header {
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-ink-muted);
+  .glass,
+  .btn-glass {
+    background: var(--color-surface-2);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: inset 0 0 0 1px var(--color-ink-muted);
   }
 
   .card,
-  .faq-item,
-  .step,
-  .chip {
+  .step {
     border-color: var(--color-ink-muted);
   }
 
   .lede,
   .body-sm,
-  .faq-answer-inner {
+  .faq-answer-inner,
+  .nav-link,
+  .menu-tab {
     color: var(--color-ink);
   }
 }

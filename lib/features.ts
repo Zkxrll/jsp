@@ -117,15 +117,3 @@ export const features: readonly Feature[] = [
     tags: ["Recorder", "Device Spoof", "Staff Detector"],
   },
 ] as const;
-
-export interface Stat {
-  value: string;
-  label: string;
-}
-
-/** Honest numbers only, all counted from the menu and this file. */
-export const stats: readonly Stat[] = [
-  { value: "11", label: "Menu tabs" },
-  { value: String(features.length), label: "Feature groups" },
-  { value: "2", label: "Aim modes" },
-] as const;

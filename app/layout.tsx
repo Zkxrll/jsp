@@ -1,24 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Archivo, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import { siteConfig } from "@/lib/config";
 import "./globals.css";
 import { AdBlockGate } from "@/components/adblock-gate";
+import { PointerLight } from "@/components/pointer-light";
+import { SiteHeader } from "@/components/site-header";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { MonetagScript } from "@/components/monetag-script";
 import { PopAdsScript } from "@/components/popads-script";
 
-// One display face, one body face. Both variable, self-hosted by next/font,
-// so headings render the same on every device instead of falling back to
-// whatever "Arial Black" resolves to.
-const display = Archivo({ subsets: ["latin"], variable: "--font-archivo", display: "swap" });
-const body = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-
-// Runs before first paint. Opts the page into scroll-reveal only when motion
-// is allowed, so revealed content never flashes visible and then hides. If
-// the page never hydrates, a timeout shows everything rather than leaving it
-// hidden.
-const REVEAL_BOOTSTRAP = `try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&"IntersectionObserver"in window){var d=document.documentElement;d.classList.add("reveal-on");setTimeout(function(){if(!d.dataset.revealReady)d.classList.remove("reveal-on")},4000)}}catch(e){}`;
+// One family with optical sizing: display sizes get tighter, sturdier
+// letterforms automatically, the way SF Pro Display / Text split works.
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap", axes: ["opsz"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -59,10 +53,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
+    <html lang="en" className={inter.variable}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: REVEAL_BOOTSTRAP }} />
-
         {/* Monetag Multitag, client-side except in Safari (Vignette behavior). */}
         <MonetagScript />
 
@@ -83,7 +75,13 @@ export default function RootLayout({
         {/* PopAds, injected on the client to avoid the next/script head crash. */}
         <PopAdsScript />
 
-        {children}
+        <PointerLight />
+
+        <div className="site-shell">
+          <div className="aurora" aria-hidden="true" />
+          <SiteHeader />
+          {children}
+        </div>
       </body>
     </html>
   );

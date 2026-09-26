@@ -50,7 +50,7 @@ export function AdBlockGate() {
         }
       }}
     >
-      <div className="card modal-card p-8 text-center">
+      <div className="glass modal-card p-8 text-center">
         <span className="icon-tile mx-auto text-danger">
           <AlertIcon />
         </span>
@@ -68,7 +68,7 @@ export function AdBlockGate() {
           ref={reloadRef}
           type="button"
           onClick={() => window.location.reload()}
-          className="btn btn-primary mt-8 w-full"
+          className="btn btn-primary btn-lg mt-8 w-full"
         >
           Reload page
         </button>

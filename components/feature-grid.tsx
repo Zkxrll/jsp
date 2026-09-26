@@ -99,14 +99,15 @@ export function FeatureGrid() {
         <article
           key={feature.title}
           data-reveal
-          className={`card flex flex-col p-6 ${feature.featured ? "sm:col-span-2" : ""}`}
+          data-spotlight
+          className={`card flex flex-col p-6 ${feature.featured ? "sm:col-span-2 lg:p-8" : ""}`}
         >
           <div className="flex items-center justify-between gap-4">
             <FeatureIconMark icon={feature.icon} />
             <span className="label">{feature.tab}</span>
           </div>
 
-          <h3 className="card-title mt-4">{feature.title}</h3>
+          <h3 className="title-sm mt-4">{feature.title}</h3>
 
           <p className="body-sm mt-2 flex-1">{feature.blurb}</p>
 
