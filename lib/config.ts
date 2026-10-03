@@ -17,7 +17,7 @@ export const siteConfig = {
 
   keySystemUrl:
     process.env.NEXT_PUBLIC_KEY_SYSTEM_URL ??
-    "https://jnkie.com/get-key/zkxhub",
+    "https://linkunlocker.com/zkxhub-key-z671d",
 
   links: {
     discord:

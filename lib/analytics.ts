@@ -15,7 +15,6 @@
 
 type AnalyticsEvent =
   | { name: "get_key_clicked"; props?: { source?: string } }
-  | { name: "get_key_discord_opened" }
   | { name: "get_key_redirected"; props: { destination: string } };
 
 export function track(event: AnalyticsEvent): void {

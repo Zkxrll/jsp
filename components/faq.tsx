@@ -7,7 +7,7 @@ const FAQ_ITEMS = [
   {
     question: "How do I get a key?",
     answer:
-      "Click Get Key, open the Zkx Hub Discord invite, then continue to the key system. The key system issues your key; paste it into the script when it asks.",
+      "Click Get Key to continue to the key system. The key system issues your key; paste it into the script when it asks.",
   },
   {
     question: "Is Premium lifetime?",

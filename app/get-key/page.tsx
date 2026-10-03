@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Get Key",
-  description: `Get a free ${siteConfig.name} key: open the Discord, then continue to the key system.`,
+  description: `Get a free ${siteConfig.name} key: continue to the key system.`,
 };
 
 export default function GetKeyPage() {
