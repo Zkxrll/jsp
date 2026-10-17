@@ -85,7 +85,7 @@ async function linkJnkieKey(key) {
   }
   if (data?.error) throw new Error(data.error);
   await loadProfile();
-  if (!profile?.jnkie_verified_at) throw new Error("The key was checked, but the link was not saved.");
+  if (!profile?.jnkie_verified_at || profile?.is_premium !== true) throw new Error("The key was not confirmed as Premium, or the link was not saved.");
 }
 
 function updateAuthUI() {
@@ -116,7 +116,7 @@ function updateAuthUI() {
 }
 
 async function uploadConfig(file) {
-  if (!currentUser || !profile?.jnkie_verified_at) throw new Error("Sign in with Discord and link your Jnkie key first.");
+  if (!currentUser || !profile?.jnkie_verified_at || profile?.is_premium !== true) throw new Error("An active Jnkie Premium key linked to your Discord account is required.");
   if (!(file instanceof File) || !file.name.toLowerCase().endsWith(".txt")) throw new Error("Only .txt files are allowed.");
   if (file.size > MAX_FILE_SIZE) throw new Error("File too large. Maximum size is 1 MB.");
   if (file.size === 0) throw new Error("The file is empty.");
@@ -144,7 +144,7 @@ async function uploadConfig(file) {
 }
 
 async function loadConfigs() {
-  if (!currentUser || !profile?.jnkie_verified_at) return [];
+  if (!currentUser || !profile?.jnkie_verified_at || profile?.is_premium !== true) return [];
   const { data, error } = await db.from("configs")
     .select("id, name, storage_path, size, downloads, created_at")
     .eq("user_id", currentUser.id)
@@ -327,7 +327,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 0);
   });
 
-  if (currentUser && profile?.jnkie_verified_at) await refreshConfigs();
-  else if ($("configsGrid")) $("configsGrid").innerHTML = '<div class="config-empty"><p>Sign in and link your Jnkie key to see your private configs.</p></div>';
+  if (currentUser && profile?.jnkie_verified_at && profile?.is_premium === true) await refreshConfigs();
+  else if ($("configsGrid")) $("configsGrid").innerHTML = '<div class="config-empty"><p>Sign in and link an active Premium Jnkie key to see your private configs.</p></div>';
   if ($("year")) $("year").textContent = String(new Date().getFullYear());
 });
