@@ -7,7 +7,7 @@ const FAQ_ITEMS = [
   {
     question: "How do I get a key?",
     answer:
-      "Click Get Key, open the Zkx Hub Discord invite, then continue to the key system. The key system issues your key; paste it into the script when it asks.",
+      "Click Get Key to go straight to the key system, which issues your key. Paste it into the script when it asks; joining Discord is optional.",
   },
   {
     question: "Is Premium lifetime?",
@@ -27,7 +27,7 @@ const FAQ_ITEMS = [
   {
     question: "Where do I get support?",
     answer:
-      "In the Discord. Keys, update announcements, and support all run through the same server.",
+      "In the Discord. Update announcements and support run through the same server.",
   },
 ] as const;
 
