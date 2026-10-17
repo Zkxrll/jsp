@@ -1,298 +1,321 @@
-// =========================================
-//  ZKX CONFIGS — Supabase версия
-// =========================================
-
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const SUPABASE_URL = "https://jlgyqvxiyxcdbfpnzhuf.supabase.co";
-const SUPABASE_KEY = "sb_publishable_0gH9qQ3woMTH0MmOb5DTmQ_2tATb3FO";
-
+const SUPABASE_URL = "https://bcynlipojyfdtfgifdws.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2WVB7_9PPmJkCQ9vloRu8w_mTt20Le3";
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// =========================================
-//  КУРСОР-ПРОЖЕКТОР
-// =========================================
+const MAX_FILE_SIZE = 1024 * 1024;
+let currentUser = null;
+let profile = null;
+
+function $(id) { return document.getElementById(id); }
+
 function initCursorGlow() {
-  const glow = document.getElementById('cursorGlow');
+  const glow = $("cursorGlow");
   if (!glow || window.innerWidth < 820) return;
-
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let glowX = mouseX;
-  let glowY = mouseY;
-
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
+  let x = window.innerWidth / 2, y = window.innerHeight / 2;
+  let gx = x, gy = y;
+  document.addEventListener("mousemove", (e) => { x = e.clientX; y = e.clientY; });
   function animate() {
-    glowX += (mouseX - glowX) * 0.08;
-    glowY += (mouseY - glowY) * 0.08;
-    glow.style.left = glowX + 'px';
-    glow.style.top = glowY + 'px';
+    gx += (x - gx) * 0.08;
+    gy += (y - gy) * 0.08;
+    glow.style.left = gx + "px";
+    glow.style.top = gy + "px";
     requestAnimationFrame(animate);
   }
   animate();
 }
 
-// =========================================
-//  АНОНИМНАЯ АВТОРИЗАЦИЯ
-// =========================================
-async function initAuth() {
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) {
-    const { data, error } = await db.auth.signInAnonymously();
-    if (error) {
-      console.error("Auth error:", error);
-      return null;
-    }
-    return data.user;
-  }
-  return session.user;
+function setMessage(message, type = "info") {
+  const el = $("statusMessage");
+  if (!el) return;
+  el.textContent = message;
+  el.dataset.type = type;
+  el.hidden = !message;
 }
 
-// =========================================
-//  ЗАГРУЗКА КОНФИГА В SUPABASE
-// =========================================
+function setBusy(button, busy, label) {
+  if (!button) return;
+  if (busy) {
+    button.dataset.oldLabel = button.textContent;
+    button.textContent = label;
+    button.disabled = true;
+  } else {
+    button.textContent = button.dataset.oldLabel || label;
+    button.disabled = false;
+  }
+}
+
+async function loadProfile() {
+  if (!currentUser) { profile = null; return; }
+  const { data, error } = await db.from("profiles")
+    .select("discord_id, jnkie_user_id, jnkie_verified_at")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+  if (error) console.error("Profile lookup failed:", error);
+  profile = data || null;
+}
+
+async function signInWithDiscord() {
+  const { error } = await db.auth.signInWithOAuth({
+    provider: "discord",
+    options: { redirectTo: window.location.href.split("#")[0] }
+  });
+  if (error) setMessage("Discord sign-in failed: " + error.message, "error");
+}
+
+async function signOut() {
+  const { error } = await db.auth.signOut();
+  if (error) setMessage("Could not sign out. Please try again.", "error");
+  else window.location.reload();
+}
+
+async function linkJnkieKey(key) {
+  const { data, error } = await db.functions.invoke("link-jnkie-key", { body: { key } });
+  if (error) throw new Error(error.message || "Could not verify the key.");
+  if (data?.error) throw new Error(data.error);
+  await loadProfile();
+  if (!profile?.jnkie_verified_at) throw new Error("The key was checked, but the link was not saved.");
+}
+
+function updateAuthUI() {
+  const signedIn = Boolean(currentUser);
+  const linked = Boolean(profile?.jnkie_verified_at && profile?.discord_id);
+  $("signInBtn").hidden = signedIn;
+  $("signOutBtn").hidden = !signedIn;
+  $("accountPanel").hidden = !signedIn;
+  $("linkKeyPanel").hidden = !signedIn || linked;
+  $("uploadPanel").hidden = !linked;
+  $("configsPanel").hidden = !linked;
+  $("signedInAs").textContent = currentUser?.user_metadata?.full_name
+    || currentUser?.user_metadata?.name
+    || currentUser?.email
+    || "Discord account connected";
+  $("linkedStatus").textContent = linked ? "Jnkie key linked" : "Link your Jnkie key to continue";
+  $("linkedStatus").classList.toggle("status-ok", linked);
+  $("linkedStatus").classList.toggle("status-pending", !linked);
+  if (!signedIn) {
+    $("authIntro").textContent = "Sign in with Discord to access your personal configs.";
+  } else if (!linked) {
+    $("authIntro").textContent = "Your Discord account is connected. Link the Jnkie key already associated with this same Discord account.";
+  } else {
+    $("authIntro").textContent = "Your account is linked. Your configs are private and only visible to you.";
+  }
+}
+
 async function uploadConfig(file) {
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) {
-    alert("Auth error. Please refresh.");
-    return null;
+  if (!currentUser || !profile?.jnkie_verified_at) throw new Error("Sign in with Discord and link your Jnkie key first.");
+  if (!(file instanceof File) || !file.name.toLowerCase().endsWith(".txt")) throw new Error("Only .txt files are allowed.");
+  if (file.size > MAX_FILE_SIZE) throw new Error("File too large. Maximum size is 1 MB.");
+  if (file.size === 0) throw new Error("The file is empty.");
+
+  const safeName = file.name.replace(/[\\/]/g, "_").slice(0, 180);
+  const path = `${currentUser.id}/${crypto.randomUUID()}.txt`;
+  const { error: uploadError } = await db.storage.from("configs").upload(path, file, {
+    contentType: "text/plain",
+    upsert: false
+  });
+  if (uploadError) throw new Error("Upload failed: " + uploadError.message);
+
+  const { data, error } = await db.from("configs").insert({
+    user_id: currentUser.id,
+    name: safeName,
+    storage_path: path,
+    size: file.size
+  }).select("id, name, storage_path, size, downloads, created_at").single();
+
+  if (error) {
+    await db.storage.from("configs").remove([path]);
+    throw new Error("Could not save config details: " + error.message);
   }
-
-  const id = crypto.randomUUID();
-  const path = `${user.id}/${id}.txt`;
-
-  const { error: uploadError } = await db.storage
-    .from('configs')
-    .upload(path, file, { contentType: 'text/plain' });
-
-  if (uploadError) {
-    console.error("Upload error:", uploadError);
-    alert("Upload failed: " + uploadError.message);
-    return null;
-  }
-
-  const { data, error: dbError } = await db
-    .from('configs')
-    .insert({
-      user_id: user.id,
-      name: file.name,
-      storage_path: path,
-      size: file.size,
-    })
-    .select()
-    .single();
-
-  if (dbError) {
-    console.error("DB error:", dbError);
-    alert("DB error: " + dbError.message);
-    return null;
-  }
-
   return data;
 }
 
-// =========================================
-//  ЗАГРУЗКА СПИСКА КОНФИГОВ
-// =========================================
 async function loadConfigs() {
-  const { data, error } = await db
-    .from('configs')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  if (error) {
-    console.error("Load error:", error);
-    return [];
-  }
+  if (!currentUser || !profile?.jnkie_verified_at) return [];
+  const { data, error } = await db.from("configs")
+    .select("id, name, storage_path, size, downloads, created_at")
+    .eq("user_id", currentUser.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw new Error("Could not load your configs: " + error.message);
   return data || [];
 }
 
-// =========================================
-//  СКАЧИВАНИЕ КОНФИГА
-// =========================================
 async function downloadConfig(config) {
-  const { data } = db.storage
-    .from('configs')
-    .getPublicUrl(config.storage_path);
-
-  const url = data.publicUrl + '?download=' + encodeURIComponent(config.name);
-
-  const a = document.createElement('a');
-  a.href = url;
+  const { data, error } = await db.storage.from("configs").createSignedUrl(config.storage_path, 60, {
+    download: config.name
+  });
+  if (error || !data?.signedUrl) throw new Error("Could not create a private download link.");
+  const a = document.createElement("a");
+  a.href = data.signedUrl;
   a.download = config.name;
+  a.rel = "noopener";
+  document.body.appendChild(a);
   a.click();
+  a.remove();
 
-  await db
-    .from('configs')
+  const { error: countError } = await db.from("configs")
     .update({ downloads: (config.downloads || 0) + 1 })
-    .eq('id', config.id);
+    .eq("id", config.id)
+    .eq("user_id", currentUser.id);
+  if (countError) console.warn("Could not update download count:", countError.message);
 }
 
-// =========================================
-//  РЕНДЕР СПИСКА
-// =========================================
-async function renderConfigs() {
-  const grid = document.getElementById('configsGrid');
+function renderConfigs(configs) {
+  const grid = $("configsGrid");
   if (!grid) return;
-
-  grid.innerHTML = `<div class="config-empty"><p>Loading...</p></div>`;
-
-  const configs = await loadConfigs();
-
-  if (configs.length === 0) {
-    grid.innerHTML = `<div class="config-empty"><p>No configs yet. Be the first to upload one!</p></div>`;
+  if (!configs.length) {
+    grid.innerHTML = '<div class="config-empty"><p>No personal configs yet. Upload your first .txt file above.</p></div>';
     updateStats(0, 0);
     return;
   }
-
   grid.innerHTML = configs.map(cfg => `
-    <div class="config-card" data-id="${cfg.id}">
+    <article class="config-card">
       <div class="config-name">${escapeHtml(cfg.name)}</div>
       <div class="config-meta">
         <span>📅 ${formatDate(cfg.created_at)}</span>
         <span>💾 ${formatSize(cfg.size)}</span>
       </div>
       <div class="config-footer">
-        <span class="muted">⬇ ${cfg.downloads || 0} downloads</span>
-        <a href="#" class="config-download" data-download="${cfg.id}">Download</a>
+        <span class="muted">⬇ ${Number(cfg.downloads) || 0} downloads</span>
+        <button type="button" class="config-download" data-download="${escapeHtml(cfg.id)}">Download</button>
       </div>
-    </div>
-  `).join('');
-
-  updateStats(configs.length, configs.reduce((s, c) => s + (c.downloads || 0), 0));
-
-  grid.querySelectorAll('[data-download]').forEach(el => {
-    el.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const cfg = configs.find(c => c.id === el.dataset.download);
-      if (cfg) {
+    </article>
+  `).join("");
+  updateStats(configs.length, configs.reduce((sum, cfg) => sum + (Number(cfg.downloads) || 0), 0));
+  grid.querySelectorAll("[data-download]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const cfg = configs.find(item => item.id === button.dataset.download);
+      if (!cfg) return;
+      button.disabled = true;
+      try {
         await downloadConfig(cfg);
-        renderConfigs();
+        setMessage("Download started.", "success");
+        const updated = await loadConfigs();
+        renderConfigs(updated);
+      } catch (error) {
+        setMessage(error.message || "Download failed.", "error");
+      } finally {
+        button.disabled = false;
       }
     });
   });
 }
 
-// =========================================
-//  UPLOAD UI
-// =========================================
-function initUpload() {
-  const dropzone = document.getElementById('dropzone');
-  const fileInput = document.getElementById('fileInput');
-  const chooseBtn = document.getElementById('chooseFileBtn');
-  const uploadResult = document.getElementById('uploadResult');
-  const shareLink = document.getElementById('shareLink');
-  const copyBtn = document.getElementById('copyLinkBtn');
-
-  if (!dropzone) return;
-
-  dropzone.addEventListener('click', (e) => {
-    if (e.target === chooseBtn || e.target.closest('button')) return;
-    fileInput.click();
-  });
-  chooseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    fileInput.click();
-  });
-
-  ['dragenter', 'dragover'].forEach(ev => {
-    dropzone.addEventListener(ev, (e) => {
-      e.preventDefault();
-      dropzone.classList.add('dragover');
-    });
-  });
-  ['dragleave', 'drop'].forEach(ev => {
-    dropzone.addEventListener(ev, (e) => {
-      e.preventDefault();
-      dropzone.classList.remove('dragover');
-    });
-  });
-  dropzone.addEventListener('drop', (e) => {
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
-  });
-
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) handleFile(file);
-  });
-
-  async function handleFile(file) {
-    if (!file.name.endsWith('.txt')) {
-      alert('Only .txt files are allowed.');
-      return;
-    }
-    if (file.size > 1024 * 1024) {
-      alert('File too large. Max 1 MB.');
-      return;
-    }
-
-    chooseBtn.textContent = 'Uploading...';
-    chooseBtn.disabled = true;
-
-    const result = await uploadConfig(file);
-
-    chooseBtn.textContent = 'Choose file';
-    chooseBtn.disabled = false;
-
-    if (!result) return;
-
-    const link = `${window.location.origin}/c/${result.id}`;
-    shareLink.value = link;
-    uploadResult.hidden = false;
-    uploadResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    renderConfigs();
-    fileInput.value = '';
+async function refreshConfigs() {
+  const grid = $("configsGrid");
+  if (grid) grid.innerHTML = '<div class="config-empty"><p>Loading your configs…</p></div>';
+  try {
+    renderConfigs(await loadConfigs());
+  } catch (error) {
+    if (grid) grid.innerHTML = '<div class="config-empty"><p>Your configs could not be loaded. Refresh the page and try again.</p></div>';
+    setMessage(error.message, "error");
   }
+}
 
-  copyBtn.addEventListener('click', () => {
-    shareLink.select();
-    document.execCommand('copy');
-    copyBtn.textContent = 'Copied!';
-    setTimeout(() => copyBtn.textContent = 'Copy', 1500);
+function initUpload() {
+  const dropzone = $("dropzone");
+  const fileInput = $("fileInput");
+  const chooseBtn = $("chooseFileBtn");
+  if (!dropzone || !fileInput || !chooseBtn) return;
+
+  const processFile = async file => {
+    if (!file) return;
+    setMessage("");
+    setBusy(chooseBtn, true, "Uploading…");
+    try {
+      await uploadConfig(file);
+      setMessage("Config uploaded successfully.", "success");
+      fileInput.value = "";
+      await refreshConfigs();
+    } catch (error) {
+      setMessage(error.message || "Upload failed.", "error");
+    } finally {
+      setBusy(chooseBtn, false, "Choose file");
+    }
+  };
+
+  dropzone.addEventListener("click", event => {
+    if (event.target.closest("button")) return;
+    fileInput.click();
   });
+  chooseBtn.addEventListener("click", event => {
+    event.stopPropagation();
+    fileInput.click();
+  });
+  fileInput.addEventListener("change", () => processFile(fileInput.files?.[0]));
+  ["dragenter", "dragover"].forEach(name => dropzone.addEventListener(name, event => {
+    event.preventDefault();
+    dropzone.classList.add("dragover");
+  }));
+  ["dragleave", "drop"].forEach(name => dropzone.addEventListener(name, event => {
+    event.preventDefault();
+    dropzone.classList.remove("dragover");
+  }));
+  dropzone.addEventListener("drop", event => processFile(event.dataTransfer?.files?.[0]));
 }
 
-// =========================================
-//  УТИЛИТЫ
-// =========================================
-function escapeHtml(s) {
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[char]);
 }
-function formatDate(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+function formatDate(value) {
+  return new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 function formatSize(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / 1024 / 1024).toFixed(2) + " MB";
 }
 function updateStats(count, downloads) {
-  const c = document.getElementById('statConfigs');
-  const d = document.getElementById('statDownloads');
-  if (c) c.textContent = count;
-  if (d) d.textContent = downloads;
+  if ($("statConfigs")) $("statConfigs").textContent = String(count);
+  if ($("statDownloads")) $("statDownloads").textContent = String(downloads);
 }
 
-// =========================================
-//  ИНИЦИАЛИЗАЦИЯ
-// =========================================
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initCursorGlow();
-  await initAuth();
   initUpload();
-  await renderConfigs();
+  $("signInBtn").addEventListener("click", signInWithDiscord);
+  $("signOutBtn").addEventListener("click", signOut);
+  $("linkKeyForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = $("linkKeyBtn");
+    const key = $("jnkieKey").value.trim();
+    if (!key) return;
+    setMessage("");
+    setBusy(button, true, "Verifying…");
+    try {
+      await linkJnkieKey(key);
+      $("jnkieKey").value = "";
+      setMessage("Discord and Jnkie key linked successfully.", "success");
+      updateAuthUI();
+      await refreshConfigs();
+    } catch (error) {
+      setMessage(error.message || "Could not link that key.", "error");
+    } finally {
+      setBusy(button, false, "Link key");
+    }
+  });
 
-  const yearEl = document.getElementById('year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
+  const { data: { session }, error } = await db.auth.getSession();
+  if (error) console.error("Session lookup failed:", error);
+  currentUser = session?.user || null;
+  if (currentUser) await loadProfile();
+  updateAuthUI();
+
+  const { data: authListener } = db.auth.onAuthStateChange((_event, sessionNow) => {
+    currentUser = sessionNow?.user || null;
+    setTimeout(async () => {
+      if (currentUser) await loadProfile();
+      else profile = null;
+      updateAuthUI();
+      await refreshConfigs();
+    }, 0);
+  });
+
+  if (currentUser && profile?.jnkie_verified_at) await refreshConfigs();
+  else if ($("configsGrid")) $("configsGrid").innerHTML = '<div class="config-empty"><p>Sign in and link your Jnkie key to see your private configs.</p></div>';
+  if ($("year")) $("year").textContent = String(new Date().getFullYear());
 });
