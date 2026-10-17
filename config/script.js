@@ -59,7 +59,7 @@ async function loadProfile() {
 async function signInWithDiscord() {
   const { error } = await db.auth.signInWithOAuth({
     provider: "discord",
-    options: { redirectTo: window.location.href.split("#")[0] }
+    options: { redirectTo: "https://zkxhub.vercel.app/config" }
   });
   if (error) setMessage("Discord sign-in failed: " + error.message, "error");
 }
