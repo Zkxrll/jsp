@@ -39,9 +39,9 @@
 <main>
   <section class="hero">
     <div class="wrap hero-inner">
-      <div class="hero-badge">Private config storage</div>
+      <div class="hero-badge">Premium key required</div>
       <h1 class="hero-title">Your configs.<br><span class="accent">Your account.</span></h1>
-      <p class="hero-sub">Save your <code>.txt</code> configs privately and access them after signing in with Discord and linking the Jnkie key tied to that same account.</p>
+      <p class="hero-sub">Private config storage, exclusively for users with an active Jnkie Premium key linked to their Discord account. Your <code>.txt</code> files stay private to you.</p>
       <div class="hero-actions">
         <a href="#account" class="btn btn-primary btn-lg"><span class="btn-shine"></span>Connect account</a>
         <a href="#upload" class="btn btn-ghost btn-lg">My configs</a>
@@ -57,7 +57,7 @@
   <section class="section section-alt" id="account">
     <div class="wrap wrap-narrow">
       <h2 class="section-title">Account connection</h2>
-      <p class="section-sub" id="authIntro">Sign in with Discord to access your personal configs.</p>
+      <p class="section-sub" id="authIntro">This area is only available to users with an active Jnkie Premium key linked to their Discord account.</p>
       <div class="account-panel">
         <div id="accountPanel" hidden>
           <div class="account-row">
@@ -70,8 +70,8 @@
         </div>
         <div id="linkKeyPanel" hidden>
           <form id="linkKeyForm" class="key-form">
-            <label for="jnkieKey">Your Jnkie key</label>
-            <p class="muted">The key must already be linked to the same Discord account. Your key is sent to the secure server function for verification and is not saved in your browser storage.</p>
+            <label for="jnkieKey">Your Premium Jnkie key</label>
+            <p class="muted">An active Premium key is required and must already be linked to this same Discord account. Your key is verified server-side and is not saved in your browser storage.</p>
             <div class="key-input-row">
               <input id="jnkieKey" type="password" autocomplete="off" spellcheck="false" placeholder="Enter your Jnkie key" required maxlength="255">
               <button type="submit" class="btn btn-primary" id="linkKeyBtn">Link key</button>
@@ -114,8 +114,8 @@
       <h2 class="section-title">FAQ</h2>
       <div class="faq">
         <details>
-          <summary>Why do I need Discord?</summary>
-          <div class="faq-body"><p>Discord provides your account identity. Your Jnkie key must be associated with the same Discord account before your private config area is unlocked.</p></div>
+          <summary>Why do I need Discord and a Premium key?</summary>
+          <div class="faq-body"><p>Config storage is exclusive to active Jnkie Premium keys already linked to the same Discord account. Non-Premium or inactive keys cannot unlock this area.</p></div>
         </details>
         <details>
           <summary>Can other users see my configs?</summary>
