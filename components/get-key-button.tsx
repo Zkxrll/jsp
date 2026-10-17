@@ -1,8 +1,7 @@
 "use client";
 
-import { ViewTransition } from "react";
-import Link from "next/link";
 import { track } from "@/lib/analytics";
+import { siteConfig } from "@/lib/config";
 import { KeyIcon } from "./icons";
 
 type GetKeyButtonProps = {
@@ -10,39 +9,23 @@ type GetKeyButtonProps = {
   source: "header" | "hero" | "community";
   size?: "sm" | "md" | "lg";
   className?: string;
-  /**
-   * The hero button is the origin of the Get Key card: on navigation it
-   * grows into the card, and "Back" shrinks the card back into it. Only one
-   * button per page may carry this, or the browser can't pair them.
-   */
-  morph?: boolean;
 };
 
 const SIZE_CLASS = { sm: "btn-sm", md: "", lg: "btn-lg" } as const;
 
-/**
- * The one Get Key call to action. A real <Link>: prefetched, client-side,
- * no full reload. Never disabled, because ad scripts can open a separate tab
- * and the page must stay clickable when the user returns.
- */
-export function GetKeyButton({ source, size = "md", className = "", morph = false }: GetKeyButtonProps) {
-  const link = (
-    <Link
-      href="/get-key"
-      transitionTypes={morph ? ["nav-forward", "key-morph"] : ["nav-forward"]}
-      onClick={() => track({ name: "get_key_clicked", props: { source } })}
+/** Sends visitors directly to the key system; Discord is optional. */
+export function GetKeyButton({ source, size = "md", className = "" }: GetKeyButtonProps) {
+  return (
+    <a
+      href={siteConfig.keySystemUrl}
+      onClick={() => {
+        track({ name: "get_key_clicked", props: { source } });
+        track({ name: "get_key_redirected", props: { destination: siteConfig.keySystemUrl } });
+      }}
       className={`btn btn-primary ${SIZE_CLASS[size]} ${className}`}
     >
       <KeyIcon />
       Get Key
-    </Link>
-  );
-
-  if (!morph) return link;
-
-  return (
-    <ViewTransition name="get-key" share={{ "key-morph": "key-morph", default: "none" }} default="none">
-      {link}
-    </ViewTransition>
+    </a>
   );
 }
