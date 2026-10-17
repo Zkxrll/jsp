@@ -49,7 +49,7 @@ function setBusy(button, busy, label) {
 async function loadProfile() {
   if (!currentUser) { profile = null; return; }
   const { data, error } = await db.from("profiles")
-    .select("discord_id, jnkie_user_id, jnkie_verified_at")
+    .select("discord_id, jnkie_user_id, jnkie_verified_at, is_premium")
     .eq("id", currentUser.id)
     .maybeSingle();
   if (error) console.error("Profile lookup failed:", error);
@@ -72,7 +72,17 @@ async function signOut() {
 
 async function linkJnkieKey(key) {
   const { data, error } = await db.functions.invoke("link-jnkie-key", { body: { key } });
-  if (error) throw new Error(error.message || "Could not verify the key.");
+  if (error) {
+    let details = null;
+    try {
+      const response = error.context;
+      if (response && typeof response.clone === "function") details = await response.clone().json();
+    } catch (_) {}
+    if (details?.code === "PREMIUM_REQUIRED") {
+      throw new Error("This feature is only available to users with an active Jnkie Premium key. Upgrade to Premium, then try again.");
+    }
+    throw new Error(details?.error || error.message || "Could not verify the key.");
+  }
   if (data?.error) throw new Error(data.error);
   await loadProfile();
   if (!profile?.jnkie_verified_at) throw new Error("The key was checked, but the link was not saved.");
@@ -80,7 +90,7 @@ async function linkJnkieKey(key) {
 
 function updateAuthUI() {
   const signedIn = Boolean(currentUser);
-  const linked = Boolean(profile?.jnkie_verified_at && profile?.discord_id);
+  const linked = Boolean(profile?.jnkie_verified_at && profile?.discord_id && profile?.is_premium === true);
   $("signInBtn").hidden = signedIn;
   $("signOutBtn").hidden = !signedIn;
   $("accountPanel").hidden = !signedIn;
@@ -93,15 +103,15 @@ function updateAuthUI() {
     || currentUser?.user_metadata?.name
     || currentUser?.email
     || "Discord account connected";
-  $("linkedStatus").textContent = linked ? "Jnkie key linked" : "Link your Jnkie key to continue";
+  $("linkedStatus").textContent = linked ? "Premium access active" : "Premium key required";
   $("linkedStatus").classList.toggle("status-ok", linked);
   $("linkedStatus").classList.toggle("status-pending", !linked);
   if (!signedIn) {
-    $("authIntro").textContent = "Sign in with Discord to access your personal configs.";
+    $("authIntro").textContent = "This area is exclusive to users with an active Jnkie Premium key. Sign in with Discord to check your access.";
   } else if (!linked) {
-    $("authIntro").textContent = "Your Discord account is connected. Link the Jnkie key already associated with this same Discord account.";
+    $("authIntro").textContent = "Config storage is only available with an active Jnkie Premium key linked to this Discord account. Non-Premium keys cannot unlock access.";
   } else {
-    $("authIntro").textContent = "Your account is linked. Your configs are private and only visible to you.";
+    $("authIntro").textContent = "Premium access is active. Your configs are private and only visible to you.";
   }
 }
 
