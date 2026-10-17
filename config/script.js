@@ -85,7 +85,9 @@ function updateAuthUI() {
   $("signOutBtn").hidden = !signedIn;
   $("accountPanel").hidden = !signedIn;
   $("linkKeyPanel").hidden = !signedIn || linked;
+  $("upload").hidden = !linked;
   $("uploadPanel").hidden = !linked;
+  $("myConfigs").hidden = !linked;
   $("configsPanel").hidden = !linked;
   $("signedInAs").textContent = currentUser?.user_metadata?.full_name
     || currentUser?.user_metadata?.name
