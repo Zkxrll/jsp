@@ -3,30 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zkx Configs — Save, share and load your configs</title>
-<meta name="description" content="Upload, save and share your Zkx Hub configs. Free, fast, offline-friendly.">
+<title>Zkx Configs — Your private configs</title>
+<meta name="description" content="Store and manage your personal Zkx Hub text configs securely.">
 <meta name="theme-color" content="#a855f7">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<!-- Анимированный фон -->
 <div class="bg-glow"></div>
-<div class="bg-orbs">
-  <span class="orb orb-1"></span>
-  <span class="orb orb-2"></span>
-</div>
-
-<!-- Курсор-прожектор -->
+<div class="bg-orbs"><span class="orb orb-1"></span><span class="orb orb-2"></span></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 
-<!-- Шапка -->
 <header class="header">
   <div class="wrap header-inner">
     <a href="#" class="brand">
@@ -34,162 +24,122 @@
       <span class="brand-text">Zkx <span class="accent">Configs</span></span>
     </a>
     <nav class="nav">
-      <a href="#configs">Browse</a>
-      <a href="#upload">Upload</a>
+      <a href="#account">Account</a>
+      <a href="#upload">My configs</a>
       <a href="#faq">FAQ</a>
-      <a href="https://zkxhub.vercel.app" target="_blank" rel="noopener" class="nav-external">Zkx Hub ↗</a>
+      <a href="https://zkxhub.vercel.app" target="_blank" rel="noopener">Zkx Hub ↗</a>
     </nav>
-    <a href="#upload" class="btn btn-primary btn-sm">
-      <span class="btn-shine"></span>
-      Upload Config
-    </a>
+    <div class="header-actions">
+      <button type="button" class="btn btn-primary btn-sm" id="signInBtn">Continue with Discord</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="signOutBtn" hidden>Sign out</button>
+    </div>
   </div>
 </header>
 
 <main>
-
-  <!-- Hero -->
   <section class="hero">
     <div class="wrap hero-inner">
-      <div class="hero-badge">Built for Zkx Hub</div>
-      <h1 class="hero-title">
-        Save and share your <span class="accent">configs</span>.
-      </h1>
-      <p class="hero-sub">
-        Upload your <code>.txt</code> configs, get a shareable link, and load them back into the script in seconds. Free, no registration.
-      </p>
+      <div class="hero-badge">Private config storage</div>
+      <h1 class="hero-title">Your configs.<br><span class="accent">Your account.</span></h1>
+      <p class="hero-sub">Save your <code>.txt</code> configs privately and access them after signing in with Discord and linking the Jnkie key tied to that same account.</p>
       <div class="hero-actions">
-        <a href="#upload" class="btn btn-primary btn-lg">
-          <span class="btn-shine"></span>
-          Upload your config
-        </a>
-        <a href="#configs" class="btn btn-ghost btn-lg">
-          Browse configs
-        </a>
+        <a href="#account" class="btn btn-primary btn-lg"><span class="btn-shine"></span>Connect account</a>
+        <a href="#upload" class="btn btn-ghost btn-lg">My configs</a>
       </div>
-
       <div class="hero-stats">
-        <div>
-          <span class="stat-num" id="statConfigs">0</span>
-          <span class="stat-label">Configs</span>
-        </div>
-        <div>
-          <span class="stat-num" id="statDownloads">0</span>
-          <span class="stat-label">Downloads</span>
-        </div>
-        <div>
-          <span class="stat-num">24/7</span>
-          <span class="stat-label">Online</span>
-        </div>
+        <div><span class="stat-num" id="statConfigs">0</span><span class="stat-label">Your configs</span></div>
+        <div><span class="stat-num" id="statDownloads">0</span><span class="stat-label">Downloads</span></div>
+        <div><span class="stat-num">1 MB</span><span class="stat-label">Max file size</span></div>
       </div>
     </div>
   </section>
 
-  <!-- Загрузка -->
-  <section class="section" id="upload">
+  <section class="section section-alt" id="account">
     <div class="wrap wrap-narrow">
-      <h2 class="section-title">Upload a config</h2>
-      <p class="section-sub">Drop your <code>.txt</code> file below. Max size — 1 MB.</p>
+      <h2 class="section-title">Account connection</h2>
+      <p class="section-sub" id="authIntro">Sign in with Discord to access your personal configs.</p>
+      <div class="account-panel">
+        <div id="accountPanel" hidden>
+          <div class="account-row">
+            <div>
+              <p class="muted">Signed in as</p>
+              <p class="account-name" id="signedInAs">Discord account</p>
+            </div>
+            <span class="status-pill status-pending" id="linkedStatus">Link your Jnkie key to continue</span>
+          </div>
+        </div>
+        <div id="linkKeyPanel" hidden>
+          <form id="linkKeyForm" class="key-form">
+            <label for="jnkieKey">Your Jnkie key</label>
+            <p class="muted">The key must already be linked to the same Discord account. Your key is sent to the secure server function for verification and is not saved in your browser storage.</p>
+            <div class="key-input-row">
+              <input id="jnkieKey" type="password" autocomplete="off" spellcheck="false" placeholder="Enter your Jnkie key" required maxlength="255">
+              <button type="submit" class="btn btn-primary" id="linkKeyBtn">Link key</button>
+            </div>
+          </form>
+        </div>
+        <div id="statusMessage" class="status-message" role="status" aria-live="polite" hidden></div>
+      </div>
+    </div>
+  </section>
 
+  <section class="section" id="upload" hidden>
+    <div class="wrap wrap-narrow" id="uploadPanel" hidden>
+      <h2 class="section-title">Upload a config</h2>
+      <p class="section-sub">Only you can view and download the configs in your account. Text files only, maximum 1 MB.</p>
       <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept=".txt" hidden>
+        <input type="file" id="fileInput" accept=".txt,text/plain" hidden>
         <div class="dropzone-inner">
           <div class="dropzone-icon">📁</div>
-          <p class="dropzone-text">Drag & drop your <code>.txt</code> here</p>
-          <p class="dropzone-sub">or</p>
+          <p class="dropzone-text">Drop your <code>.txt</code> file here</p>
+          <p class="dropzone-sub">or choose it from your device</p>
           <button type="button" class="btn btn-primary" id="chooseFileBtn">Choose file</button>
         </div>
       </div>
-
-      <div class="upload-result" id="uploadResult" hidden>
-        <div class="upload-success">
-          <span class="success-icon">✓</span>
-          <div>
-            <p class="success-title">Config uploaded!</p>
-            <p class="success-sub">Share this link:</p>
-            <div class="copy-row">
-              <input type="text" id="shareLink" readonly>
-              <button type="button" class="btn btn-primary btn-sm" id="copyLinkBtn">Copy</button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
-  <!-- Список конфигов -->
-  <section class="section section-alt" id="configs">
-    <div class="wrap">
-      <h2 class="section-title">Recent configs</h2>
-      <p class="section-sub">Latest uploads from the community.</p>
-
+  <section class="section section-alt" id="myConfigs">
+    <div class="wrap" id="configsPanel" hidden>
+      <h2 class="section-title">My configs</h2>
+      <p class="section-sub">These files are private to your signed-in account. They are not listed publicly.</p>
       <div class="configs-grid" id="configsGrid">
-        <div class="config-empty">
-          <p>Loading...</p>
-        </div>
+        <div class="config-empty"><p>Sign in and link your Jnkie key to see your configs.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ -->
   <section class="section" id="faq">
     <div class="wrap wrap-narrow">
       <h2 class="section-title">FAQ</h2>
-
       <div class="faq">
         <details>
-          <summary>How do I use a config?</summary>
-          <div class="faq-body">
-            <p>Download the <code>.txt</code> file, then load it in Zkx Hub via the config import option.</p>
-          </div>
+          <summary>Why do I need Discord?</summary>
+          <div class="faq-body"><p>Discord provides your account identity. Your Jnkie key must be associated with the same Discord account before your private config area is unlocked.</p></div>
         </details>
-
         <details>
-          <summary>Is it free?</summary>
-          <div class="faq-body">
-            <p>Yes, completely free. No registration, no limits.</p>
-          </div>
+          <summary>Can other users see my configs?</summary>
+          <div class="faq-body"><p>No public config list is provided. Database rules and private file storage restrict access to your own account. Download links are short-lived.</p></div>
         </details>
-
         <details>
-          <summary>How long do configs stay online?</summary>
-          <div class="faq-body">
-            <p>Forever. Unless you delete them or they violate our rules.</p>
-          </div>
-        </details>
-
-        <details>
-          <summary>Can I share a config with my friends?</summary>
-          <div class="faq-body">
-            <p>Yes — every config has a unique link. Copy it and send it to anyone.</p>
-          </div>
+          <summary>Which files can I upload?</summary>
+          <div class="faq-body"><p>Only non-empty .txt files up to 1 MB.</p></div>
         </details>
       </div>
     </div>
   </section>
-
 </main>
 
 <footer class="footer">
   <div class="wrap footer-inner">
     <div class="footer-brand">
       <span class="brand-logo">Z</span>
-      <div>
-        <strong>Zkx Configs</strong>
-        <p class="muted">Save, share and load your configs.</p>
-      </div>
+      <div><strong>Zkx Configs</strong><p class="muted">Private config storage for Zkx Hub.</p></div>
     </div>
-    <div class="footer-links">
-      <a href="https://zkxhub.vercel.app" target="_blank" rel="noopener">Zkx Hub</a>
-      <a href="#" target="_blank" rel="noopener">Discord</a>
-    </div>
+    <div class="footer-links"><a href="https://zkxhub.vercel.app" target="_blank" rel="noopener">Zkx Hub</a></div>
     <p class="footer-copy muted">© <span id="year">2026</span> Zkx</p>
   </div>
 </footer>
-
-<!-- Supabase SDK (локальный файл) -->
-<script src="supabase.js"></script>
-<!-- Основной скрипт -->
 <script type="module" src="script.js"></script>
 </body>
-</html> 
+</html>
