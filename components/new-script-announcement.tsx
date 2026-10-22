@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRightIcon } from "@/components/icons";
 
@@ -8,6 +8,15 @@ const DISMISS_KEY = "zkx-steal-an-egg-announcement-dismissed";
 
 export function NewScriptAnnouncement() {
   const [open, setOpen] = useState(false);
+
+  const dismiss = useCallback(() => {
+    setOpen(false);
+    try {
+      window.sessionStorage.setItem(DISMISS_KEY, "1");
+    } catch {
+      // Closing still works when storage is unavailable.
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -25,16 +34,7 @@ export function NewScriptAnnouncement() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
-
-  function dismiss() {
-    setOpen(false);
-    try {
-      window.sessionStorage.setItem(DISMISS_KEY, "1");
-    } catch {
-      // Closing still works when storage is unavailable.
-    }
-  }
+  }, [open, dismiss]);
 
   if (!open) return null;
 
