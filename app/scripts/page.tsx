@@ -25,7 +25,7 @@ const SCRIPTS = [
     name: "Steal An Egg",
     label: "03 / GAME",
     description:
-      "Steal An Egg script entry. Its feature list still needs verification from the source, so specific functions aren't listed here yet.",
+      "Automation for stealing, placing, hatching, and selling eggs or pets, plus mutations, fusing, event helpers, player options, ESP, egg predictors, and server hopping.",
   },
 ] as const;
 
@@ -110,8 +110,7 @@ export default function ScriptsPage() {
 
           <div className="mx-auto mt-6 max-w-5xl">
             <p className="body-sm">
-              Feature summaries are based on the available script settings and feature catalog.
-              Steal An Egg details are left unlisted until its source can be inspected reliably.
+              Each summary highlights the main feature groups available for that game.
             </p>
             <a
               href={SOURCE_URL}
