@@ -14,22 +14,33 @@ const SCRIPTS = [
   { name: "Steal An Egg", category: "SIMULATOR", description: "Script for Steal An Egg." },
 ] as const;
 
-function CopyButton() {
-  const [copied, setCopied] = useState(false);
+function CopyButton({ game }: { game: string }) {
+  const [status, setStatus] = useState<"copied" | "error" | null>(null);
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(LOADSTRING);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
+      setStatus("copied");
+      window.setTimeout(() => setStatus(null), 1800);
     } catch {
-      setCopied(false);
+      setStatus("error");
     }
   }
 
   return (
-    <button type="button" onClick={copy} className="btn btn-primary w-full">
-      {copied ? <><CheckIcon /> Copied</> : <>Copy loadstring</>}
+    <button
+      type="button"
+      onClick={copy}
+      className="btn btn-primary w-full"
+      aria-label={`Copy loadstring for ${game}`}
+    >
+      {status === "copied" ? (
+        <><CheckIcon /> Copied</>
+      ) : status === "error" ? (
+        <>Clipboard unavailable</>
+      ) : (
+        <>Copy loadstring</>
+      )}
     </button>
   );
 }
@@ -45,7 +56,7 @@ export default function ScriptsPage() {
             <p className="lede mx-auto mt-5 max-w-xl">
               Browse the available game scripts and copy the shared loader when you’re ready.
             </p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-muted">
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-ink-muted">
               <span className="h-1.5 w-1.5 rounded-full bg-keyframe" />
               {SCRIPTS.length} scripts listed
             </div>
@@ -58,7 +69,7 @@ export default function ScriptsPage() {
                   <div className="grid h-11 w-11 place-items-center rounded-xl border border-keyframe/20 bg-keyframe/10 text-sm font-bold text-keyframe-strong">
                     {script.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}
                   </div>
-                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] font-semibold tracking-wider text-muted">
+                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] font-semibold tracking-wider text-ink-muted">
                     {script.category}
                   </span>
                 </div>
@@ -71,7 +82,7 @@ export default function ScriptsPage() {
                   </code>
                 </div>
                 <div className="mt-4">
-                  <CopyButton />
+                  <CopyButton game={script.name} />
                 </div>
               </article>
             ))}
