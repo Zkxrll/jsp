@@ -13,19 +13,19 @@ const SCRIPTS = [
     name: "Rivals",
     label: "01 / FPS",
     description:
-      "The repository README describes this build as a beta skin changer. It also notes that the first version may still contain bugs.",
+      "Combat tools include configurable aimbot modes and triggerbot, weapon tweaks, player ESP, chams and tracers, custom crosshairs, hit feedback, world visuals, and gameplay automation.",
   },
   {
     name: "Sniper Duels",
     label: "02 / FPS",
     description:
-      "Listed as a supported game, but the public repository does not expose a feature list for this script yet.",
+      "Includes player ESP with boxes, names, health and optional tracers, plus configurable aimbot, FOV and visibility checks, speed controls, and noclip.",
   },
   {
     name: "Steal An Egg",
     label: "03 / GAME",
     description:
-      "Listed as a supported game, but the public repository does not expose a feature list for this script yet.",
+      "Steal An Egg script entry. Its feature list still needs verification from the source, so specific functions aren't listed here yet.",
   },
 ] as const;
 
@@ -110,9 +110,8 @@ export default function ScriptsPage() {
 
           <div className="mx-auto mt-6 max-w-5xl">
             <p className="body-sm">
-              Note: the public repository only documents Rivals as a beta skin changer.
-              The Sniper Duels and Steal An Egg feature details are not available in
-              the public source, so they are not guessed here.
+              Feature summaries are based on the available script settings and feature catalog.
+              Steal An Egg details are left unlisted until its source can be inspected reliably.
             </p>
             <a
               href={SOURCE_URL}
