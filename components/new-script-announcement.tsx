@@ -1,16 +1,33 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRightIcon } from "@/components/icons";
+import { GameMedia } from "./game-media";
+import { ArrowRightIcon, CloseIcon } from "./icons";
+import { gameById, scriptsHref } from "@/lib/games";
 
+/** Dismissed once per browser session. */
 const DISMISS_KEY = "zkx-steal-an-egg-announcement-dismissed";
+/** Matches the closing animation in globals.css (.modal-scrim[data-state="closing"]). */
+const CLOSE_MS = 180;
+
+const GAME = gameById("steal-an-egg");
+
+type Phase = "closed" | "open" | "closing";
+
+function focusables(root: HTMLElement) {
+  return Array.from(
+    root.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+  );
+}
 
 export function NewScriptAnnouncement() {
-  const [open, setOpen] = useState(false);
+  const [phase, setPhase] = useState<Phase>("closed");
+  const cardRef = useRef<HTMLElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const dismiss = useCallback(() => {
-    setOpen(false);
+  const rememberDismissal = useCallback(() => {
     try {
       window.sessionStorage.setItem(DISMISS_KEY, "1");
     } catch {
@@ -18,76 +35,119 @@ export function NewScriptAnnouncement() {
     }
   }, []);
 
+  const dismiss = useCallback(() => {
+    rememberDismissal();
+    setPhase("closing");
+    closeTimer.current = setTimeout(() => {
+      setPhase("closed");
+      returnFocusRef.current?.focus();
+    }, CLOSE_MS);
+  }, [rememberDismissal]);
+
+  // Show once per session.
   useEffect(() => {
+    let dismissed = false;
     try {
-      if (window.sessionStorage.getItem(DISMISS_KEY) === "1") return;
+      dismissed = window.sessionStorage.getItem(DISMISS_KEY) === "1";
     } catch {
       // If storage is unavailable, still show the announcement for this visit.
     }
-    setOpen(true);
+    if (dismissed) return;
+
+    const frame = requestAnimationFrame(() => setPhase("open"));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") dismiss();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, dismiss]);
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
 
-  if (!open) return null;
+  // While open: focus moves into the dialog, Escape closes it, and the
+  // page behind it neither scrolls nor takes focus.
+  const isOpen = phase === "open";
+  useEffect(() => {
+    if (!isOpen) return;
+
+    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    cardRef.current?.focus();
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        dismiss();
+        return;
+      }
+      if (event.key !== "Tab" || !cardRef.current) return;
+
+      const items = focusables(cardRef.current);
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first || !last) return;
+
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || active === cardRef.current)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = overflow;
+    };
+  }, [isOpen, dismiss]);
+
+  if (phase === "closed") return null;
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
+      className="modal-scrim"
+      data-state={phase}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) dismiss();
       }}
     >
       <section
+        ref={cardRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="new-script-title"
-        className="card relative w-full max-w-lg overflow-hidden p-6 shadow-2xl sm:p-8"
+        aria-describedby="new-script-body"
+        tabIndex={-1}
+        className="modal-card"
       >
-        <div
-          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-keyframe/20 blur-3xl"
-          aria-hidden="true"
-        />
-
-        <button
-          type="button"
-          onClick={dismiss}
-          aria-label="Close announcement"
-          className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full border border-white/10 text-lg text-ink-muted transition-colors hover:bg-white/5 hover:text-ink"
-        >
-          ×
+        <button type="button" onClick={dismiss} aria-label="Close announcement" className="modal-close">
+          <CloseIcon />
         </button>
 
-        <div className="relative">
-          <p className="label label-accent">NEW SCRIPT AVAILABLE</p>
-          <h2 id="new-script-title" className="section-title mt-4">
-            Steal An Egg is here.
+        <GameMedia game={GAME} priority sizes="(min-width: 448px) 416px, 100vw" />
+
+        <div className="p-6 sm:p-8">
+          <p className="label label-accent">New script</p>
+          <h2 id="new-script-title" className="section-title mt-3">
+            {GAME.name} is here.
           </h2>
-          <p className="body-sm mt-3">
-            The new Steal An Egg script is now available, with egg-stealing and
+          <p id="new-script-body" className="body-sm mt-3">
+            The new {GAME.name} script is now available, with egg-stealing and
             hatching automation, pet management, event tools, predictors, and more.
           </p>
 
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/scripts#steal-an-egg"
-              onClick={dismiss}
+              href={scriptsHref(GAME.id)}
+              transitionTypes={["nav-forward"]}
+              onClick={rememberDismissal}
               className="btn btn-primary w-full sm:w-auto"
             >
-              Check it out <ArrowUpRightIcon />
+              View the script <ArrowRightIcon />
             </Link>
-            <button
-              type="button"
-              onClick={dismiss}
-              className="btn btn-glass w-full sm:w-auto"
-            >
+            <button type="button" onClick={dismiss} className="btn btn-secondary w-full sm:w-auto">
               Maybe later
             </button>
           </div>

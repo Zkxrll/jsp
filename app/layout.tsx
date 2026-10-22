@@ -1,18 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter } from "next/font/google";
+import { Archivo, Inter } from "next/font/google";
 import { siteConfig } from "@/lib/config";
 import "./globals.css";
 import { AdBlockGate } from "@/components/adblock-gate";
-import { PointerLight } from "@/components/pointer-light";
 import { SiteHeader } from "@/components/site-header";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { MonetagScript } from "@/components/monetag-script";
 import { PopAdsScript } from "@/components/popads-script";
 
-// One family with optical sizing: display sizes get tighter, sturdier
-// letterforms automatically, the way SF Pro Display / Text split works.
+// Inter for reading, with optical sizing. Archivo for display: its width
+// axis gives the condensed, uppercase headings their game-title cut.
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap", axes: ["opsz"] });
+const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo", display: "swap", axes: ["wdth"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#060509",
+  themeColor: "#08070b",
   colorScheme: "dark",
 };
 
@@ -53,7 +53,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${archivo.variable}`}>
       <head>
         {/* Monetag Multitag, client-side except in Safari (Vignette behavior). */}
         <MonetagScript />
@@ -75,10 +75,8 @@ export default function RootLayout({
         {/* PopAds, injected on the client to avoid the next/script head crash. */}
         <PopAdsScript />
 
-        <PointerLight />
-
         <div className="site-shell">
-          <div className="aurora" aria-hidden="true" />
+          <div className="backlight" aria-hidden="true" />
           <SiteHeader />
           {children}
         </div>

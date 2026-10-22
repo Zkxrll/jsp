@@ -38,7 +38,7 @@ export function AdBlockGate() {
 
   return (
     <div
-      className="modal-scrim"
+      className="modal-scrim modal-scrim-top"
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="adblock-title"
@@ -50,9 +50,9 @@ export function AdBlockGate() {
         }
       }}
     >
-      <div className="glass modal-card p-8 text-center">
-        <span className="icon-tile mx-auto text-danger">
-          <AlertIcon />
+      <div className="modal-card p-8 text-center">
+        <span className="mx-auto grid h-12 w-12 place-items-center rounded-[var(--radius)] border border-line bg-surface-2 text-danger">
+          <AlertIcon className="h-5 w-5" />
         </span>
 
         <h2 id="adblock-title" className="section-title mt-6">

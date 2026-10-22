@@ -3,66 +3,62 @@
 /* ------------------------------------------------------------------ *
  * Zkx Hub design system
  *
- * Spacing: 4pt grid. Whole Tailwind steps only (no 1.5 / 2.5 / 3.5).
- * Type: Inter with optical sizing. One family, the ramp below:
+ * Identity: taken from the ZK mark. Brushed charcoal surfaces, a violet
+ *   edge, and hard diagonal cuts. Violet is an accent, never a wash.
+ * Type: Archivo (display, condensed and uppercase) over Inter (body).
  *   12 label · 14 small · 16 body · 18 title-sm · 20 lede
- *   28–48 section title · 48–96 display
- * Radius: 24 surfaces · 12 inner tiles · pill for every control.
- * Materials: glass (.glass) is for the floating functional layer only:
- *   header, controls, the menu preview, sheets. Content sits on solid
- *   surfaces (.card). Glass is never stacked on glass.
+ *   24–40 section title · 44–80 display
+ * Spacing: 4pt grid. Whole Tailwind steps only (no 1.5 / 2.5 / 3.5).
+ * Radius: 16 surfaces · 10 controls and inner tiles · 6 chips.
+ *   Media frames use the chamfer (.cut) instead of a radius: two corners
+ *   cut on the same diagonal as the mark.
+ * Surfaces: solid. Hairlines (1px, --color-line) separate content; there
+ *   are no glows. The header is the only translucent layer, because
+ *   content scrolls beneath it.
  * Motion: springs, expressed as CSS linear() curves.
  *   --spring        critically damped (damping 1.0, response 0.4s)
- *   --spring-bouncy damping 0.8, response 0.35s, ~1.5% overshoot.
- *                   Only for release after a press.
+ *   --spring-bouncy damping 0.8, response 0.35s. Only for release after
+ *                   a press.
  * ------------------------------------------------------------------ */
 @theme {
-  --color-ink: #f5f3fa;
-  --color-ink-soft: #c4bfd1;
-  --color-ink-muted: #8e889e;
+  --color-ink: #f3f1f7;
+  --color-ink-soft: #c2bdcf;
+  --color-ink-muted: #8f899e;
 
-  --color-bg: #060509;
-  --color-surface: #0e0c15;
-  --color-surface-2: #16121f;
-  --color-surface-border: #231d2f;
+  --color-bg: #08070b;
+  --color-surface: #0f0e14;
+  --color-surface-2: #16141d;
+  --color-surface-3: #1d1a26;
+  --color-surface-border: #24202e;
+  --color-line: #24202e;
+  --color-line-strong: #342e42;
 
   --color-keyframe: #9a5cff;
   --color-keyframe-strong: #b892ff;
+  --color-keyframe-deep: #7638ea;
   --color-danger: #ff7a7d;
   --color-warning: #f5c76b;
   --color-online: #4ade80;
 }
 
 @theme inline {
-  --font-display: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-archivo), var(--font-inter), system-ui, sans-serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
 }
 
-/* Registered so the header can animate its tint smoothly on scroll. */
-@property --glass-tint {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(14, 12, 21, 0.5);
-}
-
 :root {
-  --radius-lg: 1.5rem;
-  --radius: 0.75rem;
+  --radius-lg: 1rem;
+  --radius: 0.625rem;
+  --radius-sm: 0.375rem;
   --radius-pill: 999px;
+  --cut: 1rem;
 
   --spring: linear(0, 0.046, 0.149, 0.272, 0.395, 0.507, 0.605, 0.688, 0.755, 0.81, 0.854, 0.888, 0.914, 0.935, 0.951, 0.963, 0.972, 0.979, 0.984, 0.988, 0.991, 0.994, 0.995, 0.996, 1);
   --spring-duration: 520ms;
   --spring-bouncy: linear(0, 0.035, 0.121, 0.233, 0.354, 0.473, 0.583, 0.679, 0.761, 0.829, 0.883, 0.925, 0.956, 0.979, 0.994, 1.005, 1.011, 1.014, 1.015, 1.015, 1.014, 1.012, 1.01, 1.008, 1.007, 1.005, 1.004, 1.003, 1.002, 1.001, 1.001, 1);
   --spring-bouncy-duration: 640ms;
 
-  /* Glass material */
-  --glass-fill: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035));
-  --glass-tint: rgba(14, 12, 21, 0.5);
-  --glass-blur: blur(24px) saturate(180%);
-  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 16px 48px -16px rgba(0, 0, 0, 0.6);
-
-  --header-top: 0.75rem;
-  --header-height: 3.5rem;
+  --header-height: 4rem;
 }
 
 /* ------------------------------------------------------------------ *
@@ -72,13 +68,13 @@
   *,
   *::before,
   *::after {
-    border-color: var(--color-surface-border);
+    border-color: var(--color-line);
   }
 
   html {
     color-scheme: dark;
     scroll-behavior: smooth;
-    scroll-padding-top: calc(var(--header-top) + var(--header-height) + 1.5rem);
+    scroll-padding-top: calc(var(--header-height) + 1.5rem);
     background: var(--color-bg);
     -webkit-text-size-adjust: 100%;
   }
@@ -134,6 +130,10 @@
   button {
     font: inherit;
   }
+
+  code {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -169,104 +169,82 @@
     background: var(--color-bg);
   }
 
-  /* Static ambient light at the top of every page. Gives the glass above
-     it something to refract. It never moves: full-viewport motion is a
-     vestibular trigger and adds nothing. */
-  .aurora {
+  /* One static pool of light behind the top of every page, offset toward
+     the hero's product shot. It never moves. */
+  .backlight {
     position: absolute;
     inset: 0 0 auto;
-    height: 64rem;
+    height: 52rem;
     z-index: -1;
     pointer-events: none;
-    background:
-      radial-gradient(40rem 24rem at 50% 8rem, color-mix(in srgb, var(--color-keyframe) 26%, transparent), transparent 70%),
-      radial-gradient(28rem 20rem at 18% 20rem, color-mix(in srgb, #5b3bff 18%, transparent), transparent 70%),
-      radial-gradient(28rem 20rem at 84% 26rem, color-mix(in srgb, #d05bff 14%, transparent), transparent 70%);
+    background: radial-gradient(48rem 30rem at 72% 12rem, color-mix(in srgb, var(--color-keyframe) 13%, transparent), transparent 70%);
   }
 
-  /* Materials --------------------------------------------------------- */
-
-  /* Liquid glass: blurred, saturated backdrop, a light fill, and a rim
-     that catches light on the top-left edge and fades around the shape. */
-  .glass {
-    position: relative;
-    background: var(--glass-fill), var(--glass-tint);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    box-shadow: var(--glass-shadow);
+  .section {
+    padding-block: 3.5rem;
   }
 
-  .glass::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    pointer-events: none;
-    background: linear-gradient(
-      160deg,
-      rgba(255, 255, 255, 0.4),
-      rgba(255, 255, 255, 0.08) 28%,
-      rgba(255, 255, 255, 0.02) 60%,
-      rgba(255, 255, 255, 0.14)
-    );
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  @media (min-width: 640px) {
+    .section {
+      padding-block: 4.5rem;
+    }
   }
+
+  /* Surfaces ---------------------------------------------------------- */
 
   /* Solid content surface. */
   .card {
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--color-line);
     border-radius: var(--radius-lg);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
-      var(--color-surface);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 24px 48px -32px rgba(0, 0, 0, 0.8);
+    background: var(--color-surface);
   }
 
-  /* Pointer-following light on surfaces (set by <PointerLight>). Light,
-     not movement: the card itself never shifts. */
-  [data-spotlight] {
-    isolation: isolate;
+  /* One surface split into cells by 1px hairlines: the gap shows the
+     line color through. Keeps related items in one object instead of a
+     field of separate rounded boxes. */
+  .panel-grid {
+    display: grid;
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    background: var(--color-line);
   }
 
-  [data-spotlight]::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0;
-    background: radial-gradient(
-      28rem circle at var(--mx, 50%) var(--my, 0%),
-      color-mix(in srgb, var(--color-keyframe) 12%, transparent),
-      transparent 45%
-    );
-    transition: opacity 320ms ease;
+  .panel-grid > * {
+    background: var(--color-surface);
   }
 
-  @media (hover: hover) {
-    [data-spotlight]:hover::before {
-      opacity: 1;
-    }
+  /* The chamfer: top-right and bottom-left corners cut on the mark's
+     diagonal. For media frames, which have no border to lose. */
+  .cut {
+    clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
   }
 
   /* Header ------------------------------------------------------------ */
 
-  /* A floating glass capsule, not a bar. Content scrolls beneath it. */
+  /* Full-width bar. Translucent because content scrolls beneath it; the
+     hairline under it only appears once something is underneath. */
   .site-header {
     position: fixed;
-    top: var(--header-top);
-    inset-inline: 0;
+    inset: 0 0 auto;
     z-index: 50;
-    width: min(100% - 1.5rem, 64rem);
     height: var(--header-height);
-    margin-inline: auto;
-    border-radius: var(--radius-pill);
+    border-bottom: 1px solid transparent;
+    background: color-mix(in srgb, var(--color-bg) 78%, transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
     view-transition-name: site-header;
+  }
+
+  .site-header[data-scrolled="true"],
+  .site-header[data-menu-open="true"] {
+    border-bottom-color: var(--color-line);
+  }
+
+  .site-header[data-menu-open="true"] {
+    background: var(--color-bg);
   }
 
   .site-header-inner {
@@ -275,20 +253,42 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0 0.5rem 0 1.25rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 800;
+    font-stretch: 88%;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  .brand img {
+    width: auto;
+    height: 1.75rem;
   }
 
   .nav {
     position: relative;
     display: flex;
     align-items: center;
+    height: 100%;
   }
 
   .nav-link {
     position: relative;
     z-index: 1;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-pill);
+    display: inline-flex;
+    align-items: center;
+    height: 2.75rem;
+    padding: 0 0.875rem;
+    border-radius: var(--radius-sm);
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-ink-soft);
@@ -305,21 +305,54 @@
     }
   }
 
-  /* The lens behind the active link. Moves on a spring; a CSS transition
-     retargets from its current value, so fast scrolling never makes it
-     jump. */
+  /* The bar under the active link, sitting on the header's bottom edge.
+     Moves on a spring; a CSS transition retargets from its current value,
+     so fast scrolling never makes it jump. */
   .nav-indicator {
     position: absolute;
-    top: 0;
+    bottom: -1px;
     left: 0;
-    height: 100%;
-    border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    height: 2px;
+    background: var(--color-keyframe);
     transition:
       transform var(--spring-duration) var(--spring),
       width var(--spring-duration) var(--spring),
       opacity 200ms ease;
+  }
+
+  /* Phone menu: drops from the header, same path in and out. */
+  .mobile-menu {
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-bg);
+    animation: menu-in 280ms var(--spring) both;
+  }
+
+  .mobile-menu-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3rem;
+    border-bottom: 1px solid var(--color-line);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+  }
+
+  .mobile-menu-link:last-child {
+    border-bottom: 0;
+  }
+
+  .mobile-menu-link[aria-current="true"] {
+    color: var(--color-ink);
+  }
+
+  .mobile-menu-link svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-ink-muted);
   }
 
   /* Type -------------------------------------------------------------- */
@@ -328,7 +361,7 @@
     font-size: 0.75rem;
     font-weight: 600;
     line-height: 1rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-ink-muted);
   }
@@ -337,20 +370,36 @@
     color: var(--color-keyframe-strong);
   }
 
+  /* Condensed, uppercase, heavy: reads as a game title, not a SaaS hero.
+     Uppercase needs almost no negative tracking, unlike mixed case. */
   .display {
-    font-size: clamp(3rem, 9vw, 6rem);
-    font-weight: 700;
-    line-height: 0.98;
-    letter-spacing: -0.045em;
+    font-size: clamp(2.75rem, 7.2vw, 5rem);
+    font-weight: 800;
+    font-stretch: 80%;
+    line-height: 0.92;
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
   }
 
   .section-title {
-    font-size: clamp(1.75rem, 4.5vw, 3rem);
-    line-height: 1.06;
-    letter-spacing: -0.035em;
+    font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+    font-weight: 800;
+    font-stretch: 84%;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .title-md {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-stretch: 84%;
+    line-height: 1.1;
+    text-transform: uppercase;
   }
 
   .title-sm {
+    font-family: var(--font-body);
     font-size: 1.125rem;
     font-weight: 600;
     line-height: 1.5rem;
@@ -366,8 +415,8 @@
 
   @media (min-width: 640px) {
     .lede {
-      font-size: 1.25rem;
-      line-height: 1.875rem;
+      font-size: 1.125rem;
+      line-height: 1.75rem;
     }
   }
 
@@ -377,11 +426,8 @@
     line-height: 1.5rem;
   }
 
-  .text-gradient {
-    background: linear-gradient(100deg, #f5f3fa 0%, var(--color-keyframe-strong) 45%, var(--color-keyframe) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .accent {
+    color: var(--color-keyframe-strong);
   }
 
   /* Small elements ---------------------------------------------------- */
@@ -389,50 +435,56 @@
   .chip {
     display: inline-flex;
     align-items: center;
-    border-radius: var(--radius-pill);
-    padding: 0.25rem 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    padding: 0.125rem 0.5rem;
+    background: var(--color-surface-2);
     font-size: 0.75rem;
     font-weight: 500;
-    line-height: 1rem;
+    line-height: 1.25rem;
     color: var(--color-ink-soft);
     white-space: nowrap;
   }
 
-  .icon-tile {
-    --tile-bg: color-mix(in srgb, var(--color-keyframe) 14%, var(--color-surface-2));
-    display: grid;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    flex: 0 0 auto;
-    border-radius: var(--radius);
-    background: var(--tile-bg);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    color: var(--color-keyframe-strong);
+  /* Small solid tag that sits on artwork, e.g. "New" on a game image. */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    height: 1.5rem;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-keyframe-deep);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
   }
 
-  .icon-tile svg {
+  .icon-mark {
+    display: block;
     width: 1.25rem;
     height: 1.25rem;
+    flex: 0 0 auto;
+    color: var(--color-keyframe-strong);
   }
 
   /* Buttons ----------------------------------------------------------- */
 
-  /* Capsules, sentence case. Press compresses instantly (pointer-down
-     feedback); release springs back with a hint of overshoot. */
+  /* Sentence case, 44px minimum target. Press compresses instantly
+     (pointer-down feedback); release springs back with a hint of
+     overshoot. */
   .btn {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-height: 3rem;
-    padding: 0 1.5rem;
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
     border: 0;
-    border-radius: var(--radius-pill);
-    font-size: 1rem;
+    border-radius: var(--radius);
+    font-size: 0.9375rem;
     font-weight: 600;
     line-height: 1;
     letter-spacing: -0.01em;
@@ -441,15 +493,15 @@
     user-select: none;
     transition:
       transform var(--spring-bouncy-duration) var(--spring-bouncy),
-      background-color 200ms ease,
-      box-shadow 200ms ease,
-      color 200ms ease,
-      opacity 200ms ease;
+      background-color 160ms ease,
+      box-shadow 160ms ease,
+      color 160ms ease,
+      opacity 160ms ease;
   }
 
   .btn:active {
-    transform: scale(0.96);
-    transition-duration: 80ms, 200ms, 200ms, 200ms, 200ms;
+    transform: scale(0.97);
+    transition-duration: 80ms, 160ms, 160ms, 160ms, 160ms;
     transition-timing-function: ease-out;
   }
 
@@ -461,55 +513,53 @@
 
   .btn-sm {
     min-height: 2.5rem;
-    padding: 0 1rem;
+    padding: 0 0.875rem;
     font-size: 0.875rem;
   }
 
   .btn-icon {
-    width: 2.5rem;
+    width: 2.75rem;
     padding: 0;
   }
 
+  .btn-sm.btn-icon {
+    width: 2.5rem;
+  }
+
   .btn-lg {
-    min-height: 3.5rem;
-    padding: 0 2rem;
-    font-size: 1.0625rem;
+    min-height: 3.25rem;
+    padding: 0 1.75rem;
+    font-size: 1rem;
   }
 
+  /* White on #7638ea is 6.1:1. A single top highlight gives it an edge;
+     no glow. */
   .btn-primary {
-    background: linear-gradient(180deg, #9a62ff, #7440ec);
+    background: var(--color-keyframe-deep);
     color: #fff;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.28),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-      0 8px 24px -8px color-mix(in srgb, var(--color-keyframe) 70%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
-  .btn-glass {
-    background: var(--glass-fill), rgba(255, 255, 255, 0.02);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+  .btn-secondary {
+    background: var(--color-surface-2);
     color: var(--color-ink);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 0 1px var(--color-line-strong);
   }
 
   @media (hover: hover) {
     .btn-primary:hover {
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.35),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-        0 12px 32px -8px color-mix(in srgb, var(--color-keyframe) 90%, transparent);
+      background: #8448f2;
     }
 
-    .btn-glass:hover {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)), rgba(255, 255, 255, 0.02);
+    .btn-secondary:hover {
+      background: var(--color-surface-3);
     }
   }
 
   .btn:disabled,
   .btn[aria-disabled="true"] {
-    background: rgba(255, 255, 255, 0.04);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px var(--color-line);
     color: var(--color-ink-muted);
     cursor: not-allowed;
     transform: none;
@@ -520,6 +570,7 @@
   }
 
   .text-link {
+    border-radius: 2px;
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-ink-muted);
@@ -533,12 +584,142 @@
     }
   }
 
+  /* Game media -------------------------------------------------------- */
+
+  /* 16:9 artwork frame. Fixed ratio so nothing shifts while it loads.
+     A thin inner line keeps dark art from bleeding into the surface. */
+  .game-media {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-surface-2);
+  }
+
+  .game-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms var(--spring);
+  }
+
+  .game-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  .game-media .tag {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 1;
+  }
+
+  /* A game tile on the home page: the whole tile is the link. */
+  .game-tile {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    color: inherit;
+  }
+
+  .game-tile-name {
+    transition: color 200ms ease;
+  }
+
+  .game-tile-arrow {
+    transition: transform 320ms var(--spring);
+  }
+
+  @media (hover: hover) {
+    .game-tile:hover .game-media img,
+    .game-card:hover .game-media img {
+      transform: scale(1.03);
+    }
+
+    .game-tile:hover .game-tile-name {
+      color: var(--color-keyframe-strong);
+    }
+
+    .game-tile:hover .game-tile-arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  .game-tile:focus-visible {
+    outline-offset: 6px;
+  }
+
+  /* A game entry on the scripts page. */
+  .game-card {
+    display: grid;
+    gap: 1.25rem;
+    padding: 0.75rem;
+    scroll-margin-top: calc(var(--header-height) + 1.5rem);
+    transition: border-color 600ms ease;
+  }
+
+  @media (min-width: 640px) {
+    .game-card {
+      padding: 1rem;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .game-card {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 2rem;
+    }
+  }
+
+  /* Arrived here from a link (the announcement, a game tile): the card
+     briefly takes the accent edge so the eye lands on it. */
+  .game-card[data-targeted="true"] {
+    border-color: color-mix(in srgb, var(--color-keyframe) 70%, transparent);
+    transition-duration: 0ms;
+  }
+
+  /* Loader field ------------------------------------------------------ */
+
+  .loader-field {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+  }
+
+  .loader-field-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .loader-field code {
+    display: block;
+    padding: 0.875rem 1rem 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.375rem;
+    color: var(--color-ink-soft);
+    word-break: break-all;
+  }
+
   /* Menu preview ------------------------------------------------------ */
 
+  /* A stand-in for the in-game window: solid, with the violet rule along
+     the top that the real menu has. Elevated because it is the product
+     shot, the one surface allowed a real shadow. */
   .menu-window {
-    border-radius: var(--radius-lg);
     overflow: hidden;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
     text-align: left;
+    box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.9);
   }
 
   .menu-titlebar {
@@ -546,8 +727,10 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.75rem 1rem;
+    border-top: 2px solid var(--color-keyframe);
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-surface-2);
   }
 
   .menu-tab {
@@ -556,9 +739,9 @@
     display: flex;
     align-items: center;
     height: 2.5rem;
-    padding: 0 1rem;
+    padding: 0 0.875rem;
     border: 0;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
     background: transparent;
     color: var(--color-ink-muted);
     font-size: 0.875rem;
@@ -578,15 +761,20 @@
     }
   }
 
+  .menu-tab:focus-visible {
+    outline-offset: -2px;
+  }
+
+  /* The selected-tab marker: a filled row with a violet edge on its
+     leading side, the way the in-game list marks a selection. */
   .menu-tab-indicator {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
     height: 2.5rem;
-    border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-3);
+    box-shadow: inset 2px 0 0 var(--color-keyframe);
     transition: transform var(--spring-duration) var(--spring);
   }
 
@@ -607,7 +795,7 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--color-line);
     font-size: 0.875rem;
     color: var(--color-ink-soft);
   }
@@ -616,33 +804,35 @@
     border-bottom: 0;
   }
 
-  /* iOS-style switch. The thumb stretches while pressed and springs to
-     its new side on release. */
+  /* Switch. The thumb stretches while pressed and springs to its new side
+     on release. */
   .switch {
     position: relative;
-    width: 3rem;
-    height: 1.75rem;
+    width: 2.75rem;
+    height: 1.5rem;
     flex: 0 0 auto;
     border: 0;
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--color-surface-3);
+    box-shadow: inset 0 0 0 1px var(--color-line-strong);
     cursor: pointer;
-    transition: background-color 240ms ease;
+    transition: background-color 240ms ease, box-shadow 240ms ease;
   }
 
   .switch[aria-checked="true"] {
-    background: var(--color-keyframe);
+    background: var(--color-keyframe-deep);
+    box-shadow: inset 0 0 0 1px transparent;
   }
 
   .switch-thumb {
     position: absolute;
-    top: 0.125rem;
-    left: 0.125rem;
-    width: 1.5rem;
-    height: 1.5rem;
+    top: 0.1875rem;
+    left: 0.1875rem;
+    width: 1.125rem;
+    height: 1.125rem;
     border-radius: var(--radius-pill);
     background: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     transition:
       transform var(--spring-bouncy-duration) var(--spring-bouncy),
       width 200ms var(--spring);
@@ -653,7 +843,7 @@
   }
 
   .switch:active .switch-thumb {
-    width: 1.875rem;
+    width: 1.5rem;
   }
 
   .switch[aria-checked="true"]:active .switch-thumb {
@@ -667,20 +857,20 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    border-radius: 1.25rem;
-    background: rgba(255, 255, 255, 0.04);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
-    transition: box-shadow 240ms ease, background-color 240ms ease;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+    background: var(--color-surface-2);
+    transition: border-color 240ms ease, background-color 240ms ease;
   }
 
   @media (hover: hover) {
     .step:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: var(--color-surface-3);
     }
   }
 
   .step[data-done="true"] {
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-keyframe) 50%, transparent);
+    border-color: color-mix(in srgb, var(--color-keyframe) 50%, transparent);
   }
 
   .step-badge {
@@ -689,7 +879,7 @@
     width: 2.5rem;
     height: 2.5rem;
     flex: 0 0 auto;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius);
     background: color-mix(in srgb, var(--color-keyframe) 16%, transparent);
     color: var(--color-keyframe-strong);
   }
@@ -703,14 +893,14 @@
     animation: pop-in var(--spring-bouncy-duration) var(--spring-bouncy) both;
   }
 
-  /* FAQ: an inset grouped list ---------------------------------------- */
+  /* FAQ: one surface, rows separated by hairlines --------------------- */
 
   .faq-group {
     overflow: hidden;
   }
 
   .faq-item + .faq-item {
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--color-line);
   }
 
   .faq-trigger {
@@ -720,10 +910,11 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.25rem;
     border: 0;
     background: transparent;
     color: var(--color-ink);
+    font-family: var(--font-body);
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.5rem;
@@ -733,9 +924,15 @@
     transition: background-color 200ms ease;
   }
 
+  @media (min-width: 640px) {
+    .faq-trigger {
+      padding-inline: 1.5rem;
+    }
+  }
+
   @media (hover: hover) {
     .faq-trigger:hover {
-      background: rgba(255, 255, 255, 0.025);
+      background: var(--color-surface-2);
     }
   }
 
@@ -753,6 +950,7 @@
 
   .faq-item-open .faq-chevron {
     transform: rotate(180deg);
+    color: var(--color-keyframe-strong);
   }
 
   .faq-panel {
@@ -775,33 +973,90 @@
   }
 
   .faq-answer-inner {
-    padding: 0 1.5rem 1.25rem;
+    padding: 0 1.25rem 1.25rem;
     color: var(--color-ink-soft);
     font-size: 0.9375rem;
     line-height: 1.5rem;
   }
 
-  /* Sheet (ad blocker notice) ----------------------------------------- */
+  @media (min-width: 640px) {
+    .faq-answer-inner {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  /* Modal: announcement and ad blocker notice ------------------------- */
 
   .modal-scrim {
     position: fixed;
     inset: 0;
-    /* Above any overlay an ad network injects. */
-    z-index: 99999;
+    z-index: 100;
     display: grid;
     place-items: center;
-    padding: 1.5rem;
-    background: rgba(6, 5, 9, 0.6);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    animation: fade 240ms ease both;
+    padding: 1rem;
+    overflow-y: auto;
+    background: rgba(4, 3, 6, 0.78);
+    animation: fade 200ms ease both;
+  }
+
+  /* The ad blocker notice sits above any overlay an ad network injects. */
+  .modal-scrim-top {
+    z-index: 99999;
   }
 
   .modal-card {
+    position: relative;
     width: 100%;
     max-width: 26rem;
-    border-radius: 2rem;
-    animation: materialize var(--spring-duration) var(--spring) both;
+    overflow: hidden;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: 0 40px 80px -24px rgba(0, 0, 0, 0.8);
+    animation: modal-in var(--spring-duration) var(--spring) both;
+  }
+
+  .modal-card:focus {
+    outline: none;
+  }
+
+  /* Leaving retraces the way in: down and back, then gone. */
+  .modal-scrim[data-state="closing"] {
+    animation: fade 180ms ease reverse both;
+  }
+
+  .modal-scrim[data-state="closing"] .modal-card {
+    animation: modal-out 180ms ease-in both;
+  }
+
+  /* Close control that sits on artwork: solid, so it reads on any image. */
+  .modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: rgba(8, 7, 11, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: background-color 160ms ease;
+  }
+
+  .modal-close svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  @media (hover: hover) {
+    .modal-close:hover {
+      background: rgba(8, 7, 11, 0.92);
+    }
   }
 
   /* Status ------------------------------------------------------------ */
@@ -821,7 +1076,7 @@
   /* Entrance ---------------------------------------------------------- */
 
   .animate-rise {
-    animation: rise 640ms var(--spring) both;
+    animation: rise 560ms var(--spring) both;
   }
 }
 
@@ -838,29 +1093,7 @@
     [data-reveal] {
       animation: reveal linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 70%;
-    }
-
-    /* The menu preview starts tilted back and settles flat as it scrolls
-       into view. */
-    .hero-window {
-      animation: settle linear both;
-      animation-timeline: view();
-      animation-range: entry 10% cover 45%;
-    }
-
-    /* Hero copy recedes as the page scrolls away from it. */
-    .hero-copy {
-      animation: recede linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 60vh;
-    }
-
-    /* The header's glass thickens once content is underneath it. */
-    .site-header {
-      animation: header-thicken linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 12rem;
+      animation-range: entry 0% entry 60%;
     }
   }
 }
@@ -919,52 +1152,49 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(16px);
-    filter: blur(6px);
+    transform: translateY(12px);
   }
 }
 
 @keyframes reveal {
   from {
     opacity: 0;
-    transform: translateY(32px) scale(0.98);
+    transform: translateY(24px);
   }
 }
 
-@keyframes settle {
+@keyframes menu-in {
   from {
-    transform: perspective(1400px) rotateX(18deg) scale(0.92);
-    opacity: 0.4;
+    opacity: 0;
+    transform: translateY(-8px);
   }
 }
 
-@keyframes recede {
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+@keyframes modal-out {
   to {
-    transform: translateY(-48px) scale(0.97);
-    opacity: 0.2;
-  }
-}
-
-@keyframes header-thicken {
-  from {
-    --glass-tint: rgba(14, 12, 21, 0.2);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 rgba(0, 0, 0, 0);
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
   }
 }
 
 @keyframes panel-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
-    filter: blur(4px);
+    transform: translateY(10px);
   }
 }
 
 @keyframes panel-in-down {
   from {
     opacity: 0;
-    transform: translateY(-12px);
-    filter: blur(4px);
+    transform: translateY(-10px);
   }
 }
 
@@ -972,14 +1202,6 @@
   from {
     transform: scale(0.4);
     opacity: 0;
-  }
-}
-
-@keyframes materialize {
-  from {
-    opacity: 0;
-    transform: scale(0.94);
-    filter: blur(8px);
   }
 }
 
@@ -992,8 +1214,7 @@
 @keyframes vt-recede {
   to {
     opacity: 0;
-    transform: scale(0.97);
-    filter: blur(4px);
+    transform: scale(0.98);
   }
 }
 
@@ -1014,8 +1235,7 @@
 @keyframes vt-return {
   from {
     opacity: 0;
-    transform: scale(0.97);
-    filter: blur(4px);
+    transform: scale(0.98);
   }
 }
 
@@ -1038,8 +1258,13 @@
 
   .animate-rise,
   .modal-card,
-  .menu-panel {
-    animation: fade 200ms ease both;
+  .menu-panel,
+  .mobile-menu {
+    animation: fade 160ms ease both;
+  }
+
+  .modal-scrim[data-state="closing"] .modal-card {
+    animation: fade 160ms ease reverse both;
   }
 
   .btn,
@@ -1048,11 +1273,16 @@
   .nav-indicator,
   .menu-tab-indicator,
   .faq-chevron,
-  .faq-panel {
+  .faq-panel,
+  .game-media img,
+  .game-tile-arrow {
     transition-duration: 0ms;
   }
 
-  .btn:active {
+  .btn:active,
+  .game-tile:hover .game-media img,
+  .game-card:hover .game-media img,
+  .game-tile:hover .game-tile-arrow {
     transform: none;
   }
 
@@ -1070,37 +1300,47 @@
   }
 }
 
-/* Reduced transparency: glass becomes a frosted solid. */
+/* Reduced transparency: the header becomes solid. */
 @media (prefers-reduced-transparency: reduce) {
-  .glass,
-  .btn-glass,
-  .modal-scrim {
-    background: var(--color-surface-2);
+  .site-header {
+    background: var(--color-bg);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 }
 
-/* Increased contrast: solid fills, defined borders, full-strength text. */
+/* Increased contrast: defined borders, full-strength text. */
 @media (prefers-contrast: more) {
-  .glass,
-  .btn-glass {
-    background: var(--color-surface-2);
+  .site-header {
+    background: var(--color-bg);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    box-shadow: inset 0 0 0 1px var(--color-ink-muted);
+    border-bottom-color: var(--color-ink-muted);
   }
 
   .card,
-  .step {
+  .step,
+  .panel-grid,
+  .loader-field,
+  .modal-card,
+  .menu-window {
     border-color: var(--color-ink-muted);
+  }
+
+  .panel-grid {
+    background: var(--color-ink-muted);
+  }
+
+  .btn-secondary {
+    box-shadow: inset 0 0 0 1px var(--color-ink-muted);
   }
 
   .lede,
   .body-sm,
   .faq-answer-inner,
   .nav-link,
-  .menu-tab {
+  .menu-tab,
+  .label {
     color: var(--color-ink);
   }
 }

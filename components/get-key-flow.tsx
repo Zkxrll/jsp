@@ -55,7 +55,7 @@ export function GetKeyFlow() {
           </button>
         </div>
 
-        <div className="mt-8 border-t border-white/5 pt-6">
+        <div className="mt-8 border-t border-line pt-6">
           <Link
             href="/"
             transitionTypes={["nav-back", "key-morph"]}

@@ -6,8 +6,11 @@ import { FeatureGrid } from "@/components/feature-grid";
 import { MenuPreview } from "@/components/menu-preview";
 import { CopyDiscordButton } from "@/components/copy-discord-button";
 import { DiscordGlyph } from "@/components/discord-glyph";
-import { ArrowUpRightIcon, CheckIcon } from "@/components/icons";
+import { ArrowRightIcon, ArrowUpRightIcon, CheckIcon } from "@/components/icons";
 import { RouteTransition } from "@/components/route-transition";
+import { GameTiles } from "@/components/game-tiles";
+import { SectionHeader } from "@/components/section-header";
+import Link from "next/link";
 import { siteConfig } from "@/lib/config";
 import { features } from "@/lib/features";
 
@@ -46,24 +49,13 @@ const DEFENSE = [
   },
 ] as const;
 
-/** Section heading, identical everywhere: label, title, optional lede. */
-function SectionHeader({ label, title, children }: { label: string; title: string; children?: React.ReactNode }) {
-  return (
-    <div className="mx-auto max-w-2xl text-center" data-reveal>
-      <p className="label label-accent">{label}</p>
-      <h2 className="section-title mt-4">{title}</h2>
-      {children && <p className="lede mt-4">{children}</p>}
-    </div>
-  );
-}
-
 function DiscordButton({ size = "md", className = "" }: { size?: "md" | "lg"; className?: string }) {
   return (
     <a
       href={siteConfig.links.discord}
       target="_blank"
       rel="noopener noreferrer"
-      className={`btn btn-glass ${size === "lg" ? "btn-lg" : ""} ${className}`}
+      className={`btn btn-secondary ${size === "lg" ? "btn-lg" : ""} ${className}`}
     >
       <DiscordGlyph />
       Join Discord
@@ -75,130 +67,149 @@ export default function HomePage() {
   return (
     <RouteTransition>
       <main className="flex-1">
-        {/* Hero */}
-        <section className="pb-16 pt-32 sm:pb-24 sm:pt-40">
-          <div className="hero-copy wrap text-center">
-            <p className="chip animate-rise">Built for Roblox Rivals</p>
+        {/* Hero: the pitch on the left, the menu itself on the right. */}
+        <section className="pb-4 pt-28 sm:pb-8 sm:pt-32 lg:pt-36">
+          <div className="wrap grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center">
+            <div>
+              <p className="label label-accent animate-rise">Built for Roblox Rivals</p>
 
-            <h1 className="display animate-rise mt-6" style={{ animationDelay: "40ms" }}>
-              The full <span className="text-gradient">Rivals</span> menu.
-            </h1>
+              <h1 className="display animate-rise mt-5" style={{ animationDelay: "40ms" }}>
+                The full <span className="accent">Rivals</span> menu.
+              </h1>
 
-            <p className="lede animate-rise mx-auto mt-6 max-w-2xl" style={{ animationDelay: "80ms" }}>
-              Silent and camera aim, voidspam antihit, weapon mods, ESP, chams, and
-              a full world editor. Free with a key from the key system, or pay once
-              for lifetime Premium.
-            </p>
+              <p className="lede animate-rise mt-6 max-w-xl" style={{ animationDelay: "80ms" }}>
+                Silent and camera aim, voidspam antihit, weapon mods, ESP, chams, and
+                a full world editor. Free with a key from the key system, or pay once
+                for lifetime Premium.
+              </p>
 
-            <div
-              className="animate-rise mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
-              style={{ animationDelay: "120ms" }}
-            >
-              <GetKeyButton source="hero" size="lg" className="w-full sm:w-auto" />
-              <DiscordButton size="lg" className="w-full sm:w-auto" />
-            </div>
-          </div>
-
-          <div className="wrap mt-16 sm:mt-24">
-            <div className="hero-window mx-auto max-w-4xl">
-              <div className="animate-rise" style={{ animationDelay: "200ms" }}>
-                <MenuPreview />
+              <div
+                className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row"
+                style={{ animationDelay: "120ms" }}
+              >
+                <GetKeyButton source="hero" size="lg" className="w-full sm:w-auto" />
+                <DiscordButton size="lg" className="w-full sm:w-auto" />
               </div>
+
+              <p className="body-sm animate-rise mt-6" style={{ animationDelay: "160ms" }}>
+                Also for Sniper Duels and Steal An Egg.{" "}
+                <Link
+                  href="/scripts"
+                  transitionTypes={["nav-forward"]}
+                  className="font-medium text-ink underline decoration-line-strong underline-offset-4 hover:decoration-keyframe"
+                >
+                  See all scripts
+                </Link>
+              </p>
+            </div>
+
+            <div className="animate-rise min-w-0" style={{ animationDelay: "200ms" }}>
+              <MenuPreview />
             </div>
           </div>
         </section>
 
+        {/* Script library */}
+        <section className="wrap section">
+          <SectionHeader label="Script library" title="Three games. One loader.">
+            Every script loads from the same source. Pick a game to see what it
+            covers and copy its loader.
+          </SectionHeader>
+
+          <div className="mt-10 sm:mt-12">
+            <GameTiles />
+          </div>
+        </section>
+
         {/* Features */}
-        <section id="features" className="wrap py-16 sm:py-24">
+        <section id="features" className="wrap section">
           <SectionHeader label="Everything inside" title="What the menu does.">
             {`${features.length} feature groups, pulled straight from the in-game menu. Nothing here is a feature the script does not have.`}
           </SectionHeader>
 
-          <div className="mt-12 sm:mt-16">
+          <div className="mt-10 sm:mt-12">
             <FeatureGrid />
           </div>
         </section>
 
         {/* Defense */}
-        <section className="wrap py-16 sm:py-24">
+        <section className="wrap section">
           <SectionHeader label="Defense" title="Most scripts stop at silent aim.">
             Zkx Hub ships a working antihit, with anti-aim running on top of it.
           </SectionHeader>
 
-          <div className="mt-12 grid gap-4 sm:mt-16 md:grid-cols-2">
+          <div className="panel-grid mt-10 sm:mt-12 md:grid-cols-2" data-reveal>
             {DEFENSE.map((item) => (
-              <article key={item.title} className="card p-8" data-reveal data-spotlight>
-                <h3 className="section-title">{item.title}</h3>
-                <p className="lede mt-4">{item.body}</p>
+              <article key={item.title} className="p-6 sm:p-8">
+                <h3 className="title-md">{item.title}</h3>
+                <p className="lede mt-3">{item.body}</p>
               </article>
             ))}
           </div>
         </section>
 
         {/* Premium */}
-        <section id="premium" className="wrap py-16 sm:py-24">
-          <div className="card overflow-hidden p-8 sm:p-12" data-reveal data-spotlight>
-            <div
-              className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-keyframe/20 blur-3xl"
-              aria-hidden="true"
-            />
-            <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
-              <div>
-                <p className="label label-accent">Premium</p>
-                <h2 className="section-title mt-4">One purchase. No subscription.</h2>
-                <p className="lede mt-4">
-                  Premium is a single payment that stays yours. No monthly key, no
-                  renewal, and every future update is included.
-                </p>
-              </div>
+        <section id="premium" className="wrap section">
+          <div className="card grid gap-10 p-6 sm:p-10 lg:grid-cols-2 lg:items-center lg:gap-16 lg:p-12" data-reveal>
+            <div>
+              <p className="label label-accent">Premium</p>
+              <h2 className="section-title mt-4">One purchase. No subscription.</h2>
+              <p className="lede mt-4">
+                Premium is a single payment that stays yours. No monthly key, no
+                renewal, and every future update is included.
+              </p>
+            </div>
 
-              <div>
-                <ul className="grid gap-4">
-                  {PREMIUM_PERKS.map((perk) => (
-                    <li key={perk} className="flex items-center gap-3 text-ink">
-                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-keyframe/15 text-keyframe-strong">
-                        <CheckIcon className="h-3 w-3" />
-                      </span>
-                      {perk}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={PREMIUM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary btn-lg mt-8 w-full sm:w-auto"
-                >
-                  Get lifetime Premium
-                  <ArrowUpRightIcon />
-                </a>
-              </div>
+            <div>
+              <ul className="panel-grid sm:grid-cols-2">
+                {PREMIUM_PERKS.map((perk) => (
+                  <li key={perk} className="flex items-center gap-3 px-4 py-4 text-ink">
+                    <CheckIcon className="h-4 w-4 shrink-0 text-keyframe-strong" />
+                    {perk}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href={PREMIUM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-lg mt-6 w-full sm:w-auto"
+              >
+                Get lifetime Premium
+                <ArrowUpRightIcon />
+              </a>
             </div>
           </div>
         </section>
 
         {/* Community */}
-        <section className="wrap py-16 sm:py-24">
-          <SectionHeader label="Community" title="Join the community.">
-            Discord is where updates and support live. New builds are posted there
-            first.
-          </SectionHeader>
+        <section className="wrap section">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between" data-reveal>
+            <div className="max-w-xl">
+              <p className="label label-accent">Community</p>
+              <h2 className="section-title mt-4">Join the community.</h2>
+              <p className="lede mt-4">
+                Discord is where updates and support live. New builds are posted there
+                first.
+              </p>
+            </div>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row" data-reveal>
-            <GetKeyButton source="community" className="w-full sm:w-auto" />
-            <DiscordButton className="w-full sm:w-auto" />
-            <CopyDiscordButton />
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <GetKeyButton source="community" className="w-full sm:w-auto" />
+              <DiscordButton className="w-full sm:w-auto" />
+              <CopyDiscordButton />
+            </div>
           </div>
         </section>
 
         {/* Updates */}
-        <section id="updates" className="wrap py-16 sm:py-24">
+        <section id="updates" className="wrap section">
           <SectionHeader label="Updates" title="Latest changes." />
-          <div className="mt-12 grid gap-4 sm:mt-16 md:grid-cols-2">
+          <div className="panel-grid mt-10 sm:mt-12 md:grid-cols-2" data-reveal>
             {CHANGELOG.map((entry) => (
-              <article key={entry.title} className="card p-8" data-reveal data-spotlight>
+              <article key={entry.title} className="p-6 sm:p-8">
                 <p className="label label-accent">{entry.tag}</p>
-                <h3 className="title-sm mt-4">{entry.title}</h3>
+                <h3 className="title-sm mt-3">{entry.title}</h3>
                 <p className="body-sm mt-2">{entry.body}</p>
               </article>
             ))}
@@ -206,10 +217,27 @@ export default function HomePage() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="wrap wrap-narrow py-16 sm:py-24">
-          <SectionHeader label="FAQ" title="Before you grab a key." />
-          <div className="mt-12" data-reveal>
-            <FAQ />
+        <section id="faq" className="wrap section">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-16">
+            <div data-reveal>
+              <p className="label label-accent">FAQ</p>
+              <h2 className="section-title mt-4">Before you grab a key.</h2>
+              <p className="body-sm mt-4">
+                Something not covered here?{" "}
+                <a
+                  href={siteConfig.links.discord}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-medium text-ink underline decoration-line-strong underline-offset-4 hover:decoration-keyframe"
+                >
+                  Ask in the Discord
+                  <ArrowRightIcon className="h-3.5 w-3.5" />
+                </a>
+              </p>
+            </div>
+            <div data-reveal>
+              <FAQ />
+            </div>
           </div>
         </section>
       </main>

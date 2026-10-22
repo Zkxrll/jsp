@@ -59,22 +59,22 @@ export function MenuPreview() {
 
   return (
     <figure className="m-0">
-      <div className="menu-window glass">
+      <div className="menu-window">
         <div className="menu-titlebar">
           <div className="flex items-baseline gap-2">
-            <span className="text-sm font-semibold text-ink">Zkx Hub</span>
+            <span className="font-display text-sm font-extrabold uppercase tracking-wide text-ink">Zkx Hub</span>
             <span className="text-sm text-ink-muted">Rivals</span>
           </div>
           <span className="chip">Preview</span>
         </div>
 
-        <div className="grid md:grid-cols-[14rem_1fr]">
+        <div className="grid md:grid-cols-[13rem_1fr]">
           {/* Tabs: a vertical rail on desktop, a scrolling strip on phones. */}
           <div
             role="tablist"
             aria-label="Menu sections"
             onKeyDown={onKeyDown}
-            className="relative flex gap-1 overflow-x-auto border-b border-white/5 p-3 [scrollbar-width:none] md:flex-col md:gap-0 md:overflow-visible md:border-b-0 md:border-r"
+            className="relative flex gap-1 overflow-x-auto border-b border-line bg-surface p-2 [scrollbar-width:none] md:flex-col md:gap-0 md:overflow-visible md:border-b-0 md:border-r md:p-3"
           >
             <span
               className="menu-tab-indicator hidden md:block"
@@ -94,7 +94,7 @@ export function MenuPreview() {
                 aria-controls="menu-panel"
                 tabIndex={i === index ? 0 : -1}
                 onClick={() => select(i)}
-                className="menu-tab max-md:aria-selected:bg-white/8"
+                className="menu-tab max-md:aria-selected:bg-surface-3"
               >
                 {f.title}
               </button>
@@ -105,7 +105,7 @@ export function MenuPreview() {
             id="menu-panel"
             role="tabpanel"
             aria-labelledby={`menu-tab-${index}`}
-            className="min-h-96 p-6 sm:p-8"
+            className="min-h-96 p-6"
           >
             <div key={index} data-dir={direction} className="menu-panel">
               <p className="label label-accent">{feature.tab}</p>

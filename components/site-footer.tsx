@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/config";
 // import { AdSlot } from "@/lib/ads/ad-slot";
@@ -11,6 +12,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   const links: FooterLink[] = [
+    { label: "Scripts", href: "/scripts" },
     { label: "Get Key", href: "/get-key" },
     { label: "Status", href: "/status" },
     siteConfig.links.docs ? { label: "Docs", href: siteConfig.links.docs } : null,
@@ -18,12 +20,15 @@ export function SiteFooter() {
   ].filter((link): link is FooterLink => link !== null);
 
   return (
-    <footer className="relative z-10 mt-16 border-t border-white/5">
-      <div className="wrap flex flex-col items-center gap-4 py-8 text-sm text-ink-muted sm:flex-row sm:justify-between">
-        <p>
-          © {year} {siteConfig.name}. All rights reserved.
-        </p>
-        <nav className="flex items-center gap-6" aria-label="Footer">
+    <footer className="relative z-10 mt-8 border-t border-line">
+      <div className="wrap flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <Image src="/brand/zk-mark.webp" alt="" width={26} height={24} />
+          <p className="text-sm text-ink-muted">
+            © {year} {siteConfig.name}. All rights reserved.
+          </p>
+        </div>
+        <nav className="flex flex-wrap items-center gap-x-6 gap-y-2" aria-label="Footer">
           {links.map((link) =>
             link.href.startsWith("http") ? (
               <a

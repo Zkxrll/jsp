@@ -7,8 +7,9 @@ import { features, type FeatureIcon } from "@/lib/features";
  * describe a feature the script does not ship. Server component, no JS
  * shipped to the client.
  *
- * Layout: on large screens the two `featured` entries take a half-width
- * cell each across the top row, and the rest fall into a four-up grid.
+ * Layout: one surface split by hairlines. On large screens the two
+ * `featured` entries take a half-width cell each across the top row, and
+ * the rest fill two four-up rows, so no cell is ever left empty.
  */
 
 const ICONS: Record<FeatureIcon, ReactNode> = {
@@ -28,9 +29,9 @@ const ICONS: Record<FeatureIcon, ReactNode> = {
   sliders: (
     <>
       <path d="M5 6h14M5 12h14M5 18h14" />
-      <circle cx="9" cy="6" r="1.9" fill="var(--tile-bg)" />
-      <circle cx="15" cy="12" r="1.9" fill="var(--tile-bg)" />
-      <circle cx="8" cy="18" r="1.9" fill="var(--tile-bg)" />
+      <circle cx="9" cy="6" r="1.9" fill="var(--color-surface)" />
+      <circle cx="15" cy="12" r="1.9" fill="var(--color-surface)" />
+      <circle cx="8" cy="18" r="1.9" fill="var(--color-surface)" />
     </>
   ),
   eye: (
@@ -77,47 +78,45 @@ const ICONS: Record<FeatureIcon, ReactNode> = {
 
 function FeatureIconMark({ icon }: { icon: FeatureIcon }) {
   return (
-    <span className="icon-tile" aria-hidden="true">
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.7}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {ICONS[icon]}
-      </svg>
-    </span>
+    <svg
+      viewBox="0 0 24 24"
+      className="icon-mark"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {ICONS[icon]}
+    </svg>
   );
 }
 
 export function FeatureGrid() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="panel-grid sm:grid-cols-2 lg:grid-cols-4" data-reveal>
       {features.map((feature) => (
         <article
           key={feature.title}
-          data-reveal
-          data-spotlight
-          className={`card flex flex-col p-6 ${feature.featured ? "sm:col-span-2 lg:p-8" : ""}`}
+          className={`flex flex-col p-6 ${feature.featured ? "sm:col-span-2 lg:p-8" : ""}`}
         >
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             <FeatureIconMark icon={feature.icon} />
             <span className="label">{feature.tab}</span>
           </div>
 
-          <h3 className="title-sm mt-4">{feature.title}</h3>
+          <h3 className={feature.featured ? "title-md mt-5" : "title-sm mt-5"}>{feature.title}</h3>
 
           <p className="body-sm mt-2 flex-1">{feature.blurb}</p>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <ul className="mt-5 flex flex-wrap gap-2" aria-label={`${feature.title} options`}>
             {feature.tags.map((tag) => (
-              <span key={tag} className="chip">
+              <li key={tag} className="chip">
                 {tag}
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </article>
       ))}
     </div>

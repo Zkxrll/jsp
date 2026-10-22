@@ -1,115 +1,72 @@
-"use client";
-
-import { useState } from "react";
 import { RouteTransition } from "@/components/route-transition";
 import { SiteFooter } from "@/components/site-footer";
-import { CheckIcon, CopyIcon } from "@/components/icons";
+import { SectionHeader } from "@/components/section-header";
+import { GameMedia } from "@/components/game-media";
+import { CopyLoaderButton } from "@/components/copy-loader-button";
+import { HashTarget } from "@/components/hash-target";
+import { games, LOADSTRING } from "@/lib/games";
 
-const LOADSTRING = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/ZkxrI/ZkxHub/refs/heads/main/source"))()';
-
-const SCRIPTS = [
-  {
-    name: "Rivals",
-    label: "",
-    description:
-      "Combat tools include configurable aimbot modes and triggerbot, weapon tweaks, player ESP, chams and tracers, custom crosshairs, hit feedback, world visuals, and gameplay automation.",
-  },
-  {
-    name: "Sniper Duels",
-    label: "",
-    description:
-      "Includes player ESP with boxes, names, health and optional tracers, plus configurable aimbot, FOV and visibility checks, speed controls, and noclip.",
-  },
-  {
-    name: "Steal An Egg",
-    label: "",
-    description:
-      "Automation for stealing, placing, hatching, and selling eggs or pets, plus mutations, fusing, event helpers, player options, ESP, egg predictors, and server hopping.",
-  },
-] as const;
-
-function CopyButton({ game }: { game: string }) {
-  const [status, setStatus] = useState<"copied" | "error" | null>(null);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(LOADSTRING);
-      setStatus("copied");
-      window.setTimeout(() => setStatus(null), 1800);
-    } catch {
-      setStatus("error");
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={copy}
-      className="btn btn-primary btn-sm w-full sm:w-auto"
-      aria-label={`Copy loader for ${game}`}
-    >
-      {status === "copied" ? (
-        <><CheckIcon /> Copied</>
-      ) : status === "error" ? (
-        <>Clipboard unavailable</>
-      ) : (
-        <><CopyIcon /> Copy loader</>
-      )}
-    </button>
-  );
-}
+const GAME_IDS = games.map((game) => game.id);
 
 export default function ScriptsPage() {
   return (
     <RouteTransition>
       <main className="flex-1">
-        <section className="wrap pb-16 pt-32 sm:pb-24 sm:pt-40">
-          <div className="mx-auto max-w-3xl text-center" data-reveal>
-            <p className="label label-accent">SCRIPT LIBRARY</p>
-            <h1 className="display mt-4">
-              Pick a game. <span className="text-gradient">Copy the script.</span>
-            </h1>
-            <p className="lede mx-auto mt-5 max-w-2xl">
-              A quick overview of each game, followed by the loader you can copy
-              straight from the page. Every entry currently uses the same source.
-            </p>
-            <div className="mt-6 flex justify-center">
-              <span className="chip">3 game entries · shared loader</span>
-            </div>
-          </div>
+        <section className="wrap pb-16 pt-28 sm:pb-24 sm:pt-36">
+          <SectionHeader
+            as="h1"
+            label="Script library"
+            title={
+              <>
+                Pick a game.
+                <br />
+                Copy the script.
+              </>
+            }
+          >
+            A quick overview of each game, followed by the loader you can copy
+            straight from the page. Every entry currently uses the same source.
+          </SectionHeader>
 
-          <div className="mx-auto mt-12 max-w-5xl overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.015] sm:mt-16">
-            {SCRIPTS.map((script, index) => (
+          <div className="mt-12 grid gap-6 sm:mt-16">
+            {games.map((game, index) => (
               <article
-                key={script.name}
-                id={script.name === "Steal An Egg" ? "steal-an-egg" : undefined}
-                className="scroll-mt-28 grid gap-5 border-b border-white/[0.08] p-5 last:border-b-0 sm:p-7 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-center md:gap-8"
+                key={game.id}
+                id={game.id}
+                aria-labelledby={`${game.id}-title`}
+                className="game-card card"
                 data-reveal
               >
-                <div className="min-w-0">
-                  <p className="label label-accent">{script.label}</p>
-                  <h2 className="title-sm mt-3">{script.name}</h2>
-                  <p className="body-sm mt-2 max-w-md">{script.description}</p>
-                </div>
+                <GameMedia
+                  game={game}
+                  showNewTag
+                  priority={index === 0}
+                  className="cut rounded-[var(--radius)]"
+                  sizes="(min-width: 1152px) 560px, (min-width: 900px) 50vw, 100vw"
+                />
 
-                <div className="min-w-0 rounded-2xl border border-white/[0.08] bg-black/25 p-4">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <p className="label">LOADSTRING</p>
-                    <span className="text-xs text-ink-muted">Shared source</span>
-                  </div>
-                  <code className="block break-all font-mono text-xs leading-5 text-ink-soft">
-                    {LOADSTRING}
-                  </code>
-                  <div className="mt-4 flex justify-end">
-                    <CopyButton game={script.name} />
+                <div className="min-w-0 px-1 pb-1 sm:px-2 lg:pr-4">
+                  <h2 id={`${game.id}-title`} className="section-title">
+                    {game.name}
+                  </h2>
+                  <p className="body-sm mt-3 max-w-lg">{game.description}</p>
+
+                  <div className="loader-field mt-6">
+                    <div className="loader-field-head">
+                      <p className="label">
+                        Loadstring<span className="hidden sm:inline"> · shared source</span>
+                      </p>
+                      <CopyLoaderButton game={game.name} />
+                    </div>
+                    <code>{LOADSTRING}</code>
                   </div>
                 </div>
               </article>
             ))}
           </div>
-
         </section>
       </main>
+      <HashTarget ids={GAME_IDS} />
       <SiteFooter />
     </RouteTransition>
   );

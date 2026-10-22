@@ -35,6 +35,7 @@ app/
 components/          UI pieces — presentational, import from lib/ for data
 lib/
   config.ts           *** Single source of truth for branding + redirect URL ***
+  games.ts            Script library: games, artwork, loader, anchors
   analytics.ts        Typed analytics event stub — no provider wired in yet
   ads/                Provider-agnostic ad-slot system — see ads/README.md
 ```
@@ -105,11 +106,17 @@ change or rebuild logic needed.
 - **Fonts** — `app/layout.tsx`: Archivo (display) and Inter (body) via
   `next/font`. One display face, one body face; don't add a third.
 - **Design rules** — documented at the top of `app/globals.css`: 4pt
-  spacing (whole Tailwind steps only), the type ramp, one radius, one
-  button system (`.btn` + `.btn-primary` / `.btn-ghost`, `.btn-sm`).
-- **Logo** — `public/logo.jpg` (hero and share card). Favicon is
-  `app/icon.png`, iOS home-screen icon `app/apple-icon.png`.
+  spacing (whole Tailwind steps only), the type ramp, the radius scale,
+  the chamfer (`.cut`) for game art, and one button system (`.btn` +
+  `.btn-primary` / `.btn-secondary`, `.btn-sm` / `.btn-lg`).
+- **Logo** — the ZK mark: `public/brand/zk-mark.webp` (header, footer)
+  and `public/brand/zk-mark.png` (share card). Favicon is `app/icon.png`,
+  iOS home-screen icon `app/apple-icon.png`.
 - **Hero copy, features, stats** — `app/page.tsx` and `lib/features.ts`.
+- **Games and loader** — `lib/games.ts`: name, artwork (`public/games/`),
+  copy, and the stable anchor (`/scripts#<id>`) for each script. The
+  scripts page, the home page tiles, and the new-script announcement all
+  read from it, so they always show the same image.
 - **Share image** — `app/opengraph-image.tsx` renders it from the logo,
   name, and tagline in `lib/config.ts`.
 

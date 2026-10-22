@@ -12,8 +12,8 @@ export const contentType = "image/png";
  * twitter-image.tsx so both previews stay identical.
  */
 export async function renderShareImage() {
-  const logo = await readFile(join(process.cwd(), "public/logo.jpg"));
-  const logoSrc = `data:image/jpeg;base64,${logo.toString("base64")}`;
+  const logo = await readFile(join(process.cwd(), "public/brand/zk-mark.png"));
+  const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;
 
   return new ImageResponse(
     (
@@ -26,12 +26,12 @@ export async function renderShareImage() {
           gap: 64,
           padding: "0 96px",
           background:
-            "radial-gradient(900px 520px at 22% 40%, rgba(154, 92, 255, 0.22), transparent 70%), #060509",
+            "radial-gradient(900px 520px at 22% 50%, rgba(154, 92, 255, 0.16), transparent 70%), #08070b",
           color: "#f4f1fb",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={logoSrc} width={320} height={320} alt="" style={{ borderRadius: 320 }} />
+        <img src={logoSrc} width={340} height={314} alt="" />
         <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 620 }}>
           <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: 4, color: "#b892ff" }}>
             RIVALS SCRIPT

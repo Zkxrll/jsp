@@ -83,6 +83,30 @@ export function Spinner({ className }: IconProps) {
   );
 }
 
+export function ArrowRightIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </Stroke>
+  );
+}
+
+export function CloseIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M6 6l12 12M18 6 6 18" />
+    </Stroke>
+  );
+}
+
+export function MenuIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M4 8h16M4 16h16" />
+    </Stroke>
+  );
+}
+
 export function ChevronDownIcon(props: IconProps) {
   return (
     <Stroke {...props}>
