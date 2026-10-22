@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { RouteTransition } from "@/components/route-transition";
 import { SiteFooter } from "@/components/site-footer";
-import { ArrowUpRightIcon, CheckIcon, CopyIcon } from "@/components/icons";
+import { CheckIcon, CopyIcon } from "@/components/icons";
 
-const SOURCE_URL = "https://raw.githubusercontent.com/ZkxrI/ZkxHub/refs/heads/main/source";
 const LOADSTRING = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/ZkxrI/ZkxHub/refs/heads/main/source"))()';
 
 const SCRIPTS = [
@@ -108,19 +107,6 @@ export default function ScriptsPage() {
             ))}
           </div>
 
-          <div className="mx-auto mt-6 max-w-5xl">
-            <p className="body-sm">
-              Each summary highlights the main feature groups available for that game.
-            </p>
-            <a
-              href={SOURCE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-keyframe-strong transition-colors hover:text-ink"
-            >
-              View hosted source <ArrowUpRightIcon />
-            </a>
-          </div>
         </section>
       </main>
       <SiteFooter />
