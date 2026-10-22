@@ -117,9 +117,20 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <Link
+            href="/scripts"
+            transitionTypes={isHome ? undefined : ["nav-back"]}
+            aria-current={pathname === "/scripts" ? "page" : undefined}
+            className={`nav-link ${pathname === "/scripts" ? "text-ink" : ""}`}
+          >
+            Scripts
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
+          <Link href="/scripts" className="btn btn-glass btn-sm md:hidden" aria-current={pathname === "/scripts" ? "page" : undefined}>
+            Scripts
+          </Link>
           <a
             href={siteConfig.links.discord}
             target="_blank"
