@@ -82,7 +82,8 @@ export default function ScriptsPage() {
             {SCRIPTS.map((script, index) => (
               <article
                 key={script.name}
-                className="grid gap-5 border-b border-white/[0.08] p-5 last:border-b-0 sm:p-7 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-center md:gap-8"
+                id={script.name === "Steal An Egg" ? "steal-an-egg" : undefined}
+                className="scroll-mt-28 grid gap-5 border-b border-white/[0.08] p-5 last:border-b-0 sm:p-7 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-center md:gap-8"
                 data-reveal
               >
                 <div className="min-w-0">
