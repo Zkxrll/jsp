@@ -129,7 +129,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             href="/scripts"
-            aria-current={pathname === "/scripts" ? "page" : undefined}
+            aria-current={pathname === "/scripts" ? "true" : undefined}
             className="nav-link md:hidden"
           >
             Scripts
