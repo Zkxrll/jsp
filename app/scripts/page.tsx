@@ -52,7 +52,7 @@ export default function ScriptsPage() {
           </div>
 
           <div className="mx-auto mt-12 grid max-w-5xl gap-4 sm:mt-16 md:grid-cols-2 lg:grid-cols-3">
-            {SCRIPTS.map((script, index) => (
+            {SCRIPTS.map((script) => (
               <article key={script.name} className="card flex flex-col p-6" data-reveal data-spotlight>
                 <div className="flex items-start justify-between gap-3">
                   <div className="grid h-11 w-11 place-items-center rounded-xl border border-keyframe/20 bg-keyframe/10 text-sm font-bold text-keyframe-strong">
