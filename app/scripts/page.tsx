@@ -10,19 +10,19 @@ const LOADSTRING = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/Z
 const SCRIPTS = [
   {
     name: "Rivals",
-    label: "01 / FPS",
+    label: "",
     description:
       "Combat tools include configurable aimbot modes and triggerbot, weapon tweaks, player ESP, chams and tracers, custom crosshairs, hit feedback, world visuals, and gameplay automation.",
   },
   {
     name: "Sniper Duels",
-    label: "02 / FPS",
+    label: "",
     description:
       "Includes player ESP with boxes, names, health and optional tracers, plus configurable aimbot, FOV and visibility checks, speed controls, and noclip.",
   },
   {
     name: "Steal An Egg",
-    label: "03 / GAME",
+    label: "",
     description:
       "Automation for stealing, placing, hatching, and selling eggs or pets, plus mutations, fusing, event helpers, player options, ESP, egg predictors, and server hopping.",
   },
