@@ -3,15 +3,30 @@
 import { useState } from "react";
 import { RouteTransition } from "@/components/route-transition";
 import { SiteFooter } from "@/components/site-footer";
-import { ArrowUpRightIcon, CheckIcon } from "@/components/icons";
+import { ArrowUpRightIcon, CheckIcon, CopyIcon } from "@/components/icons";
 
 const SOURCE_URL = "https://raw.githubusercontent.com/ZkxrI/ZkxHub/refs/heads/main/source";
 const LOADSTRING = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/ZkxrI/ZkxHub/refs/heads/main/source"))()';
 
 const SCRIPTS = [
-  { name: "Rivals", category: "FPS", description: "Script for Roblox Rivals." },
-  { name: "Sniper Duels", category: "FPS", description: "Script for Roblox Sniper Duels." },
-  { name: "Steal An Egg", category: "SIMULATOR", description: "Script for Steal An Egg." },
+  {
+    name: "Rivals",
+    label: "01 / FPS",
+    description:
+      "The repository README describes this build as a beta skin changer. It also notes that the first version may still contain bugs.",
+  },
+  {
+    name: "Sniper Duels",
+    label: "02 / FPS",
+    description:
+      "Listed as a supported game, but the public repository does not expose a feature list for this script yet.",
+  },
+  {
+    name: "Steal An Egg",
+    label: "03 / GAME",
+    description:
+      "Listed as a supported game, but the public repository does not expose a feature list for this script yet.",
+  },
 ] as const;
 
 function CopyButton({ game }: { game: string }) {
@@ -31,15 +46,15 @@ function CopyButton({ game }: { game: string }) {
     <button
       type="button"
       onClick={copy}
-      className="btn btn-primary w-full"
-      aria-label={`Copy loadstring for ${game}`}
+      className="btn btn-primary btn-sm w-full sm:w-auto"
+      aria-label={`Copy loader for ${game}`}
     >
       {status === "copied" ? (
         <><CheckIcon /> Copied</>
       ) : status === "error" ? (
         <>Clipboard unavailable</>
       ) : (
-        <>Copy loadstring</>
+        <><CopyIcon /> Copy loader</>
       )}
     </button>
   );
@@ -52,49 +67,60 @@ export default function ScriptsPage() {
         <section className="wrap pb-16 pt-32 sm:pb-24 sm:pt-40">
           <div className="mx-auto max-w-3xl text-center" data-reveal>
             <p className="label label-accent">SCRIPT LIBRARY</p>
-            <h1 className="display mt-4">All scripts. <span className="text-gradient">One hub.</span></h1>
-            <p className="lede mx-auto mt-5 max-w-xl">
-              Browse the available game scripts and copy the shared loader when you’re ready.
+            <h1 className="display mt-4">
+              The scripts. <span className="text-gradient">No clutter.</span>
+            </h1>
+            <p className="lede mx-auto mt-5 max-w-2xl">
+              A quick overview of each game, followed by the loader you can copy
+              straight from the page. Every entry currently uses the same source.
             </p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-ink-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-keyframe" />
-              {SCRIPTS.length} scripts listed
+            <div className="mt-6 flex justify-center">
+              <span className="chip">3 game entries · shared loader</span>
             </div>
           </div>
 
-          <div className="mx-auto mt-12 grid max-w-5xl gap-4 sm:mt-16 md:grid-cols-2 lg:grid-cols-3">
-            {SCRIPTS.map((script) => (
-              <article key={script.name} className="card flex flex-col p-6" data-reveal data-spotlight>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="grid h-11 w-11 place-items-center rounded-xl border border-keyframe/20 bg-keyframe/10 text-sm font-bold text-keyframe-strong">
-                    {script.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}
-                  </div>
-                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] font-semibold tracking-wider text-ink-muted">
-                    {script.category}
-                  </span>
+          <div className="mx-auto mt-12 max-w-5xl overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.015] sm:mt-16">
+            {SCRIPTS.map((script, index) => (
+              <article
+                key={script.name}
+                className="grid gap-5 border-b border-white/[0.08] p-5 last:border-b-0 sm:p-7 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-center md:gap-8"
+                data-reveal
+              >
+                <div className="min-w-0">
+                  <p className="label label-accent">{script.label}</p>
+                  <h2 className="title-sm mt-3">{script.name}</h2>
+                  <p className="body-sm mt-2 max-w-md">{script.description}</p>
                 </div>
-                <h2 className="title-sm mt-6">{script.name}</h2>
-                <p className="body-sm mt-2 flex-1">{script.description}</p>
-                <div className="mt-6 rounded-lg border border-white/10 bg-black/20 p-3">
-                  <p className="label label-accent mb-2">LOADSTRING</p>
-                  <code className="block break-all text-xs leading-relaxed text-ink/75">
+
+                <div className="min-w-0 rounded-2xl border border-white/[0.08] bg-black/25 p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <p className="label">LOADSTRING</p>
+                    <span className="text-xs text-ink-muted">Shared source</span>
+                  </div>
+                  <code className="block break-all font-mono text-xs leading-5 text-ink-soft">
                     {LOADSTRING}
                   </code>
-                </div>
-                <div className="mt-4">
-                  <CopyButton game={script.name} />
+                  <div className="mt-4 flex justify-end">
+                    <CopyButton game={script.name} />
+                  </div>
                 </div>
               </article>
             ))}
           </div>
 
-          <div className="card mx-auto mt-8 flex max-w-5xl flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6" data-reveal>
-            <div>
-              <p className="title-sm">Source</p>
-              <p className="body-sm mt-1 break-all">Hosted from the ZkxHub GitHub repository.</p>
-            </div>
-            <a href={SOURCE_URL} target="_blank" rel="noopener noreferrer" className="btn btn-glass shrink-0">
-              View source <ArrowUpRightIcon />
+          <div className="mx-auto mt-6 max-w-5xl">
+            <p className="body-sm">
+              Note: the public repository only documents Rivals as a beta skin changer.
+              The Sniper Duels and Steal An Egg feature details are not available in
+              the public source, so they are not guessed here.
+            </p>
+            <a
+              href={SOURCE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-keyframe-strong transition-colors hover:text-ink"
+            >
+              View hosted source <ArrowUpRightIcon />
             </a>
           </div>
         </section>
