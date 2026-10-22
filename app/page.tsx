@@ -1,4 +1,5 @@
 import { SiteFooter } from "@/components/site-footer";
+import { NewScriptAnnouncement } from "@/components/new-script-announcement";
 import { GetKeyButton } from "@/components/get-key-button";
 import { FAQ } from "@/components/faq";
 import { FeatureGrid } from "@/components/feature-grid";
@@ -213,6 +214,7 @@ export default function HomePage() {
         </section>
       </main>
 
+      <NewScriptAnnouncement />
       <SiteFooter />
     </RouteTransition>
   );
