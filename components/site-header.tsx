@@ -15,6 +15,7 @@ const NAV = [
 ] as const;
 
 type SectionId = (typeof NAV)[number]["id"];
+type NavId = SectionId | "scripts";
 
 /** Which home-page section is under the middle of the viewport. */
 function useActiveSection(enabled: boolean) {
@@ -36,14 +37,11 @@ function useActiveSection(enabled: boolean) {
           if (entry.isIntersecting) setActive(entry.target.id as SectionId);
         }
       },
-      // A thin band across the middle of the screen: a section is active
-      // while it crosses it.
       { rootMargin: "-45% 0px -54% 0px" },
     );
 
     sections.forEach((el) => observer.observe(el));
 
-    // Above the first section (the hero), nothing is active.
     const onScroll = () => {
       const first = sections[0];
       if (first && first.getBoundingClientRect().top > window.innerHeight / 2) setActive(null);
@@ -59,17 +57,15 @@ function useActiveSection(enabled: boolean) {
   return active;
 }
 
-/**
- * Floating glass capsule. Lives in the root layout, so it persists across
- * routes and never re-animates. On the home page, a lens slides behind the
- * section currently in view.
- */
+/** Floating glass capsule shared by every route. */
 export function SiteHeader() {
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const active = useActiveSection(isHome);
+  const activeSection = useActiveSection(isHome);
+  const active: NavId | null =
+    activeSection ?? (pathname === "/scripts" ? "scripts" : null);
 
-  const linkRefs = useRef<Partial<Record<SectionId, HTMLAnchorElement | null>>>({});
+  const linkRefs = useRef<Partial<Record<NavId, HTMLAnchorElement | null>>>({});
   const [lens, setLens] = useState<{ x: number; width: number } | null>(null);
 
   useLayoutEffect(() => {
@@ -118,17 +114,24 @@ export function SiteHeader() {
             </Link>
           ))}
           <Link
+            ref={(el) => {
+              linkRefs.current.scripts = el;
+            }}
             href="/scripts"
             transitionTypes={isHome ? undefined : ["nav-back"]}
-            aria-current={pathname === "/scripts" ? "page" : undefined}
-            className={`nav-link ${pathname === "/scripts" ? "text-ink" : ""}`}
+            aria-current={active === "scripts" ? "true" : undefined}
+            className="nav-link"
           >
             Scripts
           </Link>
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link href="/scripts" className="btn btn-glass btn-sm md:hidden" aria-current={pathname === "/scripts" ? "page" : undefined}>
+          <Link
+            href="/scripts"
+            aria-current={pathname === "/scripts" ? "page" : undefined}
+            className="nav-link md:hidden"
+          >
             Scripts
           </Link>
           <a
@@ -136,7 +139,7 @@ export function SiteHeader() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Join the Zkx Hub Discord"
-            className="btn btn-glass btn-sm btn-icon"
+            className="btn btn-glass btn-sm btn-icon hidden sm:inline-flex"
           >
             <DiscordGlyph />
           </a>
