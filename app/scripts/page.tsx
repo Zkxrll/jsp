@@ -67,7 +67,7 @@ export default function ScriptsPage() {
           <div className="mx-auto max-w-3xl text-center" data-reveal>
             <p className="label label-accent">SCRIPT LIBRARY</p>
             <h1 className="display mt-4">
-              The scripts. <span className="text-gradient">No clutter.</span>
+              Pick a game. <span className="text-gradient">Copy the script.</span>
             </h1>
             <p className="lede mx-auto mt-5 max-w-2xl">
               A quick overview of each game, followed by the loader you can copy
