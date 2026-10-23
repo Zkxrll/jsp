@@ -652,26 +652,62 @@
     outline-offset: 6px;
   }
 
-  /* A game entry on the scripts page. */
+  /* A game entry on the scripts page. The artwork fills the card's
+     leading edge and dissolves into the surface along a diagonal, the
+     same "/" as the ZK mark, so art and text share one object instead of
+     a picture sitting in a box. Phones: art on top, dissolving downward
+     into the text. The mask sits on the frame, not the image, so the
+     hover zoom moves the art under a fixed fade. */
   .game-card {
     display: grid;
-    gap: 1.25rem;
-    padding: 0.75rem;
+    overflow: hidden;
     scroll-margin-top: calc(var(--header-height) + 1.5rem);
     transition: border-color 600ms ease;
   }
 
+  .game-card-media {
+    -webkit-mask-image: linear-gradient(170deg, #000 28%, transparent 72%);
+    mask-image: linear-gradient(170deg, #000 28%, transparent 72%);
+  }
+
+  /* The frame's edge line would draw a hard rectangle through the fade. */
+  .game-card-media::after {
+    content: none;
+  }
+
+  .game-card-body {
+    position: relative;
+    min-width: 0;
+    margin-top: -2.5rem;
+    padding: 0 1.25rem 1.25rem;
+  }
+
   @media (min-width: 640px) {
-    .game-card {
-      padding: 1rem;
+    .game-card-body {
+      padding: 0 1.75rem 1.75rem;
     }
   }
 
   @media (min-width: 900px) {
     .game-card {
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-      align-items: center;
-      gap: 2rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      min-height: 22rem;
+    }
+
+    .game-card-media {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 62%;
+      aspect-ratio: auto;
+      -webkit-mask-image: linear-gradient(72deg, #000 42%, transparent 84%);
+      mask-image: linear-gradient(72deg, #000 42%, transparent 84%);
+    }
+
+    .game-card-body {
+      grid-column: 2;
+      align-self: center;
+      margin-top: 0;
+      padding: 2.5rem 2.5rem 2.5rem 1rem;
     }
   }
 

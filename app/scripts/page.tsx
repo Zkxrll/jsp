@@ -41,11 +41,11 @@ export default function ScriptsPage() {
                   game={game}
                   showNewTag
                   priority={index === 0}
-                  className="cut rounded-[var(--radius)]"
-                  sizes="(min-width: 1152px) 560px, (min-width: 900px) 50vw, 100vw"
+                  className="game-card-media"
+                  sizes="(min-width: 1152px) 680px, (min-width: 900px) 62vw, 100vw"
                 />
 
-                <div className="min-w-0 px-1 pb-1 sm:px-2 lg:pr-4">
+                <div className="game-card-body">
                   <h2 id={`${game.id}-title`} className="section-title">
                     {game.name}
                   </h2>
