@@ -8,10 +8,10 @@ function readStatus(value: string | undefined): ServiceStatus {
 export const siteConfig = {
   name: "Zkx Hub",
 
-  tagline: "Silent aim, a real antihit, and a full menu for Rivals.",
+  tagline: "Roblox scripts for Rivals, Sniper Duels, and Steal An Egg, from one loader.",
 
   description:
-    "Zkx Hub is a Rivals script with silent and camera aimbot, voidspam antihit, anti-aim, weapon mods, ESP, chams, bullet tracers, a full lighting suite, and background automation.",
+    "Zkx Hub is a Roblox script hub with scripts for Rivals, Sniper Duels, and Steal An Egg: aimbot, ESP, and automation, all from one loader and one key system.",
 
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://zkxhub.vercel.app",
 

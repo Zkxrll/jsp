@@ -1,13 +1,22 @@
+import type { GameId } from "./games";
+
 /**
- * Feature catalog for Zkx Hub.
+ * Feature catalog for Zkx Hub, one list per game.
  *
- * Every entry here maps to a real tab or groupbox in the script's in-game
- * Obsidian menu. Copy is written from how each feature actually behaves, so
- * the site and the menu never drift apart. Add or change a feature in one
- * place: this file. Nothing renders a feature that the script does not have.
+ * Rivals: every entry maps to a real tab or groupbox in the script's
+ * in-game Obsidian menu, with its real toggle names as tags.
+ * Sniper Duels and Steal An Egg: written only from what their scripts-page
+ * descriptions state. Their in-game tab and toggle names aren't documented
+ * here yet, so `tab` and `tags` are left out rather than guessed; add them
+ * once known. Nothing renders a feature that a script does not have.
  */
 
 export type FeatureIcon =
+  | "egg"
+  | "sparkle"
+  | "calendar"
+  | "user"
+  | "shuffle"
   | "crosshair"
   | "shield"
   | "sliders"
@@ -23,17 +32,17 @@ export interface Feature {
   /** Menu-accurate name, matches the tab or groupbox it comes from. */
   title: string;
   /** The tab it lives under in-game, shown as a small kicker. */
-  tab: string;
+  tab?: string;
   /** One or two plain sentences describing real behaviour. */
   blurb: string;
   /** Real toggle names from the menu, rendered as chips. */
-  tags: readonly string[];
+  tags?: readonly string[];
   icon: FeatureIcon;
   /** Leads the grid: rendered wider on large screens. */
   featured?: boolean;
 }
 
-export const features: readonly Feature[] = [
+const rivals: readonly Feature[] = [
   {
     title: "Aimbot",
     tab: "Combat",
@@ -117,3 +126,60 @@ export const features: readonly Feature[] = [
     tags: ["Recorder", "Device Spoof", "Staff Detector"],
   },
 ] as const;
+
+const sniperDuels: readonly Feature[] = [
+  {
+    title: "ESP",
+    icon: "eye",
+    blurb: "Player ESP with boxes, names, and health, plus optional tracers.",
+  },
+  {
+    title: "Aimbot",
+    icon: "crosshair",
+    blurb: "A configurable aimbot with FOV and visibility checks.",
+  },
+  {
+    title: "Movement",
+    icon: "move",
+    blurb: "Speed controls and noclip.",
+  },
+] as const;
+
+const stealAnEgg: readonly Feature[] = [
+  {
+    title: "Egg & Pet Automation",
+    icon: "egg",
+    blurb: "Automates stealing, placing, hatching, and selling eggs or pets.",
+  },
+  {
+    title: "Mutations & Fusing",
+    icon: "sparkle",
+    blurb: "Tools for mutations and fusing.",
+  },
+  {
+    title: "Event Helpers",
+    icon: "calendar",
+    blurb: "Helpers for in-game events.",
+  },
+  {
+    title: "Player Options",
+    icon: "user",
+    blurb: "Options for your own player.",
+  },
+  {
+    title: "ESP & Egg Predictors",
+    icon: "eye",
+    blurb: "ESP, plus egg predictors.",
+  },
+  {
+    title: "Server Hopping",
+    icon: "shuffle",
+    blurb: "Hop to another server from the script.",
+  },
+] as const;
+
+export const featuresByGame: Record<GameId, readonly Feature[]> = {
+  rivals,
+  "sniper-duels": sniperDuels,
+  "steal-an-egg": stealAnEgg,
+};

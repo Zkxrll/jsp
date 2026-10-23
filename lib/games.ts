@@ -20,7 +20,7 @@ export interface Game {
   /** Full description on the scripts page. */
   description: string;
   /** The newest script. Marked "New" and announced on the home page. */
-  isNew?: boolean;
+  isNew: boolean;
 }
 
 /** Every entry currently loads from the same source. */
@@ -39,6 +39,7 @@ export const games = [
     summary: "Aimbot modes, weapon mods, ESP, chams, and world visuals.",
     description:
       "Combat tools include configurable aimbot modes and triggerbot, weapon tweaks, player ESP, chams and tracers, custom crosshairs, hit feedback, world visuals, and gameplay automation.",
+    isNew: false,
   },
   {
     id: "sniper-duels",
@@ -48,6 +49,7 @@ export const games = [
     summary: "ESP, aimbot with visibility checks, speed, and noclip.",
     description:
       "Includes player ESP with boxes, names, health and optional tracers, plus configurable aimbot, FOV and visibility checks, speed controls, and noclip.",
+    isNew: false,
   },
   {
     id: "steal-an-egg",
@@ -72,4 +74,18 @@ export function gameById(id: GameId): LibraryGame {
 
 export function scriptsHref(id: GameId) {
   return `/scripts#${id}`;
+}
+
+/** "Rivals, Sniper Duels, and Steal An Egg", from the list above. */
+export function gameNameList() {
+  const names = games.map((g) => g.name);
+  if (names.length <= 2) return names.join(" and ");
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+}
+
+const NUMBER_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+
+/** "Three", so headings stay right as games are added. */
+export function gameCountWord() {
+  return NUMBER_WORDS[games.length] ?? String(games.length);
 }

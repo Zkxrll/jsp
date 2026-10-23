@@ -1,18 +1,56 @@
 import type { ReactNode } from "react";
-import { features, type FeatureIcon } from "@/lib/features";
+import { featuresByGame, type FeatureIcon } from "@/lib/features";
+import type { GameId } from "@/lib/games";
 
 /**
- * Feature showcase for the landing page. Pure presentation: it renders
- * whatever lib/features.ts contains, so the marketing copy can never
- * describe a feature the script does not ship. Server component, no JS
- * shipped to the client.
+ * One game's features. Pure presentation: it renders whatever
+ * lib/features.ts holds for that game, so the copy can never describe a
+ * feature the script does not ship. Server component, no JS shipped.
  *
- * Layout: one surface split by hairlines. On large screens the two
- * `featured` entries take a half-width cell each across the top row, and
- * the rest fill two four-up rows, so no cell is ever left empty.
+ * Layout: one surface split by hairlines, with a column count per game
+ * chosen so no cell is ever left empty. Rivals: the two `featured`
+ * entries take a half-width cell each across the top row, and the rest
+ * fill two four-up rows.
  */
 
+/** Columns per game; each divides that game's feature count evenly. */
+const GRID_COLUMNS: Record<GameId, string> = {
+  rivals: "sm:grid-cols-2 lg:grid-cols-4",
+  "sniper-duels": "md:grid-cols-3",
+  "steal-an-egg": "sm:grid-cols-2 lg:grid-cols-3",
+};
+
 const ICONS: Record<FeatureIcon, ReactNode> = {
+  egg: (
+    <>
+      <path d="M12 3c-3.6 0-6.5 5.4-6.5 10a6.5 6.5 0 0 0 13 0C18.5 8.4 15.6 3 12 3Z" />
+      <path d="m8 13.5 2 -1.5 2 1.5 2 -1.5 2 1.5" />
+    </>
+  ),
+  sparkle: (
+    <>
+      <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
+      <path d="M12 8.5 13.2 10.8 15.5 12 13.2 13.2 12 15.5 10.8 13.2 8.5 12 10.8 10.8Z" />
+    </>
+  ),
+  calendar: (
+    <>
+      <rect x="4" y="5.5" width="16" height="14.5" rx="2" />
+      <path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" />
+    </>
+  ),
+  shuffle: (
+    <>
+      <path d="M3 7h3.5c4.5 0 6.5 10 11 10H21M3 17h3.5c1.6 0 2.8-1.2 3.8-2.8M13.7 9.8C14.7 8.2 15.9 7 17.5 7H21" />
+      <path d="m18.5 4.5 2.5 2.5-2.5 2.5M18.5 14.5l2.5 2.5-2.5 2.5" />
+    </>
+  ),
   crosshair: (
     <>
       <circle cx="12" cy="12" r="7" />
@@ -93,30 +131,32 @@ function FeatureIconMark({ icon }: { icon: FeatureIcon }) {
   );
 }
 
-export function FeatureGrid() {
+export function FeatureGrid({ gameId }: { gameId: GameId }) {
   return (
-    <div className="panel-grid sm:grid-cols-2 lg:grid-cols-4" data-reveal>
-      {features.map((feature) => (
+    <div className={`panel-grid ${GRID_COLUMNS[gameId]}`}>
+      {featuresByGame[gameId].map((feature) => (
         <article
           key={feature.title}
           className={`flex flex-col p-6 ${feature.featured ? "sm:col-span-2 lg:p-8" : ""}`}
         >
           <div className="flex items-center gap-3">
             <FeatureIconMark icon={feature.icon} />
-            <span className="label">{feature.tab}</span>
+            {feature.tab && <span className="label">{feature.tab}</span>}
           </div>
 
           <h3 className={feature.featured ? "title-md mt-5" : "title-sm mt-5"}>{feature.title}</h3>
 
           <p className="body-sm mt-2 flex-1">{feature.blurb}</p>
 
-          <ul className="mt-5 flex flex-wrap gap-2" aria-label={`${feature.title} options`}>
-            {feature.tags.map((tag) => (
-              <li key={tag} className="chip">
-                {tag}
-              </li>
-            ))}
-          </ul>
+          {feature.tags && (
+            <ul className="mt-5 flex flex-wrap gap-2" aria-label={`${feature.title} options`}>
+              {feature.tags.map((tag) => (
+                <li key={tag} className="chip">
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          )}
         </article>
       ))}
     </div>

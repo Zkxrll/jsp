@@ -17,7 +17,7 @@ const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo", displa
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} · Rivals script`,
+    default: `${siteConfig.name} · Roblox script hub`,
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,

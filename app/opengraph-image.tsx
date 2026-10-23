@@ -34,7 +34,7 @@ export async function renderShareImage() {
         <img src={logoSrc} width={340} height={314} alt="" />
         <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 620 }}>
           <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: 4, color: "#b892ff" }}>
-            RIVALS SCRIPT
+            ROBLOX SCRIPT HUB
           </div>
           <div style={{ fontSize: 88, fontWeight: 800, letterSpacing: -3, lineHeight: 1 }}>
             {siteConfig.name}

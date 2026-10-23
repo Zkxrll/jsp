@@ -2,12 +2,17 @@
 
 import { useState } from "react";
 import { ChevronDownIcon } from "./icons";
+import { gameNameList } from "@/lib/games";
 
 const FAQ_ITEMS = [
   {
     question: "How do I get a key?",
     answer:
       "Click Get Key to go straight to the key system, which issues your key. Paste it into the script when it asks; joining Discord is optional.",
+  },
+  {
+    question: "Which games are supported?",
+    answer: `${gameNameList()}. Every game uses the same loader; pick yours in the script library to copy it.`,
   },
   {
     question: "Is Premium lifetime?",
@@ -22,7 +27,7 @@ const FAQ_ITEMS = [
   {
     question: "How often is Zkx Hub updated?",
     answer:
-      "Whenever a Rivals update breaks something, and when new features are ready. Fixed builds are posted in the Discord first, and the latest changes are listed in Updates above.",
+      "Whenever a game update breaks a script, and when new features are ready. Fixed builds are posted in the Discord first, and the latest changes are listed in Updates above.",
   },
   {
     question: "Where do I get support?",

@@ -617,39 +617,10 @@
     z-index: 1;
   }
 
-  /* A game tile on the home page: the whole tile is the link. */
-  .game-tile {
-    display: flex;
-    flex-direction: column;
-    border-radius: var(--radius-lg);
-    color: inherit;
-  }
-
-  .game-tile-name {
-    transition: color 200ms ease;
-  }
-
-  .game-tile-arrow {
-    transition: transform 320ms var(--spring);
-  }
-
   @media (hover: hover) {
-    .game-tile:hover .game-media img,
     .game-card:hover .game-media img {
       transform: scale(1.03);
     }
-
-    .game-tile:hover .game-tile-name {
-      color: var(--color-keyframe-strong);
-    }
-
-    .game-tile:hover .game-tile-arrow {
-      transform: translateX(3px);
-    }
-  }
-
-  .game-tile:focus-visible {
-    outline-offset: 6px;
   }
 
   /* A game entry on the scripts page. The artwork fills the card's
@@ -744,12 +715,12 @@
     word-break: break-all;
   }
 
-  /* Menu preview ------------------------------------------------------ */
+  /* Window ------------------------------------------------------------ */
 
-  /* A stand-in for the in-game window: solid, with the violet rule along
-     the top that the real menu has. Elevated because it is the product
-     shot, the one surface allowed a real shadow. */
-  .menu-window {
+  /* The hub as an in-game window: solid, with the violet rule along the
+     top that the real menu has. Elevated because it is the product shot,
+     the one surface allowed a real shadow. */
+  .window {
     overflow: hidden;
     border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-lg);
@@ -758,7 +729,7 @@
     box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.9);
   }
 
-  .menu-titlebar {
+  .window-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -769,121 +740,139 @@
     background: var(--color-surface-2);
   }
 
-  .menu-tab {
-    position: relative;
-    z-index: 1;
-    display: flex;
+  /* One game in the library window: the whole row is the link. */
+  .library-row {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr) auto;
     align-items: center;
-    height: 2.5rem;
-    padding: 0 0.875rem;
-    border: 0;
+    gap: 0.875rem;
+    padding: 0.75rem 1rem 0.75rem 0.75rem;
+    border-bottom: 1px solid var(--color-line);
+    color: inherit;
+    transition: background-color 200ms ease;
+  }
+
+  @media (min-width: 640px) {
+    .library-row {
+      grid-template-columns: 10rem minmax(0, 1fr) auto;
+      gap: 1.25rem;
+    }
+  }
+
+  .library-thumb {
+    --cut: 0.625rem;
     border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--color-ink-muted);
-    font-size: 0.875rem;
-    font-weight: 500;
-    white-space: nowrap;
-    cursor: pointer;
+  }
+
+  .library-row-name {
+    font-size: 1.125rem;
     transition: color 200ms ease;
   }
 
-  .menu-tab[aria-selected="true"] {
-    color: var(--color-ink);
+  @media (min-width: 640px) {
+    .library-row-name {
+      font-size: 1.5rem;
+    }
+  }
+
+  .library-row-arrow {
+    transition: transform 320ms var(--spring);
+  }
+
+  .library-row:focus-visible,
+  .library-footer:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .library-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3rem;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink-soft);
+    transition: background-color 200ms ease, color 200ms ease;
   }
 
   @media (hover: hover) {
-    .menu-tab:hover {
+    .library-row:hover,
+    .library-footer:hover {
+      background: var(--color-surface-2);
+    }
+
+    .library-row:hover .game-media img {
+      transform: scale(1.04);
+    }
+
+    .library-row:hover .library-row-name,
+    .library-footer:hover {
+      color: var(--color-keyframe-strong);
+    }
+
+    .library-row:hover .library-row-arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  /* Tabs: a row of games over a hairline; the selected one takes the
+     violet bar, like the header's active link. */
+  .tabs {
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--color-line);
+    scrollbar-width: none;
+  }
+
+  .tab {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0 1rem;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink-muted);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: inset 0 -2px 0 transparent;
+    transition: color 200ms ease, box-shadow 200ms ease;
+  }
+
+  .tab[aria-selected="true"] {
+    color: var(--color-ink);
+    box-shadow: inset 0 -2px 0 var(--color-keyframe);
+  }
+
+  @media (hover: hover) {
+    .tab:hover {
       color: var(--color-ink);
     }
   }
 
-  .menu-tab:focus-visible {
+  .tab:focus-visible {
     outline-offset: -2px;
   }
 
-  /* The selected-tab marker: a filled row with a violet edge on its
-     leading side, the way the in-game list marks a selection. */
-  .menu-tab-indicator {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 2.5rem;
-    border-radius: var(--radius-sm);
-    background: var(--color-surface-3);
-    box-shadow: inset 2px 0 0 var(--color-keyframe);
-    transition: transform var(--spring-duration) var(--spring);
+  /* Phones: three game names only fit the row without the tag; the
+     library above still marks the new script. */
+  @media (max-width: 639px) {
+    .tab {
+      padding: 0 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .tab .tag {
+      display: none;
+    }
   }
 
-  /* Panel content arrives from the direction of travel: moving down the
-     tab list, content rises; moving up, it drops. */
-  .menu-panel {
+  .tab-panel {
     animation: panel-in 360ms var(--spring) both;
-  }
-
-  .menu-panel[data-dir="up"] {
-    animation-name: panel-in-down;
-  }
-
-  .menu-row {
-    display: flex;
-    min-height: 3rem;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--color-line);
-    font-size: 0.875rem;
-    color: var(--color-ink-soft);
-  }
-
-  .menu-row:last-child {
-    border-bottom: 0;
-  }
-
-  /* Switch. The thumb stretches while pressed and springs to its new side
-     on release. */
-  .switch {
-    position: relative;
-    width: 2.75rem;
-    height: 1.5rem;
-    flex: 0 0 auto;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: var(--color-surface-3);
-    box-shadow: inset 0 0 0 1px var(--color-line-strong);
-    cursor: pointer;
-    transition: background-color 240ms ease, box-shadow 240ms ease;
-  }
-
-  .switch[aria-checked="true"] {
-    background: var(--color-keyframe-deep);
-    box-shadow: inset 0 0 0 1px transparent;
-  }
-
-  .switch-thumb {
-    position: absolute;
-    top: 0.1875rem;
-    left: 0.1875rem;
-    width: 1.125rem;
-    height: 1.125rem;
-    border-radius: var(--radius-pill);
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    transition:
-      transform var(--spring-bouncy-duration) var(--spring-bouncy),
-      width 200ms var(--spring);
-  }
-
-  .switch[aria-checked="true"] .switch-thumb {
-    transform: translateX(1.25rem);
-  }
-
-  .switch:active .switch-thumb {
-    width: 1.5rem;
-  }
-
-  .switch[aria-checked="true"]:active .switch-thumb {
-    transform: translateX(0.875rem);
   }
 
   /* Get Key steps ----------------------------------------------------- */
@@ -1227,13 +1216,6 @@
   }
 }
 
-@keyframes panel-in-down {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-
 @keyframes pop-in {
   from {
     transform: scale(0.4);
@@ -1294,7 +1276,7 @@
 
   .animate-rise,
   .modal-card,
-  .menu-panel,
+  .tab-panel,
   .mobile-menu {
     animation: fade 160ms ease both;
   }
@@ -1305,20 +1287,18 @@
 
   .btn,
   .btn:active,
-  .switch-thumb,
   .nav-indicator,
-  .menu-tab-indicator,
   .faq-chevron,
   .faq-panel,
   .game-media img,
-  .game-tile-arrow {
+  .library-row-arrow {
     transition-duration: 0ms;
   }
 
   .btn:active,
-  .game-tile:hover .game-media img,
   .game-card:hover .game-media img,
-  .game-tile:hover .game-tile-arrow {
+  .library-row:hover .game-media img,
+  .library-row:hover .library-row-arrow {
     transform: none;
   }
 
@@ -1359,7 +1339,7 @@
   .panel-grid,
   .loader-field,
   .modal-card,
-  .menu-window {
+  .window {
     border-color: var(--color-ink-muted);
   }
 
@@ -1375,7 +1355,7 @@
   .body-sm,
   .faq-answer-inner,
   .nav-link,
-  .menu-tab,
+  .tab,
   .label {
     color: var(--color-ink);
   }
