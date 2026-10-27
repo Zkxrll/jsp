@@ -1,13 +1,25 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
+import { SiteFooter } from "@/components/site-footer";
+import { GetKeyFlow } from "@/components/get-key-flow";
+import { RouteTransition } from "@/components/route-transition";
 import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Get Key",
-  description: `Get a free ${siteConfig.name} key from the key system.`,
+  description: `Get a free ${siteConfig.name} key: open the Discord, then continue to the key system.`,
 };
 
 export default function GetKeyPage() {
-  redirect(siteConfig.keySystemUrl);
+  return (
+    <RouteTransition>
+      <main className="wrap flex flex-1 items-center justify-center pb-16 pt-32">
+        <section className="w-full max-w-xl">
+          <GetKeyFlow />
+        </section>
+      </main>
+
+      <SiteFooter />
+    </RouteTransition>
+  );
 }
