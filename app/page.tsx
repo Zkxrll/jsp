@@ -79,7 +79,7 @@ export default function HomePage() {
 
               <p className="lede animate-rise mt-6 max-w-xl" style={{ animationDelay: "80ms" }}>
                 Silent and camera aim, voidspam antihit, weapon mods, ESP, chams, and
-                a full world editor. Free with a key from the key system, or pay once
+                a full world editor. Free with a key from the Discord, or pay once
                 for lifetime Premium.
               </p>
 
@@ -87,7 +87,7 @@ export default function HomePage() {
                 className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row"
                 style={{ animationDelay: "120ms" }}
               >
-                <GetKeyButton source="hero" size="lg" className="w-full sm:w-auto" />
+                <GetKeyButton source="hero" size="lg" morph className="w-full sm:w-auto" />
                 <DiscordButton size="lg" className="w-full sm:w-auto" />
               </div>
 
@@ -187,10 +187,10 @@ export default function HomePage() {
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between" data-reveal>
             <div className="max-w-xl">
               <p className="label label-accent">Community</p>
-              <h2 className="section-title mt-4">Join the community.</h2>
+              <h2 className="section-title mt-4">Get your key in the Discord.</h2>
               <p className="lede mt-4">
-                Discord is where updates and support live. New builds are posted there
-                first.
+                Keys, updates, and support all live in one server. New builds are posted
+                there first.
               </p>
             </div>
 
