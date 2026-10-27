@@ -1,47 +1,39 @@
 # Cloudflare script gateway
 
-This Worker is a separate candidate replacement for the Vercel `POST /api/s` route. It preserves that route's current request contract, game-ID allowlist, Junkie key check, private GitHub lookup, and plain-text response.
+This Worker is a separate replacement candidate for the Vercel `POST /api/s` script-delivery route. It preserves the request contract, game-ID allowlist, Junkie key checks, private GitHub source lookup, and plain-text response. It has a manual GitHub Actions deployment workflow.
 
-It is not deployed and does not change the production Vercel app.
+The Worker has **not** been deployed by this PR and does not change Vercel production.
 
-## Important: confirm the live request path first
+## Before deployment: verify the active caller
 
-The public bootstrap in `ZkxrI/ZkxHub/source` loads a Junkie-hosted loader. The private `Zkxrll/mmh/L04D3R` file currently points directly at GitHub Raw URLs; it does not call `/api/s` or send the `{ g, k }` body expected by this Worker. The active payload may be configured in Junkie and may differ from that repository file.
+Vercel Usage has confirmed that `/api/s` is the path consuming your Fast Origin Transfer. That means the Worker migration targets the right endpoint.
 
-Before switching anything, check Vercel **Usage → Fast Origin Transfer → Top Paths** and confirm `/api/s` (or the Vercel endpoint you intend to replace) is materially contributing to FOT. Then confirm which script loader is actually published through Junkie and how it obtains the user's key. Do not simply replace the raw URLs in `L04D3R`: without the active loader's key flow, that would likely break script loading.
+The public bootstrap in `ZkxrI/ZkxHub/source` loads a Junkie-hosted loader, and the private `Zkxrll/mmh/L04D3R` file currently points directly at GitHub Raw. The active script caller/key handoff may be configured in Junkie and may differ from that file. Before changing client code, confirm which loader is actually calling Vercel `/api/s` and update that caller to use the Worker URL after deployment. Do not replace unrelated Raw URLs.
 
-## 1. Deploy the Worker
+## 1. Add GitHub Actions secrets
 
-From the repository root, authenticate with Cloudflare and create the Worker:
+In the **Zkxrll/jsp** repository, open **Settings → Secrets and variables → Actions → New repository secret**. Add these four secrets:
 
-```sh
-npx wrangler@latest login
-npx wrangler@latest deploy --config cloudflare/script-gateway/wrangler.toml
-```
-
-This creates the Worker and prints its `workers.dev` URL. Until the secrets are configured, the gateway returns `503 unavailable`.
-
-## 2. Add secrets in Cloudflare
-
-In **Cloudflare Dashboard → Workers & Pages → zkxhub-script-gateway → Settings → Variables and Secrets**, add these as **Secret** values:
-
-- `JUNKIE_API_KEY`: your existing Junkie REST API key, with permission to look up keys.
+- `CLOUDFLARE_API_TOKEN`: create a Cloudflare API token that can edit Workers for the account where you want to host this endpoint. Keep the token limited to the required Workers permissions.
+- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID for that same account. This is an identifier, not a secret, but the workflow reads it as a repository secret for simplicity.
+- `JUNKIE_API_KEY`: the existing Junkie REST API key used by the Vercel route, with permission to look up keys.
 - `GH_SCRIPT_TOKEN`: a GitHub token with read-only Contents access to the private `Zkxrll/mmh` repository only.
 
-Do not put either secret in `wrangler.toml`, source control, the website, or client-side code. You can also set them through Wrangler's `secret put` command, which prompts for the values rather than requiring them in command history:
+Get the two existing application-secret values from your own trusted configuration. Do not paste them into chat, commit them, put them into `wrangler.toml`, or include them in logs. The workflow sends the Junkie and GitHub values to Cloudflare as Worker secrets without printing their values.
 
-```sh
-npx wrangler@latest secret put JUNKIE_API_KEY --config cloudflare/script-gateway/wrangler.toml
-npx wrangler@latest secret put GH_SCRIPT_TOKEN --config cloudflare/script-gateway/wrangler.toml
-```
+Official Cloudflare guidance: https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/ and https://developers.cloudflare.com/workers/configuration/secrets/.
 
-The repo and branch are non-secret settings in `wrangler.toml`. `ALLOW_KEYLESS` is set to `0` by default.
+## 2. Merge the pull request, then deploy manually
 
-## 3. Test before changing the loader
+After reviewing and merging this PR, open **Actions → Deploy Cloudflare script gateway → Run workflow** on the `main` branch. Enter exactly `deploy` in the confirmation field.
 
-Use the Worker URL printed by Wrangler, appending `/api/s`.
+The workflow uses a pinned Wrangler CLI version, deploys the Worker code, and provisions the two application secrets. It refuses to run on a branch other than `main` or without all four GitHub Actions secrets. The first deployment may briefly return `503 unavailable` between publishing the code and setting the application secrets.
 
-A GET request should return `405 method not allowed`. An invalid key should return `403 denied`:
+The resulting Worker URL will appear in the workflow logs, normally as `https://zkxhub-script-gateway.<your-subdomain>.workers.dev`.
+
+## 3. Smoke-test before changing clients
+
+A GET request to `/api/s` should return `405 method not allowed`. An invalid key should return `403 denied`:
 
 ```sh
 curl -i -X POST "https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev/api/s" \
@@ -51,21 +43,21 @@ curl -i -X POST "https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev/api/s" \
 
 Only test a valid key in your own environment. Do not put real keys in source code, screenshots, issues, or shell history.
 
-## 4. Switch the active loader only after identifying it
+## 4. Change the active client to the Worker
 
-When the live loader has been confirmed to use the same POST contract as the existing Vercel route, change that endpoint to:
+After the invalid-key test succeeds, update the *actual* loader that calls Vercel `/api/s` to use:
 
 ```text
 https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev/api/s
 ```
 
-Keep the JSON body compatible: `g` is the supported Roblox game ID and `k` is the user's key. The Worker returns the script as plain text.
+Keep its existing POST body and response handling: `g` is the supported Roblox game ID, `k` is the user's key, and the Worker returns the script as plain text. Test with a valid key in a real session before retiring the Vercel route.
 
-Leave Vercel's existing route in place until the new endpoint works in a real session. If the actual loader is configured in Junkie, its URL will need to be changed in that configuration; the public bootstrap file alone does not show how the active key handoff works.
+Once every client uses the Worker, those script-response bytes will no longer be sent through Vercel's Function. Keep the Vercel route available until that migration has been confirmed.
 
 ## Behavior and limitations
 
-- Every non-keyless request is checked against Junkie; invalidated or expired keys are rejected.
-- Script text is cached in Worker memory for at most 30 seconds per active isolate. This is only a best-effort performance optimization; isolates may be recycled.
+- Every non-keyless request is checked against Junkie; invalidated or expired keys are rejected. Key authorization results are never cached.
+- Script text is cached in Worker memory for up to 30 seconds per active isolate. This is best-effort only; Cloudflare may recycle isolates.
 - Secrets and request bodies are never logged. Errors return generic responses.
-- Moving script delivery off Vercel removes those response bytes from Vercel Fast Origin Transfer. It does not make a delivered script impossible to dump: a client that receives executable text can still inspect or save it.
+- This migration reduces Vercel Fast Origin Transfer by moving the response body off Vercel. It cannot make a script impossible to dump after it has been sent to a client.
