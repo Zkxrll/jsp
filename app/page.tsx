@@ -87,7 +87,7 @@ export default function HomePage() {
                 className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row"
                 style={{ animationDelay: "120ms" }}
               >
-                <GetKeyButton source="hero" size="lg" morph className="w-full sm:w-auto" />
+                <GetKeyButton source="hero" size="lg" className="w-full sm:w-auto" />
                 <DiscordButton size="lg" className="w-full sm:w-auto" />
               </div>
 
