@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
+
 import { track } from "@/lib/analytics";
-import { siteConfig } from "@/lib/config";
 import { KeyIcon } from "./icons";
 
 type GetKeyButtonProps = {
@@ -13,19 +14,19 @@ type GetKeyButtonProps = {
 
 const SIZE_CLASS = { sm: "btn-sm", md: "", lg: "btn-lg" } as const;
 
-/** Sends visitors directly to the key system; Discord is optional. */
+/** Takes visitors to the Discord step before they can access the key system. */
 export function GetKeyButton({ source, size = "md", className = "" }: GetKeyButtonProps) {
   return (
-    <a
-      href={siteConfig.keySystemUrl}
+    <Link
+      href="/get-key"
+      transitionTypes={["nav-forward", "key-morph"]}
       onClick={() => {
         track({ name: "get_key_clicked", props: { source } });
-        track({ name: "get_key_redirected", props: { destination: siteConfig.keySystemUrl } });
       }}
       className={`btn btn-primary ${SIZE_CLASS[size]} ${className}`}
     >
       <KeyIcon />
       Get Key
-    </a>
+    </Link>
   );
 }
